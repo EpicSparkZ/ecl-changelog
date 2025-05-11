@@ -102,24 +102,33 @@
   </div>
 
   <script>
-    // List of words to apply the rainbow effect
-    const rainbowWords = ['HAUNTED', 'Meow', ':3']; // Add words here for rainbow effect
+    let rainbowWords = [];
 
-    // Function to fetch the announcement text from announcementtxt.html
-    fetch('announcementtxt.html')
+    // Function to fetch special words for rainbow effect from announcementtxtspecialwords.html
+    fetch('announcementtxtspecialwords.html')
       .then(response => response.text())
       .then(data => {
-        // Apply rainbow effect to special words
-        const modifiedText = applyRainbowEffect(data);
-        document.getElementById('announcement-text').innerHTML = modifiedText;
+        // Parse the list of special words (comma-separated values)
+        rainbowWords = data.split(',').map(word => word.trim()).filter(word => word !== '');  // Clean up any extra spaces
+
+        // Fetch the announcement text and apply the rainbow effect
+        fetch('announcementtxt.html')
+          .then(response => response.text())
+          .then(data => {
+            // Apply rainbow effect to special words
+            const modifiedText = applyRainbowEffect(data);
+            document.getElementById('announcement-text').innerHTML = modifiedText;
+          })
+          .catch(error => {
+            console.error('Error loading announcement text:', error);
+          });
       })
       .catch(error => {
-        console.error('Error loading announcement text:', error);
+        console.error('Error loading special words for rainbow effect:', error);
       });
 
     // Function to apply rainbow effect to specified words in the announcement text
     function applyRainbowEffect(text) {
-      // Loop through each word in the rainbowWords array and apply the rainbow effect
       rainbowWords.forEach(word => {
         const regex = new RegExp(`(${word})`, 'gi'); // Case-insensitive search
         text = text.replace(regex, '<span class="rainbow">$1</span>');
