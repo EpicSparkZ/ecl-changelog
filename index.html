@@ -2,34 +2,37 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Home Page</title>
-  <link rel="icon" href="/list_icon.png" />
-
+  <title>Website Changelog</title>
+  <link rel="icon" href="/list_icon.png">
   <style>
     /* General body and text styling */
     body {
-      background-color: #121212; /* Dark gray */
-      color: white;              /* Text color for readability */
+      background-color: #121212;
+      color: white;
+      font-family: sans-serif;
       margin: 0;
       padding: 0;
-      height: 100vh;             /* Ensure body takes up full height */
-      font-family: sans-serif;   /* Ensure consistent font across the site */
     }
 
-    /* Black strip containing the announcement text and buttons */
+    /* Styling for the content */
+    .content {
+      padding-top: 70px;  /* Space for the button and black strip */
+      margin: 20px;
+    }
+
+    /* Black strip containing the announcement text */
     .top-strip {
       position: fixed;
-      top: 0;
-      left: 0;
+      top: 0;         /* Start from the top of the screen */
       width: 100%;
-      height: 60px;             /* Height of the strip */
+      height: 60px;   /* Make the strip slightly below the button */
       background-color: black;
+      z-index: 999;   /* Ensure the strip is above the content */
       display: flex;
-      justify-content: space-between; /* Align buttons to the sides */
-      align-items: center;      /* Vertically center the text and buttons */
+      justify-content: center; /* Center the announcement text */
+      align-items: center;      /* Vertically center the text */
       padding: 0 10px;          /* Add some padding on both sides */
       box-sizing: border-box;   /* Ensure padding doesn't push content out of bounds */
-      z-index: 1000;            /* Keep it above other content */
     }
 
     /* Announcement Text */
@@ -38,14 +41,21 @@
       font-size: 20px;
       font-weight: bold;
       text-align: center;        /* Center the text */
-      flex-grow: 1;              /* Make the announcement text take available space */
       white-space: nowrap;      /* Prevent text from wrapping */
       overflow: hidden;         /* Hide overflowing text */
       text-overflow: ellipsis;  /* Show ellipsis if the text overflows */
     }
 
-    /* Button Styling */
+    /* Rainbow effect styling */
+    .rainbow {
+      transition: color 0.5s linear;
+    }
+
+    /* Back button styling */
     button {
+      position: fixed;  /* Fix the button at the top */
+      top: 10px;        /* Space from the top of the screen */
+      right: 10px;      /* Space from the right of the screen */
       padding: 10px 20px;
       font-size: 18px;
       background-color: #444;
@@ -53,89 +63,110 @@
       border: none;
       border-radius: 5px;
       cursor: pointer;
+      z-index: 1000; /* Ensure the button is above other content */
     }
 
     button:hover {
       background-color: #666;
     }
-
-    /* First Button (on the left) */
-    .left-button {
-      margin-right: 10px;  /* Small space between the left button and the announcement */
-    }
-
-    /* Second Button (on the right) */
-    .right-button {
-      margin-left: 10px;   /* Small space between the right button and the announcement */
-    }
-
-    /* Rainbow effect styling (slower and smoother) */
-    .rainbow {
-      animation: rainbow 6s ease-in-out infinite;
-    }
-
-    @keyframes rainbow {
-      0% { color: red; }
-      14% { color: orange; }
-      28% { color: yellow; }
-      42% { color: green; }
-      57% { color: blue; }
-      71% { color: indigo; }
-      85% { color: violet; }
-      100% { color: red; }
-    }
   </style>
 </head>
 <body>
 
-  <!-- Black Strip containing Announcement and Buttons -->
+  <!-- Black Strip containing Announcement -->
   <div class="top-strip">
-    <!-- First Button on the Left -->
-    <button class="left-button" onclick="window.location.href='websitechangelog.html';">Website Changelog</button>
-
     <!-- Announcement Text (Center) -->
     <div class="announcement-text" id="announcement-text">
       <!-- Announcement text will be dynamically loaded here -->
     </div>
-
-    <!-- Second Button on the Right -->
-    <button class="right-button" onclick="window.location.href='listplacementchangelog.html';">List Changelog</button>
   </div>
 
-  <script>
-    let rainbowWords = [];
+  <!-- Page Content -->
+  <div class="content">
+    <h1>V1.0.1</h1>
+    <h3>HAUNTED Tribute</h3>
+    <p>05/10/2025</p>
+    <ul>
+      <li>Added <span class="rainbow">HAUNTED</span> back to list.</li>
+      <li>Gave <span class="rainbow">HAUNTED</span> special Tribute label.</li>
+      <li>Gave Tribute label rainbow text and glow effect property that also applies to the level name.</li>
+      <li>Brute forced <span class="rainbow">HAUNTED</span> to bottom of list permanently.</li>
+    </ul>
+    <br><br>
 
-    // Function to fetch special words for rainbow effect from announcementtxtspecialwords.html
+    <h1>V1.0.0</h1>
+    <h3>Creation of Website</h3>
+    <p>11/05/2024</p>
+    <ul>
+      <li>Initial creation of website</li>
+    </ul>
+    <br><br>
+  </div>
+
+  <!-- Back Button -->
+  <button onclick="window.location.href='index.html';">Back</button>
+
+  <script>
+    // Function to fetch special words from announcementtxtspecialwords.html
     fetch('announcementtxtspecialwords.html')
       .then(response => response.text())
       .then(data => {
-        // Parse the list of special words (comma-separated values)
-        rainbowWords = data.split(',').map(word => word.trim()).filter(word => word !== '');  // Clean up any extra spaces
-
-        // Fetch the announcement text and apply the rainbow effect
-        fetch('announcementtxt.html')
-          .then(response => response.text())
-          .then(data => {
-            // Apply rainbow effect to special words
-            const modifiedText = applyRainbowEffect(data);
-            document.getElementById('announcement-text').innerHTML = modifiedText;
-          })
-          .catch(error => {
-            console.error('Error loading announcement text:', error);
-          });
+        // Load special words dynamically
+        const specialWords = data.split(',').map(word => word.trim());
+        fetchAnnouncementText(specialWords); // Pass the special words to the next function
       })
       .catch(error => {
-        console.error('Error loading special words for rainbow effect:', error);
+        console.error('Error loading special words:', error);
       });
 
-    // Function to apply rainbow effect to specified words in the announcement text
-    function applyRainbowEffect(text) {
-      rainbowWords.forEach(word => {
-        const regex = new RegExp((${word}), 'gi'); // Case-insensitive search
+    // Function to fetch the announcement text from announcementtxt.html
+    function fetchAnnouncementText(specialWords) {
+      fetch('announcementtxt.html')
+        .then(response => response.text())
+        .then(data => {
+          // Apply rainbow effect to special words in announcement
+          const modifiedText = applyRainbowEffect(data, specialWords);
+          document.getElementById('announcement-text').innerHTML = modifiedText;
+        })
+        .catch(error => {
+          console.error('Error loading announcement text:', error);
+        });
+    }
+
+    // Function to apply rainbow effect to specified words
+    function applyRainbowEffect(text, specialWords) {
+      // Loop through each word in the specialWords array and apply the rainbow effect
+      specialWords.forEach(word => {
+        const regex = new RegExp(`(${word})`, 'gi'); // Case-insensitive search
         text = text.replace(regex, '<span class="rainbow">$1</span>');
       });
       return text;
     }
+
+    // Function to animate rainbow effect for special words in the content
+    function animateRainbow() {
+      let hue = 0;
+      setInterval(() => {
+        document.querySelectorAll('.rainbow').forEach(el => {
+          el.style.color = `hsl(${hue}, 100%, 50%)`;
+        });
+        hue = (hue + 2) % 360;
+      }, 50);
+    }
+
+    // Apply rainbow effect to content-specific words like "HAUNTED"
+    function applyRainbowToContent() {
+      const content = document.querySelectorAll('.content');
+      content.forEach(section => {
+        section.innerHTML = section.innerHTML.replace(/(HAUNTED)/gi, '<span class="rainbow">$1</span>');
+      });
+    }
+
+    // Run everything after page loads
+    window.addEventListener('DOMContentLoaded', () => {
+      animateRainbow();
+      applyRainbowToContent(); // Apply rainbow only to content-specific words
+    });
   </script>
 
 </body>
