@@ -12,7 +12,7 @@
       font-family: sans-serif;
     }
 
-    /* Fix for top-strip */
+    /* Black strip containing announcement text */
     .top-strip {
       position: fixed;
       top: 0;
@@ -28,6 +28,7 @@
       z-index: 1000;
     }
 
+    /* Announcement Text */
     .announcement-text {
       color: white;
       font-size: 20px;
@@ -36,6 +37,7 @@
       word-wrap: break-word;
       overflow-wrap: break-word;
       flex-grow: 1;
+      white-space: normal; /* Allow the text to wrap properly */
     }
 
     button {
@@ -75,6 +77,7 @@
       100% { color: red; }
     }
 
+    /* Content styling */
     .content {
       margin-top: 80px;
       padding: 20px;
@@ -123,28 +126,34 @@
   </div>
 
   <script>
-    let rainbowWords = [];
-
+    // Function to fetch the special words for rainbow effect
     fetch('announcementtxtspecialwords.html')
       .then(response => response.text())
       .then(wordData => {
-        rainbowWords = wordData
+        const rainbowWords = wordData
           .split(',')
           .map(w => w.trim())
           .filter(w => w.length > 0);
 
-        return fetch('announcementtxt.html');
-      })
-      .then(response => response.text())
-      .then(textData => {
-        const modifiedText = applyRainbowEffect(textData);
-        document.getElementById('announcement-text').innerHTML = modifiedText;
+        // After fetching special words, fetch the actual announcement text
+        fetch('announcementtxt.html')
+          .then(response => response.text())
+          .then(textData => {
+            const modifiedText = applyRainbowEffect(textData, rainbowWords);
+            document.getElementById('announcement-text').innerHTML = modifiedText;
+          })
+          .catch(error => {
+            console.error('Error loading announcement text:', error);
+            document.getElementById('announcement-text').innerHTML = 'Error loading announcement.';
+          });
       })
       .catch(error => {
-        console.error('Error loading announcement or special words:', error);
+        console.error('Error loading special words:', error);
+        document.getElementById('announcement-text').innerHTML = 'Error loading special words.';
       });
 
-    function applyRainbowEffect(text) {
+    // Function to apply rainbow effect to the special words
+    function applyRainbowEffect(text, rainbowWords) {
       rainbowWords.forEach(word => {
         const regex = new RegExp(`(${escapeRegExp(word)})`, 'gi');
         text = text.replace(regex, '<span class="rainbow">$1</span>');
@@ -152,6 +161,7 @@
       return text;
     }
 
+    // Function to escape special characters in regex
     function escapeRegExp(string) {
       return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     }
