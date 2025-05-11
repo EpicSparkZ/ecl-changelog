@@ -8,12 +8,12 @@
   <style>
     /* General body and text styling */
     body {
-      background-color: #121212; /* Dark gray */
-      color: white;              /* Text color for readability */
+      background-color: #121212;
+      color: white;
       margin: 0;
       padding: 0;
-      height: 100vh;             /* Ensure body takes up full height */
-      font-family: sans-serif;   /* Ensure consistent font across the site */
+      height: 100vh;
+      font-family: sans-serif;
     }
 
     /* Black strip containing the announcement text and buttons */
@@ -22,14 +22,14 @@
       top: 0;
       left: 0;
       width: 100%;
-      height: 60px;             /* Height of the strip */
+      height: 60px;
       background-color: black;
       display: flex;
-      justify-content: space-between; /* Align buttons to the sides */
-      align-items: center;      /* Vertically center the text and buttons */
-      padding: 0 10px;          /* Add some padding on both sides */
-      box-sizing: border-box;   /* Ensure padding doesn't push content out of bounds */
-      z-index: 1000;            /* Keep it above other content */
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 10px;
+      box-sizing: border-box;
+      z-index: 1000;
     }
 
     /* Announcement Text */
@@ -37,11 +37,11 @@
       color: white;
       font-size: 20px;
       font-weight: bold;
-      text-align: center;        /* Center the text */
-      flex-grow: 1;              /* Make the announcement text take available space */
-      white-space: nowrap;      /* Prevent text from wrapping */
-      overflow: hidden;         /* Hide overflowing text */
-      text-overflow: ellipsis;  /* Show ellipsis if the text overflows */
+      text-align: center;
+      flex-grow: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     /* Button Styling */
@@ -59,17 +59,15 @@
       background-color: #666;
     }
 
-    /* First Button (on the left) */
     .left-button {
-      margin-right: 10px;  /* Small space between the left button and the announcement */
+      margin-right: 10px;
     }
 
-    /* Second Button (on the right) */
     .right-button {
-      margin-left: 10px;   /* Small space between the right button and the announcement */
+      margin-left: 10px;
     }
 
-    /* Rainbow effect styling (slower and smoother) */
+    /* Rainbow effect styling */
     .rainbow {
       animation: rainbow 6s ease-in-out infinite;
     }
@@ -88,53 +86,45 @@
 </head>
 <body>
 
-  <!-- Black Strip containing Announcement and Buttons -->
   <div class="top-strip">
-    <!-- First Button on the Left -->
     <button class="left-button" onclick="window.location.href='websitechangelog.html';">Website Changelog</button>
-
-    <!-- Announcement Text (Center) -->
-    <div class="announcement-text" id="announcement-text">
-      <!-- Announcement text will be dynamically loaded here -->
-    </div>
-
-    <!-- Second Button on the Right -->
+    <div class="announcement-text" id="announcement-text"></div>
     <button class="right-button" onclick="window.location.href='listplacementchangelog.html';">List Changelog</button>
   </div>
 
   <script>
     let rainbowWords = [];
 
-    // Function to fetch special words for rainbow effect from announcementtxtspecialwords.html
+    // Fetch rainbow-highlighted words
     fetch('announcementtxtspecialwords.html')
       .then(response => response.text())
-      .then(data => {
-        // Parse the list of special words (comma-separated values)
-        rainbowWords = data.split(',').map(word => word.trim()).filter(word => word !== '');  // Clean up any extra spaces
+      .then(wordData => {
+        rainbowWords = wordData
+          .split(',')
+          .map(w => w.trim())
+          .filter(w => w.length > 0);
 
-        // Fetch the announcement text and apply the rainbow effect
-        fetch('announcementtxt.html')
-          .then(response => response.text())
-          .then(data => {
-            // Apply rainbow effect to special words
-            const modifiedText = applyRainbowEffect(data);
-            document.getElementById('announcement-text').innerHTML = modifiedText;
-          })
-          .catch(error => {
-            console.error('Error loading announcement text:', error);
-          });
+        return fetch('announcementtxt.html');
+      })
+      .then(response => response.text())
+      .then(textData => {
+        const modifiedText = applyRainbowEffect(textData);
+        document.getElementById('announcement-text').innerHTML = modifiedText;
       })
       .catch(error => {
-        console.error('Error loading special words for rainbow effect:', error);
+        console.error('Error loading announcement or special words:', error);
       });
 
-    // Function to apply rainbow effect to specified words in the announcement text
     function applyRainbowEffect(text) {
       rainbowWords.forEach(word => {
-        const regex = new RegExp((${word}), 'gi'); // Case-insensitive search
+        const regex = new RegExp(`(${escapeRegExp(word)})`, 'gi');
         text = text.replace(regex, '<span class="rainbow">$1</span>');
       });
       return text;
+    }
+
+    function escapeRegExp(string) {
+      return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     }
   </script>
 
