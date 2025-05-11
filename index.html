@@ -11,16 +11,23 @@
       color: white;              /* Text color for readability */
       margin: 0;
       padding: 0;
-      display: flex;
-      justify-content: flex-end; /* Align buttons to the right */
       height: 100vh;             /* Ensure body takes up full height */
-      flex-direction: column;    /* Stack the buttons vertically */
-      align-items: flex-end;     /* Right-align buttons */
+    }
+
+    /* Flex container to align buttons */
+    .button-container {
+      position: fixed;
+      top: 10px;               /* Space from the top of the screen */
+      right: 10px;             /* Align buttons to the right */
+      display: flex;
+      flex-direction: row;     /* Stack buttons horizontally */
+      align-items: flex-start; /* Top-align buttons */
+      gap: 10px;               /* Space between buttons */
+      z-index: 1000;           /* Ensure buttons are above the content */
     }
 
     /* Button Styling */
     button {
-      margin-top: 10px;         /* Space between buttons */
       padding: 10px 20px;
       font-size: 18px;
       background-color: #444;
@@ -28,7 +35,6 @@
       border: none;
       border-radius: 5px;
       cursor: pointer;
-      z-index: 1000; /* Ensure the button is above other content */
     }
 
     button:hover {
@@ -38,12 +44,12 @@
     /* Black strip from the top of the screen to slightly below the buttons */
     .top-strip {
       position: fixed;
-      top: 70px;         /* Start just below the buttons */
+      top: 50px;               /* Start just below the buttons */
       left: 0;
       width: 100%;
-      height: 60px;       /* Set the height of the strip */
+      height: 60px;            /* Height of the strip */
       background-color: black;
-      z-index: 999;       /* Ensure the strip is above other content */
+      z-index: 999;            /* Ensure the strip is below the buttons */
     }
   </style>
 </head>
@@ -52,11 +58,12 @@
 
 
 
-
   
-  <!-- Two Buttons aligned to the right -->
-  <button onclick="window.location.href='websitechangelog.html';">Website Changelog</button>
-  <button onclick="window.location.href='listplacementchangelog.html';">List Changelog</button>
+  <!-- Button Container aligned to the right, horizontally stacked -->
+  <div class="button-container">
+    <button onclick="window.location.href='websitechangelog.html';">Website Changelog</button>
+    <button onclick="window.location.href='listplacementchangelog.html';">List Changelog</button>
+  </div>
 
   
   <!-- Black Strip Below the Buttons -->
