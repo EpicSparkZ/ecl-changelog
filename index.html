@@ -6,17 +6,14 @@
   <link rel="icon" href="/list_icon.png" />
 
   <style>
-    /* General body and text styling */
     body {
       background-color: #121212;
       color: white;
       margin: 0;
       padding: 0;
-      height: 100vh;
       font-family: sans-serif;
     }
 
-    /* Black strip containing the announcement text and buttons */
     .top-strip {
       position: fixed;
       top: 0;
@@ -32,7 +29,6 @@
       z-index: 1000;
     }
 
-    /* Announcement Text */
     .announcement-text {
       color: white;
       font-size: 20px;
@@ -44,7 +40,6 @@
       text-overflow: ellipsis;
     }
 
-    /* Button Styling */
     button {
       padding: 10px 20px;
       font-size: 18px;
@@ -67,7 +62,6 @@
       margin-left: 10px;
     }
 
-    /* Rainbow effect styling */
     .rainbow {
       animation: rainbow 6s ease-in-out infinite;
     }
@@ -82,6 +76,11 @@
       85% { color: violet; }
       100% { color: red; }
     }
+
+    .content {
+      padding-top: 80px; /* Add space so content is not hidden behind the fixed top bar */
+      padding: 20px;
+    }
   </style>
 </head>
 <body>
@@ -92,10 +91,17 @@
     <button class="right-button" onclick="window.location.href='listplacementchangelog.html';">List Changelog</button>
   </div>
 
+  <!-- Content area for text, buttons, etc. -->
+  <div class="content">
+    <!-- You can add content here -->
+    <h1>Welcome to the EpicSparkZ Challenge List Changelog Website</h1>
+    <p>Use the navigation above to view the latest updates.</p>
+    <button onclick="alert('You clicked a test button!')">Test Button</button>
+  </div>
+
   <script>
     let rainbowWords = [];
 
-    // Fetch rainbow-highlighted words
     fetch('announcementtxtspecialwords.html')
       .then(response => response.text())
       .then(wordData => {
@@ -129,17 +135,4 @@
   </script>
 
 </body>
-
-
-
-
-
-<body>
-  <h1>Welcome to the EpicSparkZ Challenge List Changelog Website.</h1>
-</body>
-
-
-
-
-  
 </html>
