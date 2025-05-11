@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <title>Chat</title>
   <link rel="icon" href="/list_icon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Mobile support -->
   <style>
     body {
       background-color: #121212;
@@ -11,35 +12,31 @@
       font-family: sans-serif;
       margin: 0;
       padding: 0;
-    }
-
-    .content {
-      margin-top: 50px;
-      padding: 20px;
+      overflow-x: hidden; /* Prevent horizontal scroll */
     }
 
     .top-strip {
       position: fixed;
       top: 0;
       width: 100%;
-      height: 60px;
+      min-height: 60px;
       background-color: black;
       z-index: 999;
       display: flex;
       justify-content: center;
       align-items: center;
-      padding: 0 10px;
+      padding: 10px;
       box-sizing: border-box;
+      text-align: center;
+      flex-wrap: wrap;
     }
 
     .announcement-text {
       color: white;
-      font-size: 20px;
+      font-size: 18px;
       font-weight: bold;
-      text-align: center;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      max-width: 100%;
+      overflow-wrap: break-word;
     }
 
     .rainbow {
@@ -51,7 +48,7 @@
       top: 10px;
       right: 10px;
       padding: 10px 20px;
-      font-size: 18px;
+      font-size: 16px;
       background-color: #444;
       color: white;
       border: none;
@@ -63,6 +60,34 @@
     button:hover {
       background-color: #666;
     }
+
+    .notice {
+      position: fixed;
+      bottom: 10px;
+      width: 100%;
+      text-align: center;
+      color: #ccc;
+      font-size: 14px;
+      padding: 10px;
+      box-sizing: border-box;
+      pointer-events: none;
+    }
+
+    @media (max-width: 600px) {
+      .announcement-text {
+        font-size: 16px;
+      }
+
+      button {
+        padding: 8px 16px;
+        font-size: 14px;
+      }
+
+      .notice {
+        font-size: 12px;
+        padding: 8px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -73,9 +98,8 @@
 
   <button onclick="window.location.href='index.html';">Back</button>
 
-  <div class="content">
-    <h1>Chat (Experimental)</h1>
-    <p>This is a placeholder for the chat feature.</p>
+  <div class="notice">
+    NOTICE: This feature is experimental and may not work at times. Do not expect this to always be here.
   </div>
 
   <script>
