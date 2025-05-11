@@ -12,7 +12,7 @@
   <p>05/10/2025</p>
   <ul>
     <li>Added HAUNTED back to list.</li>
-    <li>Gave HAUNTED special Tribute label.</li>
+    <li>Gave HAUNTED special "Tribute" label.</li>
     <li>Brute forced HAUNTED to bottom of list permanently.</li>
   </ul>
 
@@ -23,6 +23,9 @@
     <li>Initial creation of website</li>
   </ul>
 
+
+
+  
   <!-- Style and rainbow effect script -->
   <style>
     body {
@@ -36,34 +39,34 @@
   </style>
 
   <script>
-    // Wrap "Tribute" in a span
     function wrapTributeWords() {
       const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
-      const regex = /\bTribute\b/g;
+      const regex = /Tribute/g;
       let node;
 
       while (node = walker.nextNode()) {
         if (regex.test(node.nodeValue)) {
-          const span = document.createElement('span');
-          span.className = 'rainbow';
-          span.textContent = 'Tribute';
-
-          const parts = node.nodeValue.split(regex);
           const parent = node.parentNode;
+          const parts = node.nodeValue.split(regex);
+
+          // Create a fragment to hold the new nodes
+          const frag = document.createDocumentFragment();
 
           parts.forEach((part, i) => {
-            parent.insertBefore(document.createTextNode(part), node);
+            frag.appendChild(document.createTextNode(part));
             if (i < parts.length - 1) {
-              parent.insertBefore(span.cloneNode(true), node);
+              const span = document.createElement('span');
+              span.className = 'rainbow';
+              span.textContent = 'Tribute';
+              frag.appendChild(span);
             }
           });
 
-          parent.removeChild(node);
+          parent.replaceChild(frag, node);
         }
       }
     }
 
-    // Animate rainbow hue
     function animateRainbow() {
       let hue = 0;
       setInterval(() => {
