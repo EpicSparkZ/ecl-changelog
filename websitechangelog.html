@@ -25,14 +25,15 @@
 
 
 
+
+
   
-  <!-- Style and rainbow effect script -->
+  <!-- Rainbow styles and script -->
   <style>
     body {
       background-color: #121212;
       color: white;
     }
-
     .rainbow {
       transition: color 0.5s linear;
     }
@@ -41,30 +42,35 @@
   <script>
     function wrapTributeWords() {
       const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
-      const regex = /Tribute/g;
-      let node;
+      const nodes = [];
 
-      while (node = walker.nextNode()) {
-        if (regex.test(node.nodeValue)) {
-          const parent = node.parentNode;
-          const parts = node.nodeValue.split(regex);
-
-          // Create a fragment to hold the new nodes
-          const frag = document.createDocumentFragment();
-
-          parts.forEach((part, i) => {
-            frag.appendChild(document.createTextNode(part));
-            if (i < parts.length - 1) {
-              const span = document.createElement('span');
-              span.className = 'rainbow';
-              span.textContent = 'Tribute';
-              frag.appendChild(span);
-            }
-          });
-
-          parent.replaceChild(frag, node);
+      // Collect all eligible text nodes first
+      while (walker.nextNode()) {
+        const currentNode = walker.currentNode;
+        if (/Tribute/.test(currentNode.nodeValue)) {
+          nodes.push(currentNode);
         }
       }
+
+      // Replace "Tribute" in each node
+      nodes.forEach(node => {
+        const parent = node.parentNode;
+        const parts = node.nodeValue.split(/(Tribute)/g);
+
+        const fragment = document.createDocumentFragment();
+        parts.forEach(part => {
+          if (part === "Tribute") {
+            const span = document.createElement("span");
+            span.className = "rainbow";
+            span.textContent = part;
+            fragment.appendChild(span);
+          } else {
+            fragment.appendChild(document.createTextNode(part));
+          }
+        });
+
+        parent.replaceChild(fragment, node);
+      });
     }
 
     function animateRainbow() {
@@ -77,6 +83,7 @@
       }, 50);
     }
 
+    // Run on load
     wrapTributeWords();
     animateRainbow();
   </script>
