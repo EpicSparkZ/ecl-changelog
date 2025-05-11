@@ -13,7 +13,7 @@
   <!-- Script to edit the text dynamically -->
   <script>
     // Store the text in a variable, which you can change easily
-    const announcementText = "Announcement Test"; // Change this text as needed
+    const announcementText = "Announcement"; // Change this text as needed
 
 
 
@@ -45,7 +45,7 @@
       height: 60px;            /* Height of the strip */
       background-color: black;
       display: flex;
-      justify-content: space-between; /* Align buttons on left and right */
+      justify-content: space-between; /* Align buttons to the right */
       align-items: center;     /* Vertically center the text and buttons */
       padding: 0 10px;         /* Add some padding on both sides */
       z-index: 999;            /* Ensure the strip is above the content */
@@ -72,7 +72,7 @@
       border: none;
       border-radius: 5px;
       cursor: pointer;
-      width: 150px;           /* Fixed button width */
+      width: auto;             /* Make button width auto to adjust based on content */
     }
 
     button:hover {
