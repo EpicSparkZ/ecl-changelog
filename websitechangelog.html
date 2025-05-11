@@ -28,41 +28,29 @@
 
 
   
-  <!-- Rainbow styles and script -->
-  <style>
-    body {
-      background-color: #121212;
-      color: white;
-    }
-    .rainbow {
-      transition: color 0.5s linear;
-    }
-  </style>
-
   <script>
-    function wrapRainbowWords(words) {
+    function wrapRainbowWords(targetWords) {
       const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
-      const nodes = [];
+      const textNodes = [];
 
-      // Collect text nodes containing target words
       while (walker.nextNode()) {
         const node = walker.currentNode;
-        if (words.some(word => node.nodeValue.includes(word))) {
-          nodes.push(node);
+        if (targetWords.some(word => node.nodeValue.includes(word))) {
+          textNodes.push(node);
         }
       }
 
-      // Wrap each target word in a rainbow span
-      nodes.forEach(node => {
+      textNodes.forEach(node => {
         const parent = node.parentNode;
-        const pattern = new RegExp(`(${words.join("|")})`, "g");
-        const parts = node.nodeValue.split(pattern);
+        const regex = new RegExp(`(${targetWords.join('|')})`, 'g');
+        const parts = node.nodeValue.split(regex);
 
         const fragment = document.createDocumentFragment();
+
         parts.forEach(part => {
-          if (words.includes(part)) {
-            const span = document.createElement("span");
-            span.className = "rainbow";
+          if (targetWords.includes(part)) {
+            const span = document.createElement('span');
+            span.className = 'rainbow';
             span.textContent = part;
             fragment.appendChild(span);
           } else {
@@ -73,3 +61,41 @@
         parent.replaceChild(fragment, node);
       });
     }
+
+    function animateRainbow() {
+      let hue = 0;
+      setInterval(() => {
+        document.querySelectorAll('.rainbow').forEach(el => {
+          el.style.color = `hsl(${hue}, 100%, 50%)`;
+        });
+        hue = (hue + 2) % 360;
+      }, 50);
+    }
+
+    // Run everything after page loads
+    window.addEventListener('DOMContentLoaded', () => {
+      wrapRainbowWords(["Tribute", "HAUNTED"]);
+      animateRainbow();
+    });
+  </script>
+
+
+
+
+
+  
+  <!-- Style and Rainbow effect -->
+  <style>
+    body {
+      background-color: #121212;
+      color: white;
+      font-family: sans-serif;
+    }
+
+    .rainbow {
+      transition: color 0.5s linear;
+    }
+  </style>
+
+</body>
+</html>
