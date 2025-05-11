@@ -1,19 +1,72 @@
 <!DOCTYPE html>
-<link rel="icon" href="/list_icon.png" />
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>HomePage</title>
+  <link rel="icon" href="/list_icon.png" />
+  <style>
+    /* General body and text styling */
+    body {
+      background-color: #121212; /* Dark gray */
+      color: white;              /* Optional: make text readable on dark background */
+      margin: 0;
+      padding: 0;
+    }
 
+    /* Button Styling */
+    button {
+      position: fixed;  /* Fix the button at the top */
+      top: 10px;        /* Space from the top of the screen */
+      right: 10px;      /* Space from the right of the screen */
+      padding: 10px 20px;
+      font-size: 18px;
+      background-color: #444;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      z-index: 1000; /* Ensure the button is above other content */
+    }
+
+    button:hover {
+      background-color: #666;
+    }
+
+    /* Additional button below */
+    button + button {
+      top: 60px;  /* Adjust for the second button to be below the first */
+    }
+
+    /* Black strip from the top of the screen to slightly below the buttons */
+    .top-strip {
+      position: fixed;
+      top: 120px;         /* Start just below the second button */
+      width: 100%;
+      height: 60px;       /* Strip height */
+      background-color: black;
+      z-index: 999;       /* Ensure the strip is above the content */
+    }
+  </style>
+</head>
 <body>
-    <button onclick="window.location.href='websitechangelog.html';">Website Changelog</button>
+
+
+
+
+
+    
+  <!-- Two Buttons -->
+  <button onclick="window.location.href='websitechangelog.html';">Website Changelog</button>
   <br>
-    <button onclick="window.location.href='listplacementchangelog.html';">List Changelog</button>
+  <button onclick="window.location.href='listplacementchangelog.html';">List Changelog</button>
+
+
+
+
+
+    
+  <!-- Black Strip Below the Buttons -->
+  <div class="top-strip"></div>
+
 </body>
-
-
-
-
-<!-- Style and Text Color -->
-<style>
-  body {
-    background-color: #121212; /* Dark gray */
-    color: white;              /* Optional: make text readable on dark background */
-  }
-</style>
+</html>
