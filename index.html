@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <title>Home Page</title>
   <link rel="icon" href="/list_icon.png" />
-
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body {
       background-color: #121212;
@@ -18,7 +18,6 @@
       top: 0;
       left: 0;
       width: 100%;
-      min-height: 60px;
       background-color: black;
       display: flex;
       justify-content: space-between;
@@ -31,7 +30,7 @@
     }
 
     .announcement-text {
-      flex-grow: 1;
+      flex: 1 1 100%;
       color: white;
       font-size: 20px;
       font-weight: bold;
@@ -49,18 +48,11 @@
       border-radius: 5px;
       cursor: pointer;
       white-space: nowrap;
+      min-width: 150px;
     }
 
     button:hover {
       background-color: #666;
-    }
-
-    .left-button {
-      margin-right: 10px;
-    }
-
-    .right-button {
-      margin-left: 10px;
     }
 
     .rainbow {
@@ -79,22 +71,36 @@
     }
 
     .content {
-      margin-top: 80px;
+      margin-top: 130px;
       padding: 20px;
-      text-align: center; /* Added to center the content horizontally */
+      text-align: center;
     }
 
-    .content h1 {
-      text-align: center; /* Ensure the h1 is centered */
+    @media (max-width: 600px) {
+      .top-strip {
+        flex-direction: column;
+        align-items: stretch;
+        text-align: center;
+      }
+
+      .top-strip button {
+        width: 100%;
+        min-width: unset;
+      }
+
+      .announcement-text {
+        order: -1;
+        margin-bottom: 10px;
+      }
     }
   </style>
 </head>
 <body>
 
   <div class="top-strip">
-    <button class="left-button" onclick="window.location.href='websitechangelog.html';">Website Changelog</button>
     <div class="announcement-text" id="announcement-text"></div>
-    <button class="right-button" onclick="window.location.href='listplacementchangelog.html';">List Changelog</button>
+    <button onclick="window.location.href='websitechangelog.html';">Website Changelog</button>
+    <button onclick="window.location.href='listplacementchangelog.html';">List Changelog</button>
   </div>
 
   <div class="content">
