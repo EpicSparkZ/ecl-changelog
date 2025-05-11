@@ -84,55 +84,6 @@
       85% { color: violet; }
       100% { color: red; }
     }
-
-    /* Style for the input section */
-    .input-section {
-      margin-top: 80px; /* Offset from the top strip */
-      padding: 10px;
-      text-align: center;
-    }
-
-    .input-section input {
-      padding: 10px;
-      font-size: 18px;
-      margin-right: 10px;
-      border-radius: 5px;
-      border: 1px solid #444;
-    }
-
-    .input-section button {
-      padding: 10px 20px;
-      font-size: 18px;
-      background-color: #444;
-      color: white;
-      border-radius: 5px;
-      border: none;
-      cursor: pointer;
-    }
-
-    .input-section button:hover {
-      background-color: #666;
-    }
-
-    /* Style for the list */
-    .list-container {
-      margin-top: 20px;
-      padding: 10px;
-      text-align: center;
-    }
-
-    .list-container ul {
-      list-style-type: none;
-      padding: 0;
-    }
-
-    .list-container li {
-      margin: 5px 0;
-      padding: 5px;
-      background-color: #333;
-      border-radius: 5px;
-    }
-
   </style>
 </head>
 <body>
@@ -151,34 +102,21 @@
     <button class="right-button" onclick="window.location.href='listplacementchangelog.html';">List Changelog</button>
   </div>
 
-  <!-- Input Section -->
-  <div class="input-section">
-    <input type="text" id="input-entry" placeholder="Enter something to submit..." />
-    <button onclick="submitEntry()">Submit</button>
-  </div>
-
-  <!-- List Section -->
-  <div class="list-container">
-    <ul id="entry-list">
-      <!-- Submitted entries will appear here -->
-    </ul>
-  </div>
-
   <script>
     let rainbowWords = [];
-    let bannedWords = [];
-    let submittedEntries = new Set();
 
-    // Fetch special words for rainbow effect
+    // Function to fetch special words for rainbow effect from announcementtxtspecialwords.html
     fetch('announcementtxtspecialwords.html')
       .then(response => response.text())
       .then(data => {
+        // Parse the list of special words (comma-separated values)
         rainbowWords = data.split(',').map(word => word.trim()).filter(word => word !== '');  // Clean up any extra spaces
 
         // Fetch the announcement text and apply the rainbow effect
         fetch('announcementtxt.html')
           .then(response => response.text())
           .then(data => {
+            // Apply rainbow effect to special words
             const modifiedText = applyRainbowEffect(data);
             document.getElementById('announcement-text').innerHTML = modifiedText;
           })
@@ -190,50 +128,13 @@
         console.error('Error loading special words for rainbow effect:', error);
       });
 
-    // Fetch banned words from bannedwords.html
-    fetch('bannedwords.html')
-      .then(response => response.text())
-      .then(data => {
-        bannedWords = data.split(',').map(word => word.trim().toLowerCase());  // Clean up and convert to lowercase
-      })
-      .catch(error => {
-        console.error('Error loading banned words:', error);
-      });
-
-    // Function to apply rainbow effect to specified words
+    // Function to apply rainbow effect to specified words in the announcement text
     function applyRainbowEffect(text) {
       rainbowWords.forEach(word => {
-        const regex = new RegExp(`(${word})`, 'gi'); // Case-insensitive search
+        const regex = new RegExp((${word}), 'gi'); // Case-insensitive search
         text = text.replace(regex, '<span class="rainbow">$1</span>');
       });
       return text;
-    }
-
-    // Function to submit an entry
-    function submitEntry() {
-      const inputField = document.getElementById('input-entry');
-      const entry = inputField.value.trim();
-
-      // Check if the entry is not empty and not a banned word
-      if (entry !== '' && !bannedWords.includes(entry.toLowerCase())) {
-        const entryLower = entry.toLowerCase();
-
-        // Check if the entry has already been submitted
-        if (!submittedEntries.has(entryLower)) {
-          // Add entry to the set and display it
-          submittedEntries.add(entryLower);
-          const li = document.createElement('li');
-          li.textContent = entry;
-          document.getElementById('entry-list').appendChild(li);
-
-          // Clear the input field
-          inputField.value = '';
-        } else {
-          alert('This entry has already been submitted!');
-        }
-      } else {
-        alert('This entry is banned or empty!');
-      }
     }
   </script>
 
