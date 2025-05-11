@@ -8,7 +8,7 @@
 <body>
 
   <h1>V1.0.1</h1>
-  <h3>Haunted <span id="tribute">Tribute</span></h3>
+  <h3>Haunted Tribute</h3>
   <p>05/10/2025</p>
   <ul>
     <li>Added HAUNTED back to list.</li>
@@ -23,20 +23,55 @@
     <li>Initial creation of website</li>
   </ul>
 
-  <!-- Rainbow effect styling and script -->
+  <!-- Rainbow effect style and script -->
   <style>
-    #tribute {
+    .rainbow {
       transition: color 0.5s linear;
     }
   </style>
 
   <script>
-    const tribute = document.getElementById('tribute');
-    let hue = 0;
-    setInterval(() => {
-      tribute.style.color = `hsl(${hue}, 100%, 50%)`;
-      hue = (hue + 2) % 360;
-    }, 50);
+    // Function to wrap the word "Tribute" in a span
+    function wrapTributeWords() {
+      const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+      const tributeRegex = /\bTribute\b/g;
+      let node;
+
+      while (node = walker.nextNode()) {
+        if (tributeRegex.test(node.nodeValue)) {
+          const span = document.createElement('span');
+          span.className = 'rainbow';
+          span.textContent = 'Tribute';
+
+          const parts = node.nodeValue.split(tributeRegex);
+          const parent = node.parentNode;
+
+          parts.forEach((part, i) => {
+            parent.insertBefore(document.createTextNode(part), node);
+            if (i < parts.length - 1) {
+              parent.insertBefore(span.cloneNode(true), node);
+            }
+          });
+
+          parent.removeChild(node);
+        }
+      }
+    }
+
+    // Animate rainbow color
+    function animateRainbow() {
+      let hue = 0;
+      setInterval(() => {
+        document.querySelectorAll('.rainbow').forEach(el => {
+          el.style.color = `hsl(${hue}, 100%, 50%)`;
+        });
+        hue = (hue + 2) % 360;
+      }, 50);
+    }
+
+    // Run both on load
+    wrapTributeWords();
+    animateRainbow();
   </script>
 
 </body>
