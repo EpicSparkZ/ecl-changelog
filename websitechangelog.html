@@ -20,7 +20,7 @@
       margin: 20px;
     }
 
-    /* Black strip containing the announcement text and buttons */
+    /* Black strip containing the announcement text */
     .top-strip {
       position: fixed;
       top: 0;         /* Start from the top of the screen */
@@ -29,8 +29,8 @@
       background-color: black;
       z-index: 999;   /* Ensure the strip is above the content */
       display: flex;
-      justify-content: space-between; /* Align buttons to the sides */
-      align-items: center;      /* Vertically center the text and buttons */
+      justify-content: center; /* Center the announcement text */
+      align-items: center;      /* Vertically center the text */
       padding: 0 10px;          /* Add some padding on both sides */
       box-sizing: border-box;   /* Ensure padding doesn't push content out of bounds */
     }
@@ -41,7 +41,6 @@
       font-size: 20px;
       font-weight: bold;
       text-align: center;        /* Center the text */
-      flex-grow: 1;              /* Make the announcement text take available space */
       white-space: nowrap;      /* Prevent text from wrapping */
       overflow: hidden;         /* Hide overflowing text */
       text-overflow: ellipsis;  /* Show ellipsis if the text overflows */
@@ -74,18 +73,12 @@
 </head>
 <body>
 
-  <!-- Black Strip containing Announcement and Buttons -->
+  <!-- Black Strip containing Announcement -->
   <div class="top-strip">
     <!-- Announcement Text (Center) -->
     <div class="announcement-text" id="announcement-text">
       <!-- Announcement text will be dynamically loaded here -->
     </div>
-
-    <!-- First Button on the Left -->
-    <button onclick="window.location.href='websitechangelog.html';">Website Changelog</button>
-
-    <!-- Second Button on the Right -->
-    <button onclick="window.location.href='listplacementchangelog.html';">List Changelog</button>
   </div>
 
   <!-- Page Content -->
