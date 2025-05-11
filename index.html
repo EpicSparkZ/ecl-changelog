@@ -13,6 +13,7 @@
       font-family: sans-serif;
     }
 
+    /* Black bar containing announcement and buttons */
     .top-strip {
       position: fixed;
       top: 0;
@@ -30,19 +31,21 @@
       gap: 10px;
     }
 
+    /* Announcement Text */
     .announcement-text {
       flex-grow: 1;
       color: white;
-      font-size: 20px;
+      font-size: 18px;
       font-weight: bold;
       text-align: center;
       word-wrap: break-word;
       overflow-wrap: break-word;
     }
 
+    /* Buttons styling */
     button {
       padding: 10px 20px;
-      font-size: 18px;
+      font-size: 16px;
       background-color: #444;
       color: white;
       border: none;
@@ -63,6 +66,7 @@
       margin-left: 10px;
     }
 
+    /* Rainbow effect for special words */
     .rainbow {
       animation: rainbow 6s ease-in-out infinite;
     }
@@ -78,20 +82,45 @@
       100% { color: red; }
     }
 
+    /* Content below the black bar */
     .content {
-      margin-top: 40px;
+      margin-top: 80px; /* Increased margin to ensure content doesn't overlap with the black bar */
       padding: 20px;
+      text-align: center;
+    }
+
+    /* Mobile Responsiveness */
+    @media (max-width: 768px) {
+      .announcement-text {
+        font-size: 16px; /* Smaller font for announcement */
+        padding: 0 10px;
+      }
+
+      button {
+        font-size: 14px; /* Smaller buttons on mobile */
+        padding: 8px 16px;
+      }
+
+      .content h1 {
+        font-size: 22px; /* Smaller welcome text on mobile */
+      }
+
+      .content p {
+        font-size: 14px; /* Smaller paragraphs on mobile */
+      }
     }
   </style>
 </head>
 <body>
 
+  <!-- Black Strip containing Announcement -->
   <div class="top-strip">
     <button class="left-button" onclick="window.location.href='websitechangelog.html';">Website Changelog</button>
     <div class="announcement-text" id="announcement-text"></div>
     <button class="right-button" onclick="window.location.href='listplacementchangelog.html';">List Changelog</button>
   </div>
 
+  <!-- Content Section -->
   <div class="content">
     <h1>Welcome to the EpicSparkZ Challenge List Changelog Website</h1>
     <p>Use the Website Changelog and List Changelog buttons above to view the changelogs.</p>
