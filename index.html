@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Buttons with Editable Announcement Text</title>
+  <title>HomePage</title>
   <link rel="icon" href="/list_icon.png" />
 
   <style>
@@ -27,6 +27,7 @@
       justify-content: space-between; /* Align buttons to the sides */
       align-items: center;      /* Vertically center the text and buttons */
       padding: 0 10px;          /* Add some padding on both sides */
+      box-sizing: border-box;   /* Ensure padding doesn't push content out of bounds */
       z-index: 1000;            /* Keep it above other content */
     }
 
@@ -37,6 +38,9 @@
       font-weight: bold;
       text-align: center;        /* Center the text */
       flex-grow: 1;              /* Make the announcement text take available space */
+      white-space: nowrap;      /* Prevent text from wrapping */
+      overflow: hidden;         /* Hide overflowing text */
+      text-overflow: ellipsis;  /* Show ellipsis if the text overflows */
     }
 
     /* Button Styling */
