@@ -68,19 +68,20 @@
       margin-left: 10px;   /* Small space between the right button and the announcement */
     }
 
-    /* Rainbow effect styling */
+    /* Rainbow effect styling (slower and smoother) */
     .rainbow {
-      animation: rainbow 3.5s linear infinite;
+      animation: rainbow 6s ease-in-out infinite;
     }
 
     @keyframes rainbow {
       0% { color: red; }
-      15% { color: orange; }
-      30% { color: yellow; }
-      45% { color: green; }
-      60% { color: blue; }
-      75% { color: indigo; }
-      100% { color: violet; }
+      14% { color: orange; }
+      28% { color: yellow; }
+      42% { color: green; }
+      57% { color: blue; }
+      71% { color: indigo; }
+      85% { color: violet; }
+      100% { color: red; }
     }
   </style>
 </head>
@@ -116,7 +117,7 @@
         console.error('Error loading announcement text:', error);
       });
 
-    // Function to apply rainbow effect to specified words
+    // Function to apply rainbow effect to specified words in the announcement text
     function applyRainbowEffect(text) {
       // Loop through each word in the rainbowWords array and apply the rainbow effect
       rainbowWords.forEach(word => {
