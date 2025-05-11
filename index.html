@@ -5,17 +5,6 @@
   <title>Buttons with Editable Announcement Text</title>
   <link rel="icon" href="/list_icon.png" />
 
-
-  
-  
-  <!-- Announcement Text at the Very Top of the Code (Easily Editable) -->
-  <div class="announcement-text">
-    Announcement
-  </div>
-
-
-
-  
   <style>
     /* General body and text styling */
     body {
@@ -26,33 +15,28 @@
       height: 100vh;             /* Ensure body takes up full height */
     }
 
-    /* Announcement text at the top of the page */
-    .announcement-text {
-      background-color: black;
-      color: white;
-      font-size: 20px;
-      font-weight: bold;
-      text-align: center;        /* Center the text */
-      padding: 15px;             /* Add some padding around the text */
-      width: 100%;               /* Full width of the screen */
-      position: fixed;
-      top: 0;
-      z-index: 1000;             /* Keep it above the black strip and buttons */
-    }
-
-    /* Black strip at the top of the screen (below announcement) */
+    /* Black strip containing the announcement text and buttons */
     .top-strip {
       position: fixed;
-      top: 60px;                /* Positioned just below the announcement text */
+      top: 0;
       left: 0;
       width: 100%;
       height: 60px;             /* Height of the strip */
       background-color: black;
       display: flex;
       justify-content: space-between; /* Align buttons to the sides */
-      align-items: center;      /* Vertically center the buttons */
+      align-items: center;      /* Vertically center the text and buttons */
       padding: 0 10px;          /* Add some padding on both sides */
-      z-index: 999;             /* Ensure the strip is above the content */
+      z-index: 1000;            /* Keep it above other content */
+    }
+
+    /* Announcement Text */
+    .announcement-text {
+      color: white;
+      font-size: 20px;
+      font-weight: bold;
+      text-align: center;        /* Center the text */
+      flex-grow: 1;              /* Make the announcement text take available space */
     }
 
     /* Button Styling */
@@ -64,7 +48,6 @@
       border: none;
       border-radius: 5px;
       cursor: pointer;
-      width: auto;              /* Make button width auto to adjust based on content */
     }
 
     button:hover {
@@ -73,19 +56,24 @@
 
     /* First Button (on the left) */
     .left-button {
-      margin-right: auto;  /* Pushes it to the left side */
+      margin-right: 10px;  /* Small space between the left button and the announcement */
     }
 
     /* Second Button (on the right) */
     .right-button {
-      margin-left: auto;   /* Pushes it to the right side */
+      margin-left: 10px;   /* Small space between the right button and the announcement */
     }
   </style>
 </head>
 <body>
 
-  <!-- Black Strip at the Very Top (below the announcement text) -->
+  <!-- Black Strip containing Announcement and Buttons -->
   <div class="top-strip">
+    <!-- Announcement Text -->
+    <div class="announcement-text">
+      Announcement
+    </div>
+
     <!-- First Button on the Left -->
     <button class="left-button" onclick="window.location.href='websitechangelog.html';">Website Changelog</button>
 
