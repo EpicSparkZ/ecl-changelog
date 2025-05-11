@@ -2,8 +2,30 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Buttons with Strip</title>
+  <title>Buttons with Editable Text</title>
   <link rel="icon" href="/list_icon.png" />
+
+
+
+
+  
+  
+  <!-- Script to edit the text dynamically -->
+  <script>
+    // Store the text in a variable, which you can change easily
+    const announcementText = "Announcement Test"; // Change this text as needed
+
+
+
+
+
+    
+    // Insert the text into the HTML element with id="announcement-text"
+    window.onload = function() {
+      document.getElementById("announcement-text").innerText = announcementText;
+    }
+  </script>
+
   <style>
     /* General body and text styling */
     body {
@@ -17,7 +39,7 @@
     /* Flex container for button layout */
     .button-container {
       position: fixed;
-      top: 10px;                /* Space from the top of the screen */
+      top: 70px;                /* Space from the top (below the black strip) */
       left: 10px;               /* Align buttons to the left */
       display: flex;
       flex-direction: row;      /* Stack buttons horizontally */
@@ -35,6 +57,9 @@
       border: none;
       border-radius: 5px;
       cursor: pointer;
+      width: 48%;              /* Make buttons responsive */
+      max-width: 200px;        /* Limit button width */
+      text-align: center;
     }
 
     button:hover {
@@ -55,25 +80,41 @@
       z-index: 999;            /* Ensure the strip is below the buttons */
     }
 
-    /* Meow Text Styling */
-    .meow-text {
+    /* Text Styling for Announcement */
+    .announcement-text {
       color: white;
       font-size: 24px;
       font-weight: bold;
+      text-align: center;      /* Ensure text is centered */
+      overflow: hidden;        /* Prevent text overflow */
+      text-overflow: ellipsis; /* Add ellipsis if text overflows */
+      white-space: nowrap;     /* Prevent text from wrapping */
     }
   </style>
 </head>
 <body>
 
+
+
+
+
+  
+  <!-- Black Strip at the Very Top -->
+  <div class="top-strip">
+    <div class="announcement-text" id="announcement-text">
+      
+      <!-- Text inserted here through JavaScript -->
+    </div>
+  </div>
+
+
+
+  
+  
   <!-- Button Container aligned to the left and right -->
   <div class="button-container">
     <button onclick="window.location.href='websitechangelog.html';">Website Changelog</button>
     <button onclick="window.location.href='listplacementchangelog.html';">List Changelog</button>
-  </div>
-
-  <!-- Black Strip at the Very Top -->
-  <div class="top-strip">
-    <div class="meow-text">Meow</div>
   </div>
 
 </body>
