@@ -16,7 +16,7 @@
 
     /* Styling for the content */
     .content {
-      margin-top: 50px;  /* Reduced from 80px to bring the content closer to the black bar */
+      margin-top: 80px;  /* Increased margin to avoid overlap with the black bar */
       padding: 20px;
     }
 
@@ -25,7 +25,7 @@
       position: fixed;
       top: 0;         /* Start from the top of the screen */
       width: 100%;
-      height: 60px;   /* Make the strip slightly below the button */
+      height: 60px;   /* Height of the strip */
       background-color: black;
       z-index: 999;   /* Ensure the strip is above the content */
       display: flex;
@@ -68,6 +68,21 @@
 
     button:hover {
       background-color: #666;
+    }
+
+    /* Mobile responsiveness */
+    @media (max-width: 768px) {
+      /* For smaller screens, adjust button size */
+      button {
+        font-size: 14px;
+        padding: 8px 16px;
+      }
+
+      /* Adjust announcement text size for small screens */
+      .announcement-text {
+        font-size: 16px;
+        padding: 0 10px;
+      }
     }
   </style>
 </head>
