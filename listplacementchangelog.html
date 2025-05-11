@@ -13,11 +13,11 @@
       padding: 0;
     }
 
-    /* Fixed Back button styling */
+    /* Back button styling */
     button {
       position: fixed;  /* Fix the button at the top */
       top: 10px;        /* Space from the top of the screen */
-      left: 10px;       /* Space from the left */
+      right: 10px;      /* Space from the right of the screen */
       padding: 10px 20px;
       font-size: 18px;
       background-color: #444;
@@ -27,3 +27,20 @@
       cursor: pointer;
       z-index: 1000; /* Ensure the button is above other content */
     }
+
+    button:hover {
+      background-color: #666;
+    }
+  </style>
+</head>
+<body>
+
+
+
+
+  
+  <!-- Back Button -->
+  <button onclick="window.location.href='index.html';">Back</button>
+
+</body>
+</html>
