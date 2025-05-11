@@ -45,7 +45,7 @@
       height: 60px;            /* Height of the strip */
       background-color: black;
       display: flex;
-      justify-content: space-between; /* Align buttons to the right */
+      justify-content: space-between; /* Align buttons to the sides */
       align-items: center;     /* Vertically center the text and buttons */
       padding: 0 10px;         /* Add some padding on both sides */
       z-index: 999;            /* Ensure the strip is above the content */
@@ -78,6 +78,16 @@
     button:hover {
       background-color: #666;
     }
+
+    /* Ensuring the first button is on the left */
+    .left-button {
+      margin-right: auto;  /* Pushes it to the left side */
+    }
+
+    /* Ensuring the second button is on the right */
+    .right-button {
+      margin-left: auto;   /* Pushes it to the right side */
+    }
   </style>
 </head>
 <body>
@@ -98,9 +108,10 @@
 
 
     
-    <!-- Buttons inside the black strip -->
-    <button onclick="window.location.href='websitechangelog.html';">Website Changelog</button>
-    <button onclick="window.location.href='listplacementchangelog.html';">List Changelog</button>
+    <!-- First Button on the Left -->
+    <button class="left-button" onclick="window.location.href='websitechangelog.html';">Website Changelog</button>
+    <!-- Second Button on the Right -->
+    <button class="right-button" onclick="window.location.href='listplacementchangelog.html';">List Changelog</button>
   </div>
 
 </body>
