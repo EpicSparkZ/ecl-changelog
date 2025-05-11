@@ -60,6 +60,7 @@
 
 
 
+
   
   <!-- Page Content -->
   <div class="content">
@@ -83,6 +84,7 @@
 
 
 
+  
 
   
   <!-- Back Button -->
@@ -93,6 +95,8 @@
 
 
 
+
+  
   
   <!-- Scripts (Placed below the content for organization) -->
   <script>
@@ -118,4 +122,33 @@
           if (targetWords.includes(part) && part !== "Tribute") {
             const span = document.createElement('span');
             span.className = 'rainbow';
-            span
+            span.textContent = part;
+            fragment.appendChild(span);
+          } else {
+            fragment.appendChild(document.createTextNode(part));
+          }
+        });
+
+        parent.replaceChild(fragment, node);
+      });
+    }
+
+    function animateRainbow() {
+      let hue = 0;
+      setInterval(() => {
+        document.querySelectorAll('.rainbow').forEach(el => {
+          el.style.color = `hsl(${hue}, 100%, 50%)`;
+        });
+        hue = (hue + 2) % 360;
+      }, 50);
+    }
+
+    // Run everything after page loads
+    window.addEventListener('DOMContentLoaded', () => {
+      wrapRainbowWords(["HAUNTED"]);  // Only apply rainbow effect to "HAUNTED"
+      animateRainbow();
+    });
+  </script>
+
+</body>
+</html>
