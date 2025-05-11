@@ -12,9 +12,10 @@
       margin: 0;
       padding: 0;
       display: flex;
-      justify-content: flex-end; /* Align everything to the right */
-      height: 100vh;             /* Ensure the body takes up the full screen height */
-      align-items: flex-start;   /* Align the buttons to the top */
+      justify-content: flex-end; /* Align buttons to the right */
+      height: 100vh;             /* Ensure body takes up full height */
+      flex-direction: column;    /* Stack the buttons vertically */
+      align-items: flex-end;     /* Right-align buttons */
     }
 
     /* Button Styling */
@@ -37,12 +38,12 @@
     /* Black strip from the top of the screen to slightly below the buttons */
     .top-strip {
       position: fixed;
-      top: 80px;         /* Start just below the second button */
-      right: 0;          /* Align strip with the right side */
+      top: 70px;         /* Start just below the buttons */
+      left: 0;
       width: 100%;
-      height: 60px;       /* Strip height */
+      height: 60px;       /* Set the height of the strip */
       background-color: black;
-      z-index: 999;       /* Ensure the strip is above the content */
+      z-index: 999;       /* Ensure the strip is above other content */
     }
   </style>
 </head>
@@ -51,14 +52,11 @@
 
 
 
-  
+
   
   <!-- Two Buttons aligned to the right -->
   <button onclick="window.location.href='websitechangelog.html';">Website Changelog</button>
   <button onclick="window.location.href='listplacementchangelog.html';">List Changelog</button>
-
-
-
 
   
   <!-- Black Strip Below the Buttons -->
