@@ -23,29 +23,32 @@
     <li>Initial creation of website</li>
   </ul>
 
-
-  
-  <!-- Rainbow effect style and script -->
+  <!-- Style and rainbow effect script -->
   <style>
+    body {
+      background-color: #121212;
+      color: white;
+    }
+
     .rainbow {
       transition: color 0.5s linear;
     }
   </style>
 
   <script>
-    // Function to wrap the word "Tribute" in a span
+    // Wrap "Tribute" in a span
     function wrapTributeWords() {
       const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
-      const tributeRegex = /\bTribute\b/g;
+      const regex = /\bTribute\b/g;
       let node;
 
       while (node = walker.nextNode()) {
-        if (tributeRegex.test(node.nodeValue)) {
+        if (regex.test(node.nodeValue)) {
           const span = document.createElement('span');
           span.className = 'rainbow';
           span.textContent = 'Tribute';
 
-          const parts = node.nodeValue.split(tributeRegex);
+          const parts = node.nodeValue.split(regex);
           const parent = node.parentNode;
 
           parts.forEach((part, i) => {
@@ -60,7 +63,7 @@
       }
     }
 
-    // Animate rainbow color
+    // Animate rainbow hue
     function animateRainbow() {
       let hue = 0;
       setInterval(() => {
@@ -71,7 +74,6 @@
       }, 50);
     }
 
-    // Run both on load
     wrapTributeWords();
     animateRainbow();
   </script>
