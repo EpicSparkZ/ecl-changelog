@@ -70,8 +70,8 @@
   <!-- Black Strip containing Announcement and Buttons -->
   <div class="top-strip">
     <!-- Announcement Text -->
-    <div class="announcement-text">
-      Announcement
+    <div class="announcement-text" id="announcement-text">
+      <!-- Announcement text will be dynamically loaded here -->
     </div>
 
     <!-- First Button on the Left -->
@@ -80,6 +80,18 @@
     <!-- Second Button on the Right -->
     <button class="right-button" onclick="window.location.href='listplacementchangelog.html';">List Changelog</button>
   </div>
+
+  <script>
+    // Function to fetch the announcement text from announcementtxt.html
+    fetch('announcementtxt.html')
+      .then(response => response.text())
+      .then(data => {
+        document.getElementById('announcement-text').innerHTML = data;
+      })
+      .catch(error => {
+        console.error('Error loading announcement text:', error);
+      });
+  </script>
 
 </body>
 </html>
