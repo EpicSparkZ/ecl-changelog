@@ -12,7 +12,7 @@
       font-family: sans-serif;
     }
 
-    /* Black strip containing announcement text */
+    /* Top strip containing buttons and announcement text */
     .top-strip {
       position: fixed;
       top: 0;
@@ -28,7 +28,7 @@
       z-index: 1000;
     }
 
-    /* Announcement Text */
+    /* Announcement text styling */
     .announcement-text {
       color: white;
       font-size: 20px;
@@ -37,7 +37,7 @@
       word-wrap: break-word;
       overflow-wrap: break-word;
       flex-grow: 1;
-      white-space: normal; /* Allow the text to wrap properly */
+      white-space: normal;
     }
 
     button {
@@ -77,29 +77,21 @@
       100% { color: red; }
     }
 
-    /* Content styling */
     .content {
-      margin-top: 80px;
+      margin-top: 80px;  /* Make sure content is not hidden under top bar */
       padding: 20px;
       text-align: center;
     }
 
-    /* For smaller screens (responsive design) */
+    /* Mobile responsiveness */
     @media (max-width: 768px) {
       .top-strip {
         flex-direction: column;
         height: auto;
-        padding: 10px;
       }
 
       .announcement-text {
         font-size: 16px;
-        white-space: normal;
-        text-align: center;
-      }
-
-      .content {
-        padding: 10px;
       }
 
       button {
@@ -126,7 +118,7 @@
   </div>
 
   <script>
-    // Function to fetch the special words for rainbow effect
+    // Function to fetch special words for rainbow effect
     fetch('announcementtxtspecialwords.html')
       .then(response => response.text())
       .then(wordData => {
