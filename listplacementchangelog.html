@@ -1,18 +1,29 @@
 <!DOCTYPE html>
-<link rel="icon" href="/list_icon.png" />
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>List Changelog</title>
+  <link rel="icon" href="/list_icon.png" />
+  <style>
+    /* General body and text styling */
+    body {
+      background-color: #121212; /* Dark gray */
+      color: white;              /* Text color for readability */
+      margin: 0;
+      padding: 0;
+    }
 
-<title>List Changelog</title>
-  <body>
-    <button onclick="window.location.href='index.html';">Back</button>
-</body>
-
-
-
-
-<!-- Style and Text Color -->
-<style>
-  body {
-    background-color: #121212; /* Dark gray */
-    color: white;              /* Optional: make text readable on dark background */
-  }
-</style>
+    /* Fixed Back button styling */
+    button {
+      position: fixed;  /* Fix the button at the top */
+      top: 10px;        /* Space from the top of the screen */
+      left: 10px;       /* Space from the left */
+      padding: 10px 20px;
+      font-size: 18px;
+      background-color: #444;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      z-index: 1000; /* Ensure the button is above other content */
+    }
