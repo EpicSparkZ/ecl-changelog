@@ -114,6 +114,7 @@
         // Load special words dynamically
         const specialWords = data.split(',').map(word => word.trim());
         fetchAnnouncementText(specialWords); // Pass the special words to the next function
+        applyRainbowToContent(specialWords); // Apply rainbow effect only to the content section
       })
       .catch(error => {
         console.error('Error loading special words:', error);
@@ -124,23 +125,22 @@
       fetch('announcementtxt.html')
         .then(response => response.text())
         .then(data => {
-          // Apply rainbow effect to special words in announcement
-          const modifiedText = applyRainbowEffect(data, specialWords);
-          document.getElementById('announcement-text').innerHTML = modifiedText;
+          // Load the announcement text (no rainbow effect needed here)
+          document.getElementById('announcement-text').innerHTML = data;
         })
         .catch(error => {
           console.error('Error loading announcement text:', error);
         });
     }
 
-    // Function to apply rainbow effect to specified words
-    function applyRainbowEffect(text, specialWords) {
-      // Loop through each word in the specialWords array and apply the rainbow effect
+    // Function to apply rainbow effect to specified words in content section
+    function applyRainbowToContent(specialWords) {
       specialWords.forEach(word => {
-        const regex = new RegExp(`(${word})`, 'gi'); // Case-insensitive search
-        text = text.replace(regex, '<span class="rainbow">$1</span>');
+        const regex = new RegExp(`(${word})`, 'gi');
+        document.querySelectorAll('.content').forEach(content => {
+          content.innerHTML = content.innerHTML.replace(regex, '<span class="rainbow">$1</span>');
+        });
       });
-      return text;
     }
 
     // Function to animate rainbow effect for special words
