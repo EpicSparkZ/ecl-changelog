@@ -8,7 +8,7 @@
 
 
 
-  
+
   
   <!-- Script to edit the text dynamically -->
   <script>
@@ -36,16 +36,31 @@
       height: 100vh;             /* Ensure body takes up full height */
     }
 
-    /* Flex container for button layout */
-    .button-container {
+    /* Black strip at the top of the screen */
+    .top-strip {
       position: fixed;
-      top: 70px;                /* Space from the top (below the black strip) */
-      left: 10px;               /* Align buttons to the left */
+      top: 0;                  /* Position the strip at the very top */
+      left: 0;
+      width: 100%;
+      height: 60px;            /* Height of the strip */
+      background-color: black;
       display: flex;
-      flex-direction: row;      /* Stack buttons horizontally */
-      justify-content: space-between; /* Push buttons to the edges */
-      width: calc(100% - 20px); /* Full width minus some space */
-      z-index: 1000;            /* Ensure buttons are above the content */
+      justify-content: space-between; /* Align buttons on left and right */
+      align-items: center;     /* Vertically center the text and buttons */
+      padding: 0 10px;         /* Add some padding on both sides */
+      z-index: 999;            /* Ensure the strip is above the content */
+    }
+
+    /* Text Styling for Announcement */
+    .announcement-text {
+      color: white;
+      font-size: 20px;
+      font-weight: bold;
+      text-align: center;      /* Ensure text is centered */
+      overflow: hidden;        /* Prevent text overflow */
+      text-overflow: ellipsis; /* Add ellipsis if text overflows */
+      white-space: nowrap;     /* Prevent text from wrapping */
+      flex-grow: 1;            /* Allow text to grow and take remaining space */
     }
 
     /* Button Styling */
@@ -57,38 +72,11 @@
       border: none;
       border-radius: 5px;
       cursor: pointer;
-      width: 48%;              /* Make buttons responsive */
-      max-width: 200px;        /* Limit button width */
-      text-align: center;
+      width: 150px;           /* Fixed button width */
     }
 
     button:hover {
       background-color: #666;
-    }
-
-    /* Black strip from the top of the screen */
-    .top-strip {
-      position: fixed;
-      top: 0;                  /* Position the strip at the very top */
-      left: 0;
-      width: 100%;
-      height: 60px;            /* Height of the strip */
-      background-color: black;
-      display: flex;
-      justify-content: center; /* Center align the text */
-      align-items: center;     /* Vertically center the text */
-      z-index: 999;            /* Ensure the strip is below the buttons */
-    }
-
-    /* Text Styling for Announcement */
-    .announcement-text {
-      color: white;
-      font-size: 24px;
-      font-weight: bold;
-      text-align: center;      /* Ensure text is centered */
-      overflow: hidden;        /* Prevent text overflow */
-      text-overflow: ellipsis; /* Add ellipsis if text overflows */
-      white-space: nowrap;     /* Prevent text from wrapping */
     }
   </style>
 </head>
@@ -101,18 +89,16 @@
   
   <!-- Black Strip at the Very Top -->
   <div class="top-strip">
+    
+    <!-- Text inserted here through JavaScript -->
     <div class="announcement-text" id="announcement-text">
-      
-      <!-- Text inserted here through JavaScript -->
+      Announcement
     </div>
-  </div>
 
 
 
-  
-  
-  <!-- Button Container aligned to the left and right -->
-  <div class="button-container">
+    
+    <!-- Buttons inside the black strip -->
     <button onclick="window.location.href='websitechangelog.html';">Website Changelog</button>
     <button onclick="window.location.href='listplacementchangelog.html';">List Changelog</button>
   </div>
