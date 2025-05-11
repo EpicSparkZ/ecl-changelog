@@ -12,7 +12,7 @@
   <p>05/10/2025</p>
   <ul>
     <li>Added HAUNTED back to list.</li>
-    <li>Gave HAUNTED special "Tribute" label.</li>
+    <li>Gave HAUNTED special Tribute label.</li>
     <li>Brute forced HAUNTED to bottom of list permanently.</li>
   </ul>
 
@@ -22,7 +22,6 @@
   <ul>
     <li>Initial creation of website</li>
   </ul>
-
 
 
 
@@ -48,7 +47,7 @@
         const fragment = document.createDocumentFragment();
 
         parts.forEach(part => {
-          if (targetWords.includes(part)) {
+          if (targetWords.includes(part) && part !== "Tribute") {
             const span = document.createElement('span');
             span.className = 'rainbow';
             span.textContent = part;
@@ -74,7 +73,7 @@
 
     // Run everything after page loads
     window.addEventListener('DOMContentLoaded', () => {
-      wrapRainbowWords(["Tribute", "HAUNTED"]);
+      wrapRainbowWords(["HAUNTED"]);  // Only apply rainbow effect to "HAUNTED"
       animateRainbow();
     });
   </script>
@@ -82,9 +81,8 @@
 
 
 
-
   
-  <!-- Style and Rainbow effect -->
+  <!-- Style and Rainbow Effect -->
   <style>
     body {
       background-color: #121212;
