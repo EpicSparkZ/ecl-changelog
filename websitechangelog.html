@@ -114,7 +114,6 @@
         // Load special words dynamically
         const specialWords = data.split(',').map(word => word.trim());
         fetchAnnouncementText(specialWords); // Pass the special words to the next function
-        applyRainbowToContent(specialWords); // Apply rainbow effect only to the content section
       })
       .catch(error => {
         console.error('Error loading special words:', error);
@@ -125,25 +124,26 @@
       fetch('announcementtxt.html')
         .then(response => response.text())
         .then(data => {
-          // Load the announcement text (no rainbow effect needed here)
-          document.getElementById('announcement-text').innerHTML = data;
+          // Apply rainbow effect to special words in announcement
+          const modifiedText = applyRainbowEffect(data, specialWords);
+          document.getElementById('announcement-text').innerHTML = modifiedText;
         })
         .catch(error => {
           console.error('Error loading announcement text:', error);
         });
     }
 
-    // Function to apply rainbow effect to specified words in content section
-    function applyRainbowToContent(specialWords) {
+    // Function to apply rainbow effect to specified words
+    function applyRainbowEffect(text, specialWords) {
+      // Loop through each word in the specialWords array and apply the rainbow effect
       specialWords.forEach(word => {
-        const regex = new RegExp(`(${word})`, 'gi');
-        document.querySelectorAll('.content').forEach(content => {
-          content.innerHTML = content.innerHTML.replace(regex, '<span class="rainbow">$1</span>');
-        });
+        const regex = new RegExp(`(${word})`, 'gi'); // Case-insensitive search
+        text = text.replace(regex, '<span class="rainbow">$1</span>');
       });
+      return text;
     }
 
-    // Function to animate rainbow effect for special words
+    // Function to animate rainbow effect for special words in the content
     function animateRainbow() {
       let hue = 0;
       setInterval(() => {
@@ -154,9 +154,18 @@
       }, 50);
     }
 
+    // Apply rainbow effect to content-specific words like "HAUNTED"
+    function applyRainbowToContent() {
+      const content = document.querySelectorAll('.content');
+      content.forEach(section => {
+        section.innerHTML = section.innerHTML.replace(/(HAUNTED)/gi, '<span class="rainbow">$1</span>');
+      });
+    }
+
     // Run everything after page loads
     window.addEventListener('DOMContentLoaded', () => {
       animateRainbow();
+      applyRainbowToContent(); // Apply rainbow only to content-specific words
     });
   </script>
 
