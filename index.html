@@ -4,22 +4,11 @@
   <meta charset="UTF-8">
   <title>Buttons with Editable Text</title>
   <link rel="icon" href="/list_icon.png" />
-
-
-
-
-
   
-  <!-- Script to edit the text dynamically -->
   <script>
     // Store the text in a variable, which you can change easily
     const announcementText = "Announcement"; // Change this text as needed
 
-
-
-
-
-    
     // Insert the text into the HTML element with id="announcement-text"
     window.onload = function() {
       document.getElementById("announcement-text").innerText = announcementText;
@@ -92,24 +81,16 @@
 </head>
 <body>
 
-
-
-
-
-  
   <!-- Black Strip at the Very Top -->
   <div class="top-strip">
-    
     <!-- Text inserted here through JavaScript -->
     <div class="announcement-text" id="announcement-text">
       Announcement
     </div>
 
-
-
-    
     <!-- First Button on the Left -->
     <button class="left-button" onclick="window.location.href='websitechangelog.html';">Website Changelog</button>
+
     <!-- Second Button on the Right -->
     <button class="right-button" onclick="window.location.href='listplacementchangelog.html';">List Changelog</button>
   </div>
