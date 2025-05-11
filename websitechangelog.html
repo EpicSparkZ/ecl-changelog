@@ -12,7 +12,7 @@
   <p>05/10/2025</p>
   <ul>
     <li>Added HAUNTED back to list.</li>
-    <li>Gave HAUNTED special Tribute label.</li>
+    <li>Gave HAUNTED special "Tribute" label.</li>
     <li>Brute forced HAUNTED to bottom of list permanently.</li>
   </ul>
 
@@ -40,26 +40,27 @@
   </style>
 
   <script>
-    function wrapTributeWords() {
+    function wrapRainbowWords(words) {
       const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
       const nodes = [];
 
-      // Collect all eligible text nodes first
+      // Collect text nodes containing target words
       while (walker.nextNode()) {
-        const currentNode = walker.currentNode;
-        if (/Tribute/.test(currentNode.nodeValue)) {
-          nodes.push(currentNode);
+        const node = walker.currentNode;
+        if (words.some(word => node.nodeValue.includes(word))) {
+          nodes.push(node);
         }
       }
 
-      // Replace "Tribute" in each node
+      // Wrap each target word in a rainbow span
       nodes.forEach(node => {
         const parent = node.parentNode;
-        const parts = node.nodeValue.split(/(Tribute)/g);
+        const pattern = new RegExp(`(${words.join("|")})`, "g");
+        const parts = node.nodeValue.split(pattern);
 
         const fragment = document.createDocumentFragment();
         parts.forEach(part => {
-          if (part === "Tribute") {
+          if (words.includes(part)) {
             const span = document.createElement("span");
             span.className = "rainbow";
             span.textContent = part;
@@ -72,21 +73,3 @@
         parent.replaceChild(fragment, node);
       });
     }
-
-    function animateRainbow() {
-      let hue = 0;
-      setInterval(() => {
-        document.querySelectorAll('.rainbow').forEach(el => {
-          el.style.color = `hsl(${hue}, 100%, 50%)`;
-        });
-        hue = (hue + 2) % 360;
-      }, 50);
-    }
-
-    // Run on load
-    wrapTributeWords();
-    animateRainbow();
-  </script>
-
-</body>
-</html>
