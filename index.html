@@ -14,11 +14,11 @@
       height: 100vh;             /* Ensure body takes up full height */
     }
 
-    /* Flex container to align buttons */
+    /* Flex container to align buttons horizontally */
     .button-container {
       position: fixed;
       top: 10px;               /* Space from the top of the screen */
-      right: 10px;             /* Align buttons to the right */
+      left: 10px;              /* Align buttons to the left */
       display: flex;
       flex-direction: row;     /* Stack buttons horizontally */
       align-items: flex-start; /* Top-align buttons */
@@ -41,32 +41,27 @@
       background-color: #666;
     }
 
-    /* Black strip from the top of the screen to slightly below the buttons */
+    /* Black strip from the top of the screen */
     .top-strip {
       position: fixed;
-      top: 50px;               /* Start just below the buttons */
+      top: 0;                 /* Position the strip at the very top */
       left: 0;
       width: 100%;
-      height: 60px;            /* Height of the strip */
+      height: 60px;           /* Height of the strip */
       background-color: black;
-      z-index: 999;            /* Ensure the strip is below the buttons */
+      z-index: 999;           /* Ensure the strip is below the buttons */
     }
   </style>
 </head>
 <body>
 
-
-
-
-  
-  <!-- Button Container aligned to the right, horizontally stacked -->
+  <!-- Button Container aligned to the left and horizontally stacked -->
   <div class="button-container">
     <button onclick="window.location.href='websitechangelog.html';">Website Changelog</button>
     <button onclick="window.location.href='listplacementchangelog.html';">List Changelog</button>
   </div>
 
-  
-  <!-- Black Strip Below the Buttons -->
+  <!-- Black Strip at the Very Top -->
   <div class="top-strip"></div>
 
 </body>
