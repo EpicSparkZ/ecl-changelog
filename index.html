@@ -10,10 +10,10 @@
       background-color: #121212;
       color: white;
       margin: 0;
-      padding: 0;
       font-family: sans-serif;
     }
 
+    /* Top fixed black bar */
     .top-strip {
       position: fixed;
       top: 0;
@@ -77,23 +77,24 @@
       100% { color: red; }
     }
 
+    /* Main content area below the fixed bar */
     .content {
-      padding-top: 80px; /* Add space so content is not hidden behind the fixed top bar */
+      margin-top: 60px; /* Same height as the top strip */
       padding: 20px;
     }
   </style>
 </head>
 <body>
 
+  <!-- Black top strip -->
   <div class="top-strip">
     <button class="left-button" onclick="window.location.href='websitechangelog.html';">Website Changelog</button>
     <div class="announcement-text" id="announcement-text"></div>
     <button class="right-button" onclick="window.location.href='listplacementchangelog.html';">List Changelog</button>
   </div>
 
-  <!-- Content area for text, buttons, etc. -->
+  <!-- Main content below the bar -->
   <div class="content">
-    <!-- You can add content here -->
     <h1>Welcome to the EpicSparkZ Challenge List Changelog Website</h1>
     <p>Use the navigation above to view the latest updates.</p>
     <button onclick="alert('You clicked a test button!')">Test Button</button>
