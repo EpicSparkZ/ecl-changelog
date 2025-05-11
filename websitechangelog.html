@@ -1,30 +1,43 @@
 <!DOCTYPE html>
-<link rel="icon" href="/list_icon.png" />
-
-<title>Website Changelog</title>
-
-<!-- Copy from first entire body and paste above to make new version changelog -->
-
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Website Changelog</title>
+  <link rel="icon" href="/list_icon.png">
+</head>
 <body>
+
   <h1>V1.0.1</h1>
-  <h3>Haunted Tribute</h3>
-  <h7>05/10/2025<h7>
-<br>
-  <ul class="dash-list">
-  <li>Added HAUNTED back to list.</li>
-  <li>Gave HAUNTED special "Tribute" label.</li>
-  <li>Brute forced HAUNTED to bottom of list permanently.</li>
-</ul>
-<body>
-<br>
-  
-<body>
+  <h3>Haunted <span id="tribute">Tribute</span></h3>
+  <p>05/10/2025</p>
+  <ul>
+    <li>Added HAUNTED back to list.</li>
+    <li>Gave HAUNTED special "Tribute" label.</li>
+    <li>Brute forced HAUNTED to bottom of list permanently.</li>
+  </ul>
+
   <h1>V1.0.0</h1>
   <h3>Creation of Website</h3>
-  <h7>11/05/2024<h7>
-<br>
-  <ul class="dash-list">
-  <li>Initial creation of website</li>
-</ul>
-<body>
-<br>
+  <p>11/05/2024</p>
+  <ul>
+    <li>Initial creation of website</li>
+  </ul>
+
+  <!-- Rainbow effect styling and script -->
+  <style>
+    #tribute {
+      transition: color 0.5s linear;
+    }
+  </style>
+
+  <script>
+    const tribute = document.getElementById('tribute');
+    let hue = 0;
+    setInterval(() => {
+      tribute.style.color = `hsl(${hue}, 100%, 50%)`;
+      hue = (hue + 2) % 360;
+    }, 50);
+  </script>
+
+</body>
+</html>
