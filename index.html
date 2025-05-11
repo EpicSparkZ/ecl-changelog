@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <title>Home Page</title>
   <link rel="icon" href="/list_icon.png" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <style>
     body {
       background-color: #121212;
@@ -18,6 +18,7 @@
       top: 0;
       left: 0;
       width: 100%;
+      min-height: 60px;
       background-color: black;
       display: flex;
       justify-content: space-between;
@@ -30,7 +31,7 @@
     }
 
     .announcement-text {
-      flex: 1 1 100%;
+      flex-grow: 1;
       color: white;
       font-size: 20px;
       font-weight: bold;
@@ -48,11 +49,18 @@
       border-radius: 5px;
       cursor: pointer;
       white-space: nowrap;
-      min-width: 150px;
     }
 
     button:hover {
       background-color: #666;
+    }
+
+    .left-button {
+      margin-right: 10px;
+    }
+
+    .right-button {
+      margin-left: 10px;
     }
 
     .rainbow {
@@ -71,42 +79,30 @@
     }
 
     .content {
-      margin-top: 130px;
+      margin-top: 80px;
       padding: 20px;
-      text-align: center;
+      text-align: center; /* Added to center the content horizontally */
     }
 
-    @media (max-width: 600px) {
-      .top-strip {
-        flex-direction: column;
-        align-items: stretch;
-        text-align: center;
-      }
-
-      .top-strip button {
-        width: 100%;
-        min-width: unset;
-      }
-
-      .announcement-text {
-        order: -1;
-        margin-bottom: 10px;
-      }
+    .content h1 {
+      text-align: center; /* Ensure the h1 is centered */
     }
   </style>
 </head>
 <body>
 
   <div class="top-strip">
+    <button class="left-button" onclick="window.location.href='websitechangelog.html';">Website Changelog</button>
     <div class="announcement-text" id="announcement-text"></div>
-    <button onclick="window.location.href='websitechangelog.html';">Website Changelog</button>
-    <button onclick="window.location.href='listplacementchangelog.html';">List Changelog</button>
+    <button class="right-button" onclick="window.location.href='listplacementchangelog.html';">List Changelog</button>
   </div>
 
   <div class="content">
     <h1>Welcome to the EpicSparkZ Challenge List Changelog Website</h1>
-    <p>Use the navigation above to view the latest updates. This is a place where you can explore changes to the challenge list, submit suggestions, and view what's new!</p>
-    <button onclick="alert('You clicked a test button!')">Test Button</button>
+    <p>Use the buttons in the top left and right to view the website changelog, and the list changelog. Please note that this site is still very in the works and some stuff may not function/work properly.</p>
+  <br>
+    <p>Click the buttons below to go to the expiremental chat and placement opinions feature.</p>
+    <button onclick="window.location.href='chat.html';">Chat</button>    <button onclick="window.location.href='placementopinions.html';">Placement Opinions</button>
   </div>
 
   <script>
