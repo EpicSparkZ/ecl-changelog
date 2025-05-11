@@ -73,9 +73,10 @@
       pointer-events: none;
     }
 
+    /* Message box at the bottom */
     .message-box {
       position: fixed;
-      bottom: 80px;
+      bottom: 80px; /* Adjusted position to lower the input box */
       left: 50%;
       transform: translateX(-50%);
       width: 80%;
@@ -87,8 +88,8 @@
       justify-content: space-between;
     }
 
-    .message-input {
-      width: 80%;
+    .message-input, .username-input {
+      width: 40%;
       padding: 8px;
       background-color: #222;
       border: none;
@@ -98,10 +99,10 @@
     }
 
     .message-list {
-      margin-top: 100px;
+      margin-top: 180px; /* Start the list lower to avoid overlap */
       padding: 10px;
       overflow-y: auto;
-      height: calc(100vh - 180px);
+      height: calc(100vh - 250px);
       display: flex;
       flex-direction: column-reverse; /* New messages appear at the top */
     }
@@ -113,6 +114,16 @@
       border-radius: 5px;
       max-width: 90%;
       word-wrap: break-word;
+    }
+
+    .username {
+      color: #4a90e2; /* Blue */
+      font-weight: bold;
+      display: inline;
+    }
+
+    .username span {
+      color: #9b59b6; /* Purple */
     }
 
     @media (max-width: 600px) {
@@ -148,8 +159,9 @@
     NOTICE: This feature is experimental and may not work at times. Do not expect this to always be here.
   </div>
 
-  <!-- Message Input Box and Send Button -->
+  <!-- Username Input and Message Input Box -->
   <div class="message-box">
+    <input type="text" id="username-input" class="username-input" placeholder="Enter your username" />
     <input type="text" id="message-input" class="message-input" placeholder="Enter your message..." />
     <button onclick="sendMessage()">Send</button>
   </div>
@@ -206,18 +218,31 @@
     function sendMessage() {
       const messageInput = document.getElementById('message-input');
       const messageList = document.getElementById('message-list');
+      const usernameInput = document.getElementById('username-input');
 
       const messageText = messageInput.value.trim();
-      if (messageText) {
+      const username = usernameInput.value.trim();
+
+      if (messageText && username) {
         const messageItem = document.createElement('div');
         messageItem.classList.add('message-item');
-        messageItem.textContent = messageText;
-        
+
+        const usernameDisplay = document.createElement('div');
+        usernameDisplay.classList.add('username');
+        usernameDisplay.innerHTML = `<span>${username}</span>`;
+
+        const messageTextDisplay = document.createElement('div');
+        messageTextDisplay.textContent = messageText;
+
+        messageItem.appendChild(usernameDisplay);
+        messageItem.appendChild(messageTextDisplay);
+
         // Insert the message at the top of the list
         messageList.insertBefore(messageItem, messageList.firstChild);
-        
-        // Clear the input box
+
+        // Clear the input boxes
         messageInput.value = '';
+        usernameInput.value = '';
       }
     }
 
