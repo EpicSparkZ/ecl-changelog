@@ -1,4 +1,127 @@
 <!DOCTYPE html>
 <html lang="en">
+<head>
+  <meta charset="UTF-8">
   <title>Chat</title>
   <link rel="icon" href="/list_icon.png" />
+  <style>
+    body {
+      background-color: #121212;
+      color: white;
+      margin: 0;
+      font-family: sans-serif;
+    }
+
+    .top-strip {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      min-height: 60px;
+      background-color: black;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px;
+      box-sizing: border-box;
+      z-index: 1000;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .announcement-text {
+      flex-grow: 1;
+      color: white;
+      font-size: 20px;
+      font-weight: bold;
+      text-align: center;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 18px;
+      background-color: #444;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    button:hover {
+      background-color: #666;
+    }
+
+    .rainbow {
+      animation: rainbow 6s ease-in-out infinite;
+    }
+
+    @keyframes rainbow {
+      0% { color: red; }
+      14% { color: orange; }
+      28% { color: yellow; }
+      42% { color: green; }
+      57% { color: blue; }
+      71% { color: indigo; }
+      85% { color: violet; }
+      100% { color: red; }
+    }
+
+    .content {
+      margin-top: 80px;
+      padding: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="top-strip">
+    <button onclick="window.location.href='index.html';">← Back</button>
+    <div class="announcement-text" id="announcement-text">Loading announcement...</div>
+  </div>
+
+  <div class="content">
+    <h1>Chat (Experimental)</h1>
+    <p>This is a placeholder for the chat feature.</p>
+  </div>
+
+  <script>
+    let rainbowWords = [];
+
+    fetch('announcementtxtspecialwords.html')
+      .then(response => response.text())
+      .then(wordData => {
+        rainbowWords = wordData
+          .split(',')
+          .map(w => w.trim())
+          .filter(w => w.length > 0);
+
+        return fetch('announcementtxt.html');
+      })
+      .then(response => response.text())
+      .then(textData => {
+        const modifiedText = applyRainbowEffect(textData);
+        document.getElementById('announcement-text').innerHTML = modifiedText;
+      })
+      .catch(error => {
+        console.error('Error loading announcement or special words:', error);
+        document.getElementById('announcement-text').textContent = 'Announcement failed to load.';
+      });
+
+    function applyRainbowEffect(text) {
+      rainbowWords.forEach(word => {
+        const regex = new RegExp(`(${escapeRegExp(word)})`, 'gi');
+        text = text.replace(regex, '<span class="rainbow">$1</span>');
+      });
+      return text;
+    }
+
+    function escapeRegExp(string) {
+      return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    }
+  </script>
+
+</body>
+</html>
