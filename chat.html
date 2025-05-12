@@ -150,7 +150,7 @@
     }
 
     .rainbow {
-      animation: rainbow 4s linear infinite; /* Slow down the rainbow effect */
+      animation: rainbow 4s linear infinite;
     }
 
     @keyframes rainbow {
@@ -321,17 +321,12 @@
     // Load messages on page load
     window.onload = loadMessages;
 
-    // Fetch announcement
+    // Fetch announcement from the URL
     const announcementText = document.getElementById('announcement-text');
-    const announcementUrl = 'https://your-api-url-here'; // <-- Update this with your actual URL
+    const announcementUrl = 'https://your-api-url-here'; // <-- Add your correct URL for announcements
 
     fetch(announcementUrl)
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('Failed to fetch announcement');
-        }
-        return response.json();
-      })
+      .then(response => response.json())
       .then(data => {
         if (data && data.announcement) {
           announcementText.innerText = data.announcement;
@@ -343,6 +338,15 @@
         console.error('Error fetching announcement:', err);
         announcementText.innerText = 'Error loading announcement.';
       });
+
+    // Handle Enter key for sending messages
+    document.getElementById('message').addEventListener('keypress', function(event) {
+      if (event.key === 'Enter') {
+        sendMessage();
+        event.preventDefault();
+      }
+    });
+
   </script>
 
 </body>
