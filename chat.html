@@ -116,14 +116,10 @@
     }
 
     #message-container {
-      position: absolute;
-      top: 60px;
-      bottom: 80px;
-      width: 100%;
+      flex-grow: 1;
+      margin-top: 60px;
+      margin-bottom: 80px;
       overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-end;
       padding: 10px;
       box-sizing: border-box;
     }
@@ -134,7 +130,6 @@
       margin-bottom: 10px;
       padding: 10px;
       color: white;
-      width: 100%;
       box-sizing: border-box;
       word-wrap: break-word;
     }
@@ -219,19 +214,13 @@
     });
 
     let bannedWords = [];
-    let modUsernames = [];
     let specialWords = [];
+    let modUsernames = [];
 
     fetch('https://raw.githubusercontent.com/EpicSparkZ/ecl-changelog/main/data/bannedwords.html')
       .then(res => res.text())
       .then(data => {
-        bannedWords = data.split(',').map(word => word.trim().toLowerCase());
-      });
-
-    fetch('modusernames.html')
-      .then(res => res.text())
-      .then(data => {
-        modUsernames = data.split(',').map(name => name.trim().toLowerCase());
+        bannedWords = data.split(',').map(w => w.trim().toLowerCase());
       });
 
     fetch('announcementtxtspecialwords.html')
@@ -241,22 +230,27 @@
         return fetch('announcementtxt.html');
       })
       .then(res => res.text())
+      .then(announcement => {
+        document.getElementById('announcement-text').innerHTML = applyRainbowEffect(announcement);
+      });
+
+    fetch('modusernames.html')
+      .then(res => res.text())
       .then(data => {
-        document.getElementById('announcement-text').innerHTML = applyRainbowEffect(data);
+        modUsernames = data.split(',').map(name => name.trim().toLowerCase());
       });
 
     function containsBannedWords(message) {
-      const words = message.toLowerCase().split(/\s+/);
-      return words.some(word => bannedWords.includes(word));
+      return message.toLowerCase().split(/\s+/).some(w => bannedWords.includes(w));
     }
 
     function applyRainbowEffect(text) {
-      let modified = text;
+      let result = text;
       specialWords.forEach(word => {
         const regex = new RegExp(`(${word})`, 'gi');
-        modified = modified.replace(regex, '<span class="rainbow">$1</span>');
+        result = result.replace(regex, '<span class="rainbow">$1</span>');
       });
-      return modified;
+      return result;
     }
 
     function saveMessage(message, username) {
@@ -265,46 +259,47 @@
       localStorage.setItem('messages', JSON.stringify(messages));
     }
 
-    function createMessageElement(message, username) {
-      const isMod = modUsernames.includes(username.toLowerCase());
+    function createMessageElement(username, message) {
+      const msgEl = document.createElement('div');
+      msgEl.className = 'message';
 
-      const messageElement = document.createElement('div');
-      messageElement.classList.add('message');
+      const userEl = document.createElement('span');
+      userEl.className = 'username';
 
-      const usernameElement = document.createElement('span');
-      usernameElement.classList.add('username');
-      if (username.toLowerCase() === 'epicsparkz') {
-        usernameElement.classList.add('rainbow');
+      const lowerUsername = username.toLowerCase();
+      if (lowerUsername === 'epicsparkz') {
+        userEl.classList.add('rainbow');
       }
-      usernameElement.textContent = (isMod ? '🛡️ ' : '') + username;
 
-      const messageTextElement = document.createElement('span');
-      messageTextElement.classList.add('message-text');
-      messageTextElement.innerHTML = ': ' + applyRainbowEffect(message);
+      if (modUsernames.includes(lowerUsername)) {
+        userEl.textContent = '🛡️ ' + username;
+      } else {
+        userEl.textContent = username;
+      }
 
-      messageElement.appendChild(usernameElement);
-      messageElement.appendChild(messageTextElement);
+      const msgText = document.createElement('span');
+      msgText.className = 'message-text';
+      msgText.innerHTML = ': ' + applyRainbowEffect(message);
 
-      return messageElement;
+      msgEl.appendChild(userEl);
+      msgEl.appendChild(msgText);
+      return msgEl;
     }
 
     function loadMessages() {
-      const messages = JSON.parse(localStorage.getItem('messages') || '[]');
       const messageContainer = document.getElementById('message-container');
       messageContainer.innerHTML = '';
-
+      const messages = JSON.parse(localStorage.getItem('messages') || '[]');
       messages.forEach(msg => {
-        const el = createMessageElement(msg.message, msg.username);
+        const el = createMessageElement(msg.username, msg.message);
         messageContainer.appendChild(el);
       });
-
-      setTimeout(() => {
-        messageContainer.scrollTop = messageContainer.scrollHeight;
-      }, 0);
+      messageContainer.scrollTop = messageContainer.scrollHeight;
     }
 
     function sendMessage() {
-      const message = document.getElementById('message').value;
+      const msgInput = document.getElementById('message');
+      const message = msgInput.value.trim();
       if (!message || !username) return;
 
       if (containsBannedWords(message)) {
@@ -313,25 +308,18 @@
       }
 
       saveMessage(message, username);
+      const el = createMessageElement(username, message);
+      document.getElementById('message-container').appendChild(el);
+      document.getElementById('message-container').scrollTop = document.getElementById('message-container').scrollHeight;
 
-      const messageContainer = document.getElementById('message-container');
-      const el = createMessageElement(message, username);
-      messageContainer.appendChild(el);
-
-      setTimeout(() => {
-        messageContainer.scrollTop = messageContainer.scrollHeight;
-      }, 0);
-
-      document.getElementById('message').value = '';
+      msgInput.value = '';
     }
 
-    document.getElementById('message').addEventListener('keydown', function(event) {
-      if (event.key === 'Enter') {
-        sendMessage();
-      }
+    document.getElementById('message').addEventListener('keydown', e => {
+      if (e.key === 'Enter') sendMessage();
     });
 
-    window.addEventListener('load', loadMessages);
+    loadMessages();
   </script>
 </body>
 </html>
