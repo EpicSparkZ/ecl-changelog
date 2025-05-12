@@ -60,8 +60,19 @@
       border-radius: 5px;
       padding: 10px;
       font-size: 14px;
-      width: 35%;
+      width: 30%; /* Username input box shorter */
       min-width: 120px;
+    }
+
+    .input-bar #message {
+      background-color: #444;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      padding: 10px;
+      font-size: 14px;
+      width: 65%; /* Message box longer */
+      min-width: 200px;
     }
 
     .input-bar button {
@@ -188,32 +199,9 @@
       }, 50);
     }
 
-    // Load username from localStorage if available
-    window.onload = function() {
-      const savedUsername = localStorage.getItem('username');
-      if (savedUsername) {
-        username = savedUsername;
-        document.getElementById('username').value = username;
-        document.getElementById('username').disabled = true;  // Disable input if username is already set
-        usernameSet = true;
-      }
-    }
-
-    // Function to lock the username once it's set
-    function setUsername() {
-      if (!usernameSet) {
-        username = document.getElementById('username').value;
-        if (username) {
-          usernameSet = true;
-          document.getElementById('username').disabled = true;  // Disable the username input after it's set
-          localStorage.setItem('username', username);  // Save username in localStorage
-        }
-      }
-    }
-
     // Function to send a message
     function sendMessage() {
-      setUsername();  // Lock username if it's not already set
+      username = document.getElementById('username').value;
       const message = document.getElementById('message').value;
       if (!message || !username) return;  // Don't send empty messages
 
