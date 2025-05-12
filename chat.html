@@ -208,11 +208,11 @@
   <script>
     // Check if username is already set in localStorage
     let username = localStorage.getItem('username') || '';
+    let hasSentMessage = false;
 
     // Disable username input if it's already set
     if (username) {
       document.getElementById('username').value = username;
-      document.getElementById('username').disabled = true;  // Disable username input after setting it
     }
 
     document.getElementById('username').addEventListener('change', (e) => {
@@ -220,7 +220,6 @@
       if (!username) {
         username = e.target.value;
         localStorage.setItem('username', username);
-        document.getElementById('username').disabled = true;  // Disable after setting
       }
     });
 
@@ -291,6 +290,12 @@
       const message = document.getElementById('message').value;
       if (!message || !username) return;
 
+      // Mark that the user has sent a message
+      if (!hasSentMessage) {
+        hasSentMessage = true;
+        document.getElementById('username').disabled = true; // Disable username input after first message
+      }
+
       if (containsBannedWords(message)) {
         alert("Your message contains a banned word and was not sent.");
         return;
@@ -306,11 +311,9 @@
 
       const usernameElement = document.createElement('span');
       usernameElement.classList.add('username');
-      
       if (username.toLowerCase() === 'epicsparkz') {
         usernameElement.classList.add('rainbow');
       }
-      
       usernameElement.textContent = username;
 
       const messageTextElement = document.createElement('span');
@@ -328,24 +331,30 @@
       document.getElementById('message').value = ''; // Clear the message input field
     }
 
-    // Handle moderator commands dynamically
-    function handleModCommands(command) {
-      if (modCommands.includes(command)) {
-        if (command === 'clearchat') {
-          // Clear the chat
-          document.getElementById('message-container').innerHTML = '';
-          alert("Chat cleared.");
-        }
-        // Add other mod commands here dynamically, like ban, mute, etc.
-      }
+    // Handle announcements
+    function loadAnnouncement() {
+      fetch('announcement.txt')
+        .then(response => response.text())
+        .then(data => {
+          document.getElementById('announcement-text').innerText = data;
+        })
+        .catch(err => {
+          console.error('Error loading announcement:', err);
+        });
     }
 
-    // Load messages on page load
-    window.onload = loadMessages;
+    // Listen for the Enter key press to send a message
+    document.getElementById('message').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        sendMessage();
+      }
+    });
 
-    // Rainbow effect for the announcement text
-    const announcementText = document.getElementById('announcement-text');
-    announcementText.innerHTML = announcementText.innerText.replace(/EpicSparkZ/gi, match => `<span class="rainbow">${match}</span>`);
+    // Load messages and announcements on page load
+    window.onload = () => {
+      loadMessages();
+      loadAnnouncement();
+    };
   </script>
 
 </body>
