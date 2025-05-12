@@ -60,19 +60,19 @@
       border-radius: 5px;
       padding: 10px;
       font-size: 14px;
-      width: 7%; /* Username input box shorter */
       min-width: 120px;
     }
 
+    /* Adjust the username input box */
+    .input-bar #username {
+      width: 7%; /* Keep it short */
+      margin-right: 10px; /* Add space between username input and message input */
+    }
+
+    /* Adjust the message input box */
     .input-bar #message {
-      background-color: #444;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      padding: 10px;
-      font-size: 14px;
-      width: 91%; /* Message box longer */
-      min-width: 200px;
+      width: 83%; /* Make it longer than the username input */
+      margin-right: 10px; /* Add space between message input and button */
     }
 
     .input-bar button {
