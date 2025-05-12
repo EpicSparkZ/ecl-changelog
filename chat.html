@@ -150,7 +150,7 @@
     }
 
     .rainbow {
-      animation: rainbow 4s linear infinite; /* Slow down the rainbow effect */
+      animation: rainbow 4s linear infinite;
     }
 
     @keyframes rainbow {
@@ -206,59 +206,48 @@
   <button class="back-button" onclick="window.location.href='index.html';">Back</button>
 
   <script>
-    // Check if username is already set in localStorage
     let username = localStorage.getItem('username') || '';
 
-    // Fetch mod usernames and commands
-    let modUsernames = [];
-    let modCommands = {};
-
-    fetch('modusernames.html')
-      .then(response => response.text())
-      .then(data => {
-        modUsernames = data.split(',').map(username => username.trim());
-      })
-      .catch(err => console.error('Error loading modusernames.html:', err));
-
-    fetch('modcommands.html')
-      .then(response => response.json())
-      .then(data => {
-        modCommands = data;
-      })
-      .catch(err => console.error('Error loading modcommands.html:', err));
-
-    // Disable username input if it's already set
     if (username) {
       document.getElementById('username').value = username;
-      document.getElementById('username').disabled = true;  // Disable username input after setting it
+      document.getElementById('username').disabled = true;
     }
 
     document.getElementById('username').addEventListener('change', (e) => {
-      // If username is not set, save it to localStorage
       if (!username) {
         username = e.target.value;
         localStorage.setItem('username', username);
-        document.getElementById('username').disabled = true;  // Disable after setting
+        document.getElementById('username').disabled = true;
       }
     });
 
     let bannedWords = [];
+    let modCommands = [];
+    let modUsernames = [];
+
     fetch('https://raw.githubusercontent.com/EpicSparkZ/ecl-changelog/main/data/bannedwords.html')
       .then(res => res.text())
       .then(data => {
         bannedWords = data.split(',').map(word => word.trim().toLowerCase());
-      })
-      .catch(err => {
-        console.error('Failed to load banned words:', err);
       });
 
-    // Check if the message contains banned words
+    fetch('https://raw.githubusercontent.com/EpicSparkZ/ecl-changelog/main/data/modcommands.txt')
+      .then(res => res.text())
+      .then(data => {
+        modCommands = data.split(',').map(cmd => cmd.trim().toLowerCase());
+      });
+
+    fetch('https://raw.githubusercontent.com/EpicSparkZ/ecl-changelog/main/data/modusernames.txt')
+      .then(res => res.text())
+      .then(data => {
+        modUsernames = data.split(',').map(name => name.trim().toLowerCase());
+      });
+
     function containsBannedWords(message) {
       const words = message.toLowerCase().split(/\s+/);
       return words.some(word => bannedWords.includes(word));
     }
 
-    // Load messages from localStorage
     function loadMessages() {
       const messages = JSON.parse(localStorage.getItem('messages') || '[]');
       const messageContainer = document.getElementById('message-container');
@@ -268,7 +257,7 @@
 
         const usernameElement = document.createElement('span');
         usernameElement.classList.add('username');
-        
+
         if (msg.username.toLowerCase() === 'epicsparkz') {
           usernameElement.classList.add('rainbow');
         }
@@ -287,16 +276,15 @@
       messageContainer.scrollTop = messageContainer.scrollHeight;
     }
 
-    // Save message to localStorage
     function saveMessage(message, username) {
       const messages = JSON.parse(localStorage.getItem('messages') || '[]');
       messages.push({ username, message });
       localStorage.setItem('messages', JSON.stringify(messages));
     }
 
-    // Send a new message
     function sendMessage() {
-      const message = document.getElementById('message').value;
+      const messageInput = document.getElementById('message');
+      const message = messageInput.value;
       if (!message || !username) return;
 
       if (containsBannedWords(message)) {
@@ -304,21 +292,19 @@
         return;
       }
 
-      // Save message
       saveMessage(message, username);
 
-      // Add message to UI
       const messageContainer = document.getElementById('message-container');
       const messageElement = document.createElement('div');
       messageElement.classList.add('message');
 
       const usernameElement = document.createElement('span');
       usernameElement.classList.add('username');
-      
+
       if (username.toLowerCase() === 'epicsparkz') {
         usernameElement.classList.add('rainbow');
       }
-      
+
       usernameElement.textContent = username;
 
       const messageTextElement = document.createElement('span');
@@ -330,18 +316,23 @@
 
       messageContainer.appendChild(messageElement);
 
-      // Automatically scroll to the latest message
       messageContainer.scrollTop = messageContainer.scrollHeight;
 
-      document.getElementById('message').value = ''; // Clear the message input field
+      messageInput.value = '';
     }
 
-    // Load messages on page load
-    window.onload = loadMessages;
+    document.getElementById('message').addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') {
+        sendMessage();
+      }
+    });
 
-    // Rainbow effect for the announcement text
-    const announcementText = document.getElementById('announcement-text');
-    announcementText.innerHTML = announcementText.innerText.replace(/EpicSparkZ/gi, match => `<span class="rainbow">${match}</span>`);
+    window.onload = function () {
+      loadMessages();
+      const ann = document.getElementById('announcement-text');
+      const raw = ann.innerText;
+      ann.innerHTML = raw.replace(/(EpicSparkZ)/gi, '<span class="rainbow">$1</span>');
+    };
   </script>
 
 </body>
