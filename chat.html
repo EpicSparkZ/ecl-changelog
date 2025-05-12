@@ -49,6 +49,7 @@
       justify-content: space-between;
       align-items: center;
       padding: 10px;
+      gap: 10px;
       box-sizing: border-box;
       z-index: 1000;
     }
@@ -61,18 +62,15 @@
       padding: 10px;
       font-size: 14px;
       min-width: 120px;
+      word-wrap: break-word;
     }
 
-    /* Adjust the username input box */
     .input-bar #username {
-      width: 7%; /* Keep it short */
-      margin-right: 10px; /* Add space between username input and message input */
+      width: 7%;
     }
 
-    /* Adjust the message input box */
     .input-bar #message {
-      width: 83%; /* Make it longer than the username input */
-      margin-right: 10px; /* Add space between message input and button */
+      width: 83%;
     }
 
     .input-bar button {
@@ -95,7 +93,7 @@
       border: none;
       border-radius: 5px;
       cursor: pointer;
-      font-size: 16px; /* Adjusted font size for consistency */
+      font-size: 16px;
       z-index: 1001;
     }
 
@@ -105,7 +103,7 @@
 
     .notice {
       position: fixed;
-      bottom: 65px; /* Positioned closer to the bottom */
+      bottom: 65px;
       width: 100%;
       text-align: center;
       color: #ccc;
@@ -117,14 +115,16 @@
     }
 
     #message-container {
-      position: fixed;
-      bottom: 80px; /* Positioned above the notice */
-      width: 100%; /* Make the container stretch across the screen */
-      max-height: 50%; /* Limit the height */
+      position: absolute;
+      top: 60px;
+      bottom: 80px;
+      width: 100%;
       overflow-y: auto;
       display: flex;
-      flex-direction: column; /* This ensures new messages appear above */
-      z-index: 998; /* Ensure messages stay above notice */
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 10px;
+      box-sizing: border-box;
     }
 
     .message {
@@ -133,8 +133,9 @@
       margin-bottom: 10px;
       padding: 10px;
       color: white;
-      width: 100%; /* Make the messages stretch across the screen */
-      box-sizing: border-box; /* Ensure the padding is included in the width */
+      width: 100%;
+      box-sizing: border-box;
+      word-wrap: break-word;
     }
 
     .message .username {
@@ -164,10 +165,6 @@
         font-size: 12px;
         padding: 8px;
       }
-
-      #message-container {
-        width: 100%; /* Ensure message container stretches across small screens */
-      }
     }
   </style>
 </head>
@@ -192,11 +189,20 @@
   <button class="back-button" onclick="window.location.href='index.html';">Back</button>
 
   <script>
+    let bannedWords = [];
+
+    fetch('https://raw.githubusercontent.com/EpicSparkZ/ecl-changelog/main/data/bannedwords.html')
+      .then(res => res.text())
+      .then(data => {
+        bannedWords = data.split(',').map(word => word.trim().toLowerCase());
+      })
+      .catch(err => {
+        console.error('Failed to load banned words:', err);
+      });
+
     let rainbowInterval;
-    let usernameSet = false;
     let username = "";
 
-    // Function to animate the rainbow color effect for username 'EpicSparkZ'
     function animateRainbow() {
       let hue = 0;
       rainbowInterval = setInterval(() => {
@@ -207,17 +213,26 @@
       }, 50);
     }
 
-    // Function to send a message
+    function containsBannedWords(message) {
+      const words = message.toLowerCase().split(/\s+/);
+      return words.some(word => bannedWords.includes(word));
+    }
+
     function sendMessage() {
       username = document.getElementById('username').value;
       const message = document.getElementById('message').value;
-      if (!message || !username) return;  // Don't send empty messages
+      if (!message || !username) return;
+
+      if (containsBannedWords(message)) {
+        alert("Your message contains a banned word and was not sent.");
+        return;
+      }
 
       const messageContainer = document.getElementById('message-container');
 
       const messageElement = document.createElement('div');
       messageElement.classList.add('message');
-      
+
       const usernameElement = document.createElement('span');
       usernameElement.classList.add('username');
       if (username.toLowerCase() === 'epicsparkz') {
@@ -232,23 +247,18 @@
       messageElement.appendChild(usernameElement);
       messageElement.appendChild(messageTextElement);
 
-      messageContainer.insertBefore(messageElement, messageContainer.firstChild);  // Insert new message at the top
+      messageContainer.appendChild(messageElement);
 
-      // Reset message input
       document.getElementById('message').value = '';
-      
-      // Ensure the view scrolls to the top of the container
-      messageContainer.scrollTop = 0;
+      messageContainer.scrollTop = messageContainer.scrollHeight;
     }
 
-    // Allow pressing 'Enter' to send message
     document.getElementById('message').addEventListener('keydown', function(event) {
       if (event.key === 'Enter') {
         sendMessage();
       }
     });
 
-    // Load and apply the special announcement text
     fetch('announcementtxtspecialwords.html')
       .then(response => response.text())
       .then(data => {
@@ -259,7 +269,6 @@
         console.error('Error loading special words:', error);
       });
 
-    // Fetch the announcement text and apply rainbow effect to special words
     function fetchAnnouncementText(specialWords) {
       fetch('announcementtxt.html')
         .then(response => response.text())
@@ -281,7 +290,7 @@
     }
 
     window.addEventListener('DOMContentLoaded', () => {
-      animateRainbow();  // Start the rainbow effect after the page loads
+      animateRainbow();
     });
   </script>
 
