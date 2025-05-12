@@ -231,7 +231,7 @@
       .then(response => response.text())
       .then(data => {
         if (data) {
-          announcementText.innerHTML = data;
+          announcementText.innerHTML = data.replace(/\[rainbow\](.*?)\[\/rainbow\]/g, '<span class="rainbow">$1</span>');
         } else {
           announcementText.innerText = 'No announcements available.';
         }
