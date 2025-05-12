@@ -165,23 +165,9 @@
     }
 
     @media (max-width: 600px) {
-      .announcement-text {
-        font-size: 16px;
-      }
-
-      .input-bar input {
-        font-size: 12px;
-      }
-
-      .input-bar button {
-        font-size: 12px;
-        padding: 8px 16px;
-      }
-
-      .notice {
-        font-size: 12px;
-        padding: 8px;
-      }
+      .announcement-text { font-size: 16px; }
+      .input-bar input, .input-bar button { font-size: 12px; padding: 8px 16px; }
+      .notice { font-size: 12px; padding: 8px; }
     }
   </style>
 </head>
@@ -207,7 +193,6 @@
 
   <script>
     let username = localStorage.getItem('username') || '';
-
     if (username) {
       document.getElementById('username').value = username;
       document.getElementById('username').disabled = true;
@@ -221,27 +206,29 @@
       }
     });
 
-    let bannedWords = [];
-    let modCommands = [];
-    let modUsernames = [];
+    // Handle enter to send message
+    document.getElementById('message').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        sendMessage();
+      }
+    });
+
+    let bannedWords = [], modCommands = [], modUsernames = [];
 
     fetch('https://raw.githubusercontent.com/EpicSparkZ/ecl-changelog/main/data/bannedwords.html')
       .then(res => res.text())
-      .then(data => {
-        bannedWords = data.split(',').map(word => word.trim().toLowerCase());
-      });
+      .then(data => bannedWords = data.split(',').map(w => w.trim().toLowerCase()))
+      .catch(err => console.error('Failed to load banned words:', err));
 
-    fetch('https://raw.githubusercontent.com/EpicSparkZ/ecl-changelog/main/data/modcommands.txt')
+    fetch('https://raw.githubusercontent.com/EpicSparkZ/ecl-changelog/main/data/modcommands.html')
       .then(res => res.text())
-      .then(data => {
-        modCommands = data.split(',').map(cmd => cmd.trim().toLowerCase());
-      });
+      .then(data => modCommands = data.split(',').map(c => c.trim().toLowerCase()))
+      .catch(err => console.error('Failed to load mod commands:', err));
 
-    fetch('https://raw.githubusercontent.com/EpicSparkZ/ecl-changelog/main/data/modusernames.txt')
+    fetch('https://raw.githubusercontent.com/EpicSparkZ/ecl-changelog/main/data/modusernames.html')
       .then(res => res.text())
-      .then(data => {
-        modUsernames = data.split(',').map(name => name.trim().toLowerCase());
-      });
+      .then(data => modUsernames = data.split(',').map(u => u.trim().toLowerCase()))
+      .catch(err => console.error('Failed to load mod usernames:', err));
 
     function containsBannedWords(message) {
       const words = message.toLowerCase().split(/\s+/);
@@ -251,26 +238,21 @@
     function loadMessages() {
       const messages = JSON.parse(localStorage.getItem('messages') || '[]');
       const messageContainer = document.getElementById('message-container');
+      messageContainer.innerHTML = '';
       messages.forEach(msg => {
         const messageElement = document.createElement('div');
         messageElement.classList.add('message');
-
         const usernameElement = document.createElement('span');
         usernameElement.classList.add('username');
-
         if (msg.username.toLowerCase() === 'epicsparkz') {
           usernameElement.classList.add('rainbow');
         }
-
         usernameElement.textContent = msg.username;
-
         const messageTextElement = document.createElement('span');
         messageTextElement.classList.add('message-text');
         messageTextElement.textContent = ': ' + msg.message;
-
         messageElement.appendChild(usernameElement);
         messageElement.appendChild(messageTextElement);
-
         messageContainer.appendChild(messageElement);
       });
       messageContainer.scrollTop = messageContainer.scrollHeight;
@@ -284,8 +266,22 @@
 
     function sendMessage() {
       const messageInput = document.getElementById('message');
-      const message = messageInput.value;
+      const message = messageInput.value.trim();
       if (!message || !username) return;
+
+      // Command handling
+      if (message.startsWith('/') && modUsernames.includes(username.toLowerCase())) {
+        const command = message.slice(1).toLowerCase();
+        if (modCommands.includes(command)) {
+          if (command === 'clear') {
+            localStorage.setItem('messages', '[]');
+            loadMessages();
+            return;
+          }
+          alert(`Executed mod command: ${command}`);
+          return;
+        }
+      }
 
       if (containsBannedWords(message)) {
         alert("Your message contains a banned word and was not sent.");
@@ -297,41 +293,33 @@
       const messageContainer = document.getElementById('message-container');
       const messageElement = document.createElement('div');
       messageElement.classList.add('message');
-
       const usernameElement = document.createElement('span');
       usernameElement.classList.add('username');
-
       if (username.toLowerCase() === 'epicsparkz') {
         usernameElement.classList.add('rainbow');
       }
-
       usernameElement.textContent = username;
-
       const messageTextElement = document.createElement('span');
       messageTextElement.classList.add('message-text');
       messageTextElement.textContent = ': ' + message;
-
       messageElement.appendChild(usernameElement);
       messageElement.appendChild(messageTextElement);
-
       messageContainer.appendChild(messageElement);
-
       messageContainer.scrollTop = messageContainer.scrollHeight;
-
       messageInput.value = '';
     }
 
-    document.getElementById('message').addEventListener('keydown', function (e) {
-      if (e.key === 'Enter') {
-        sendMessage();
-      }
-    });
-
-    window.onload = function () {
+    window.onload = () => {
       loadMessages();
-      const ann = document.getElementById('announcement-text');
-      const raw = ann.innerText;
-      ann.innerHTML = raw.replace(/(EpicSparkZ)/gi, '<span class="rainbow">$1</span>');
+      fetch('https://raw.githubusercontent.com/EpicSparkZ/ecl-changelog/main/data/announcement.txt')
+        .then(res => res.text())
+        .then(data => {
+          document.getElementById('announcement-text').innerHTML = data.replace(/EpicSparkZ/gi, '<span class="rainbow">EpicSparkZ</span>');
+        })
+        .catch(err => {
+          document.getElementById('announcement-text').innerText = 'Failed to load announcement.';
+          console.error('Announcement fetch error:', err);
+        });
     };
   </script>
 
