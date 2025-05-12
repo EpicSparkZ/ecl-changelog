@@ -79,33 +79,27 @@
       z-index: 2; /* Make sure the input bar stays above the notice */
     }
 
-    .message-input {
-      width: 70%;  /* Make the message box longer */
-      padding: 8px;
+    .message-bar input, .send-button {
       background-color: #222;
       border: none;
       color: white;
       border-radius: 5px;
       font-size: 16px;
+      padding: 8px;
+    }
+
+    .message-input {
+      flex: 2; /* Make the message box take up more space */
+      margin-right: 10px; /* Spacing between message box and send button */
     }
 
     .username-input {
-      width: 25%; /* Keep the username box small but enough to see it */
-      padding: 8px;
-      background-color: #222;
-      border: none;
-      color: white;
-      border-radius: 5px;
-      font-size: 16px;
+      flex: 1; /* Make username box take less space */
+      margin-right: 10px; /* Spacing between username box and message box */
     }
 
     .send-button {
-      padding: 8px 16px;
-      font-size: 16px;
-      background-color: #444;
-      color: white;
-      border: none;
-      border-radius: 5px;
+      flex: 0.5; /* Adjust the send button size */
       cursor: pointer;
     }
 
@@ -182,6 +176,11 @@
       .username-input {
         width: 100%;
         margin-bottom: 10px;
+      }
+
+      .send-button {
+        width: 100%;
+        margin-top: 10px;
       }
     }
   </style>
