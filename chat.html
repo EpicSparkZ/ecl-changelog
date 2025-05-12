@@ -150,7 +150,7 @@
     }
 
     .rainbow {
-      animation: rainbow 4s linear infinite;
+      animation: rainbow 4s linear infinite; /* Slow down the rainbow effect */
     }
 
     @keyframes rainbow {
@@ -165,9 +165,23 @@
     }
 
     @media (max-width: 600px) {
-      .announcement-text { font-size: 16px; }
-      .input-bar input, .input-bar button { font-size: 12px; padding: 8px 16px; }
-      .notice { font-size: 12px; padding: 8px; }
+      .announcement-text {
+        font-size: 16px;
+      }
+
+      .input-bar input {
+        font-size: 12px;
+      }
+
+      .input-bar button {
+        font-size: 12px;
+        padding: 8px 16px;
+      }
+
+      .notice {
+        font-size: 12px;
+        padding: 8px;
+      }
     }
   </style>
 </head>
@@ -192,135 +206,146 @@
   <button class="back-button" onclick="window.location.href='index.html';">Back</button>
 
   <script>
+    // Check if username is already set in localStorage
     let username = localStorage.getItem('username') || '';
+
+    // Disable username input if it's already set
     if (username) {
       document.getElementById('username').value = username;
-      document.getElementById('username').disabled = true;
+      document.getElementById('username').disabled = true;  // Disable username input after setting it
     }
 
     document.getElementById('username').addEventListener('change', (e) => {
+      // If username is not set, save it to localStorage
       if (!username) {
         username = e.target.value;
         localStorage.setItem('username', username);
-        document.getElementById('username').disabled = true;
+        document.getElementById('username').disabled = true;  // Disable after setting
       }
     });
 
-    // Handle enter to send message
-    document.getElementById('message').addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
-        sendMessage();
-      }
-    });
-
-    let bannedWords = [], modCommands = [], modUsernames = [];
-
+    let bannedWords = [];
     fetch('https://raw.githubusercontent.com/EpicSparkZ/ecl-changelog/main/data/bannedwords.html')
       .then(res => res.text())
-      .then(data => bannedWords = data.split(',').map(w => w.trim().toLowerCase()))
-      .catch(err => console.error('Failed to load banned words:', err));
+      .then(data => {
+        bannedWords = data.split(',').map(word => word.trim().toLowerCase());
+      })
+      .catch(err => {
+        console.error('Failed to load banned words:', err);
+      });
 
-    fetch('https://raw.githubusercontent.com/EpicSparkZ/ecl-changelog/main/data/modcommands.html')
+    let modCommands = [];
+    fetch('modcommands.html')
       .then(res => res.text())
-      .then(data => modCommands = data.split(',').map(c => c.trim().toLowerCase()))
-      .catch(err => console.error('Failed to load mod commands:', err));
+      .then(data => {
+        modCommands = data.split(',').map(command => command.trim().toLowerCase());
+      })
+      .catch(err => {
+        console.error('Failed to load mod commands:', err);
+      });
 
-    fetch('https://raw.githubusercontent.com/EpicSparkZ/ecl-changelog/main/data/modusernames.html')
-      .then(res => res.text())
-      .then(data => modUsernames = data.split(',').map(u => u.trim().toLowerCase()))
-      .catch(err => console.error('Failed to load mod usernames:', err));
-
+    // Check if the message contains banned words
     function containsBannedWords(message) {
       const words = message.toLowerCase().split(/\s+/);
       return words.some(word => bannedWords.includes(word));
     }
 
+    // Load messages from localStorage
     function loadMessages() {
       const messages = JSON.parse(localStorage.getItem('messages') || '[]');
       const messageContainer = document.getElementById('message-container');
-      messageContainer.innerHTML = '';
       messages.forEach(msg => {
         const messageElement = document.createElement('div');
         messageElement.classList.add('message');
+
         const usernameElement = document.createElement('span');
         usernameElement.classList.add('username');
+        
         if (msg.username.toLowerCase() === 'epicsparkz') {
           usernameElement.classList.add('rainbow');
         }
+
         usernameElement.textContent = msg.username;
+
         const messageTextElement = document.createElement('span');
         messageTextElement.classList.add('message-text');
         messageTextElement.textContent = ': ' + msg.message;
+
         messageElement.appendChild(usernameElement);
         messageElement.appendChild(messageTextElement);
+
         messageContainer.appendChild(messageElement);
       });
       messageContainer.scrollTop = messageContainer.scrollHeight;
     }
 
+    // Save message to localStorage
     function saveMessage(message, username) {
       const messages = JSON.parse(localStorage.getItem('messages') || '[]');
       messages.push({ username, message });
       localStorage.setItem('messages', JSON.stringify(messages));
     }
 
+    // Send a new message
     function sendMessage() {
-      const messageInput = document.getElementById('message');
-      const message = messageInput.value.trim();
+      const message = document.getElementById('message').value;
       if (!message || !username) return;
-
-      // Command handling
-      if (message.startsWith('/') && modUsernames.includes(username.toLowerCase())) {
-        const command = message.slice(1).toLowerCase();
-        if (modCommands.includes(command)) {
-          if (command === 'clear') {
-            localStorage.setItem('messages', '[]');
-            loadMessages();
-            return;
-          }
-          alert(`Executed mod command: ${command}`);
-          return;
-        }
-      }
 
       if (containsBannedWords(message)) {
         alert("Your message contains a banned word and was not sent.");
         return;
       }
 
+      // Save message
       saveMessage(message, username);
 
+      // Add message to UI
       const messageContainer = document.getElementById('message-container');
       const messageElement = document.createElement('div');
       messageElement.classList.add('message');
+
       const usernameElement = document.createElement('span');
       usernameElement.classList.add('username');
+      
       if (username.toLowerCase() === 'epicsparkz') {
         usernameElement.classList.add('rainbow');
       }
+      
       usernameElement.textContent = username;
+
       const messageTextElement = document.createElement('span');
       messageTextElement.classList.add('message-text');
       messageTextElement.textContent = ': ' + message;
+
       messageElement.appendChild(usernameElement);
       messageElement.appendChild(messageTextElement);
+
       messageContainer.appendChild(messageElement);
+
+      // Automatically scroll to the latest message
       messageContainer.scrollTop = messageContainer.scrollHeight;
-      messageInput.value = '';
+
+      document.getElementById('message').value = ''; // Clear the message input field
     }
 
-    window.onload = () => {
-      loadMessages();
-      fetch('https://raw.githubusercontent.com/EpicSparkZ/ecl-changelog/main/data/announcement.txt')
-        .then(res => res.text())
-        .then(data => {
-          document.getElementById('announcement-text').innerHTML = data.replace(/EpicSparkZ/gi, '<span class="rainbow">EpicSparkZ</span>');
-        })
-        .catch(err => {
-          document.getElementById('announcement-text').innerText = 'Failed to load announcement.';
-          console.error('Announcement fetch error:', err);
-        });
-    };
+    // Handle moderator commands dynamically
+    function handleModCommands(command) {
+      if (modCommands.includes(command)) {
+        if (command === 'clearchat') {
+          // Clear the chat
+          document.getElementById('message-container').innerHTML = '';
+          alert("Chat cleared.");
+        }
+        // Add other mod commands here dynamically, like ban, mute, etc.
+      }
+    }
+
+    // Load messages on page load
+    window.onload = loadMessages;
+
+    // Rainbow effect for the announcement text
+    const announcementText = document.getElementById('announcement-text');
+    announcementText.innerHTML = announcementText.innerText.replace(/EpicSparkZ/gi, match => `<span class="rainbow">${match}</span>`);
   </script>
 
 </body>
