@@ -37,8 +37,6 @@
       color: white;
       font-size: 18px;
       font-weight: bold;
-      max-width: 100%;
-      overflow-wrap: break-word;
       word-wrap: break-word;
       white-space: pre-wrap;
     }
@@ -208,7 +206,6 @@
   <button class="back-button" onclick="window.location.href='index.html';">Back</button>
 
   <script>
-    // Check if username is already set in localStorage
     let username = localStorage.getItem('username') || '';
 
     // Disable username input if it's already set
@@ -225,22 +222,6 @@
         document.getElementById('username').disabled = true;  // Disable after setting
       }
     });
-
-    let bannedWords = [];
-    fetch('https://raw.githubusercontent.com/EpicSparkZ/ecl-changelog/main/data/bannedwords.html')
-      .then(res => res.text())
-      .then(data => {
-        bannedWords = data.split(',').map(word => word.trim().toLowerCase());
-      })
-      .catch(err => {
-        console.error('Failed to load banned words:', err);
-      });
-
-    // Check if the message contains banned words
-    function containsBannedWords(message) {
-      const words = message.toLowerCase().split(/\s+/);
-      return words.some(word => bannedWords.includes(word));
-    }
 
     // Fetch announcement from the raw GitHub URL
     const announcementText = document.getElementById('announcement-text');
@@ -264,6 +245,7 @@
     function loadMessages() {
       const messages = JSON.parse(localStorage.getItem('messages') || '[]');
       const messageContainer = document.getElementById('message-container');
+      messageContainer.innerHTML = ''; // Clear existing messages before loading new ones
       messages.forEach(msg => {
         const messageElement = document.createElement('div');
         messageElement.classList.add('message');
@@ -300,11 +282,6 @@
     function sendMessage() {
       const message = document.getElementById('message').value;
       if (!message || !username) return;
-
-      if (containsBannedWords(message)) {
-        alert("Your message contains a banned word and was not sent.");
-        return;
-      }
 
       // Save message
       saveMessage(message, username);
