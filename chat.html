@@ -62,8 +62,8 @@
       border-radius: 5px;
       padding: 10px;
       font-size: 14px;
-      width: 40%; /* Adjusted width for the username and message boxes */
-      min-width: 100px;
+      width: 35%; /* Smaller width for the username box */
+      min-width: 120px;
     }
 
     .input-bar button {
@@ -79,7 +79,7 @@
     .back-button {
       position: fixed;
       top: 10px;
-      right: 10px; /* Positioned on the right now */
+      right: 10px;
       padding: 10px 20px;
       background-color: #444;
       color: white;
@@ -95,7 +95,7 @@
 
     .notice {
       position: fixed;
-      bottom: 70px; /* Adjusted to be just above the input bar */
+      bottom: 70px;
       width: 100%;
       text-align: center;
       color: #ccc;
@@ -109,6 +109,8 @@
     #message-container {
       margin-bottom: 80px;
       padding: 20px;
+      overflow-y: auto;
+      max-height: 300px;
     }
 
     .message {
@@ -185,13 +187,25 @@
       }, 50);
     }
 
-    // Function to lock the username once it is set
+    // Load username from localStorage if available
+    window.onload = function() {
+      const savedUsername = localStorage.getItem('username');
+      if (savedUsername) {
+        username = savedUsername;
+        document.getElementById('username').value = username;
+        document.getElementById('username').disabled = true;  // Disable input if username is already set
+        usernameSet = true;
+      }
+    }
+
+    // Function to lock the username once it's set
     function setUsername() {
       if (!usernameSet) {
         username = document.getElementById('username').value;
         if (username) {
           usernameSet = true;
           document.getElementById('username').disabled = true;  // Disable the username input after it's set
+          localStorage.setItem('username', username);  // Save username in localStorage
         }
       }
     }
@@ -221,11 +235,21 @@
       messageElement.appendChild(usernameElement);
       messageElement.appendChild(messageTextElement);
 
-      messageContainer.prepend(messageElement);  // New messages appear at the top
+      messageContainer.appendChild(messageElement);  // New messages will appear below
+
+      // Scroll to the bottom after a new message is added
+      messageContainer.scrollTop = messageContainer.scrollHeight;
 
       // Reset message input
       document.getElementById('message').value = '';
     }
+
+    // Allow pressing 'Enter' to send message
+    document.getElementById('message').addEventListener('keydown', function(event) {
+      if (event.key === 'Enter') {
+        sendMessage();
+      }
+    });
 
     // Load and apply the special announcement text
     fetch('announcementtxtspecialwords.html')
