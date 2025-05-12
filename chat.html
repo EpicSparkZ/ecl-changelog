@@ -126,7 +126,7 @@
       justify-content: flex-end;
       padding: 10px;
       box-sizing: border-box;
-      max-height: calc(100vh - 140px);  /* Allow the messages to scroll above the input bar */
+      max-height: calc(100vh - 140px);
     }
 
     .message {
@@ -150,7 +150,7 @@
     }
 
     .rainbow {
-      animation: rainbow 4s linear infinite; /* Slow down the rainbow effect */
+      animation: rainbow 4s linear infinite;
     }
 
     @keyframes rainbow {
@@ -168,16 +168,13 @@
       .announcement-text {
         font-size: 16px;
       }
-
       .input-bar input {
         font-size: 12px;
       }
-
       .input-bar button {
         font-size: 12px;
         padding: 8px 16px;
       }
-
       .notice {
         font-size: 12px;
         padding: 8px;
@@ -207,6 +204,7 @@
 
   <script>
     let username = localStorage.getItem('username') || '';
+    let modUsers = [];
 
     if (username) {
       document.getElementById('username').value = username;
@@ -221,127 +219,94 @@
       }
     });
 
-    // Fetch announcement text
     const announcementText = document.getElementById('announcement-text');
     const announcementUrl = 'https://raw.githubusercontent.com/EpicSparkZ/ecl-changelog/main/announcementtxt.html';
 
     fetch(announcementUrl)
       .then(response => response.text())
       .then(data => {
-        if (data) {
-          announcementText.innerHTML = data;
-        } else {
-          announcementText.innerText = 'No announcements available.';
-        }
+        const specialWords = ['IMPORTANT', 'NEW', 'UPDATE', 'ALERT'];
+        const escaped = data.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        const highlighted = escaped.replace(
+          new RegExp(`\\b(${specialWords.join('|')})\\b`, 'gi'),
+          '<span class="rainbow">$1</span>'
+        );
+        announcementText.innerHTML = highlighted;
       })
       .catch(err => {
         console.error('Error fetching announcement:', err);
         announcementText.innerText = 'Error loading announcement.';
       });
 
-    // Define commands within the code
-    const commands = {
-      'clear': () => {
-        // Clear chat messages
-        localStorage.removeItem('messages');
-        loadMessages();
-      },
-      'ping': () => {
-        // Reply with a ping message
-        sendSystemMessage('Pong!');
-      },
-      'hello': () => {
-        // Reply with a hello message
-        sendSystemMessage('Hello, how can I assist you today?');
-      },
-      'clearchat': () => {
-        // Clear chat messages and refresh chat
-        if (modUsers.includes(username.toLowerCase())) {
-          localStorage.removeItem('messages');
-          loadMessages();
-          sendSystemMessage('Chat has been cleared!');
-        } else {
-          sendSystemMessage('You do not have permission to use this command.');
-        }
-      }
-    };
-
-    // Fetch mod users from modusernames.html
-    let modUsers = [];
     fetch('modusernames.html')
       .then(response => response.text())
       .then(data => {
-        modUsers = data.split('\n').map(line => line.trim()).filter(line => line.length > 0);
-      })
-      .catch(err => console.error('Error loading mod user list:', err));
+        modUsers = data.split(/\r?\n/).map(u => u.trim().toLowerCase());
+      });
 
-    // Load messages from localStorage
     function loadMessages() {
       const messages = JSON.parse(localStorage.getItem('messages') || '[]');
-      const messageContainer = document.getElementById('message-container');
-      messageContainer.innerHTML = '';
+      const container = document.getElementById('message-container');
+      container.innerHTML = '';
       messages.forEach(msg => {
-        const messageElement = document.createElement('div');
-        messageElement.classList.add('message');
-        const usernameElement = document.createElement('span');
-        usernameElement.classList.add('username');
-        if (msg.username.toLowerCase() === 'epicsparkz') {
-          usernameElement.classList.add('rainbow');
-        }
-        usernameElement.textContent = msg.username;
-        const messageTextElement = document.createElement('span');
-        messageTextElement.classList.add('message-text');
-        messageTextElement.textContent = ': ' + msg.message;
-        messageElement.appendChild(usernameElement);
-        messageElement.appendChild(messageTextElement);
-        messageContainer.appendChild(messageElement);
+        const msgDiv = document.createElement('div');
+        msgDiv.classList.add('message');
+
+        const userEl = document.createElement('span');
+        userEl.classList.add('username');
+        if (msg.username.toLowerCase() === 'epicsparkz') userEl.classList.add('rainbow');
+        userEl.textContent = msg.username;
+
+        const textEl = document.createElement('span');
+        textEl.classList.add('message-text');
+        textEl.textContent = ': ' + msg.message;
+
+        msgDiv.appendChild(userEl);
+        msgDiv.appendChild(textEl);
+        container.appendChild(msgDiv);
       });
-      messageContainer.scrollTop = messageContainer.scrollHeight;
+      container.scrollTop = container.scrollHeight;
     }
 
-    // Save message to localStorage
     function saveMessage(message, username) {
       const messages = JSON.parse(localStorage.getItem('messages') || '[]');
       messages.push({ username, message });
       localStorage.setItem('messages', JSON.stringify(messages));
     }
 
-    // Send a system message (e.g., responses from commands)
-    function sendSystemMessage(message) {
-      const messageContainer = document.getElementById('message-container');
-      const messageElement = document.createElement('div');
-      messageElement.classList.add('message');
-      const systemMessageElement = document.createElement('span');
-      systemMessageElement.classList.add('message-text');
-      systemMessageElement.textContent = message;
-      messageElement.appendChild(systemMessageElement);
-      messageContainer.appendChild(messageElement);
-      messageContainer.scrollTop = messageContainer.scrollHeight;
+    function clearChat() {
+      localStorage.setItem('messages', '[]');
+      loadMessages();
     }
 
-    // Send a new message
     function sendMessage() {
-      const message = document.getElementById('message').value;
-      if (!message || !username) return;
+      const msgInput = document.getElementById('message');
+      const msg = msgInput.value.trim();
+      if (!msg || !username) return;
 
-      // Check if it's a command
-      if (message.startsWith('/')) {
-        const command = message.slice(1).split(' ')[0].toLowerCase();
-        if (commands[command] && modUsers.includes(username.toLowerCase())) {
-          commands[command]();  // Execute command if valid
-          document.getElementById('message').value = '';
+      if (msg.startsWith('/clearchat')) {
+        if (modUsers.includes(username.toLowerCase())) {
+          clearChat();
         } else {
-          sendSystemMessage('Unknown command or insufficient permissions.');
+          alert("You are not allowed to use this command.");
         }
-      } else {
-        saveMessage(message, username);
-        loadMessages();
-        document.getElementById('message').value = '';
+        msgInput.value = '';
+        return;
       }
+
+      saveMessage(msg, username);
+      msgInput.value = '';
+      loadMessages();
     }
 
-    // Initialize messages on page load
-    loadMessages();
+    document.getElementById('message').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        sendMessage();
+      }
+    });
+
+    window.onload = loadMessages;
   </script>
 
 </body>
