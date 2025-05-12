@@ -148,7 +148,7 @@
     }
 
     .rainbow {
-      animation: rainbow 2s linear infinite;
+      animation: rainbow 4s linear infinite; /* Slow down the rainbow effect */
     }
 
     @keyframes rainbow {
@@ -273,15 +273,25 @@
       }
     });
 
-    // Load the announcement text
+    // Load the announcement text and apply rainbow effect to special words
     fetch('announcementtxt.html')
       .then(response => response.text())
       .then(data => {
-        document.getElementById('announcement-text').innerHTML = data;
+        const specialWords = ['special', 'words', 'here']; // Replace with actual special words
+        const modifiedText = applyRainbowEffect(data, specialWords);
+        document.getElementById('announcement-text').innerHTML = modifiedText;
       })
       .catch(error => {
         console.error('Error loading announcement text:', error);
       });
+
+    function applyRainbowEffect(text, specialWords) {
+      specialWords.forEach(word => {
+        const regex = new RegExp(`(${word})`, 'gi');
+        text = text.replace(regex, '<span class="rainbow">$1</span>');
+      });
+      return text;
+    }
   </script>
 
 </body>
