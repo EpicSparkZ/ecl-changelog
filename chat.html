@@ -15,7 +15,6 @@
       display: flex;
       flex-direction: column;
       height: 100vh;
-      overflow: hidden;
     }
 
     .top-strip {
@@ -37,6 +36,8 @@
       color: white;
       font-size: 18px;
       font-weight: bold;
+      max-width: 100%;
+      overflow-wrap: break-word;
       word-wrap: break-word;
       white-space: pre-wrap;
     }
@@ -104,7 +105,7 @@
 
     .notice {
       position: fixed;
-      bottom: 55px;
+      bottom: 60px;
       width: 100%;
       text-align: center;
       color: #ccc;
@@ -126,7 +127,6 @@
       justify-content: flex-end;
       padding: 10px;
       box-sizing: border-box;
-      max-height: calc(100vh - 140px);  /* Allow the messages to scroll above the input bar */
     }
 
     .message {
@@ -150,7 +150,7 @@
     }
 
     .rainbow {
-      animation: rainbow 4s linear infinite; /* Slow down the rainbow effect */
+      animation: rainbow 4s linear infinite;
     }
 
     @keyframes rainbow {
@@ -192,7 +192,7 @@
   </div>
 
   <div class="notice">
-    NOTICE: This feature is experimental and may not work at times. Chats are currently Local Side. Do not expect this to always be here.
+    NOTICE: This feature is experimental and may not work at times. Do not expect this to always be here.
   </div>
 
   <div id="message-container"></div>
@@ -206,83 +206,50 @@
   <button class="back-button" onclick="window.location.href='index.html';">Back</button>
 
   <script>
-    let username = localStorage.getItem('username') || '';
+    let username = localStorage.getItem('username') || ''; // Load the username from localStorage
 
     // Disable username input if it's already set
     if (username) {
       document.getElementById('username').value = username;
-      document.getElementById('username').disabled = true;  // Disable username input after setting it
+      document.getElementById('username').disabled = true;
     }
 
-    document.getElementById('username').addEventListener('change', (e) => {
-      // If username is not set, save it to localStorage
+    // Listen for changes to the username input
+    document.getElementById('username').addEventListener('change', function() {
       if (!username) {
-        username = e.target.value;
-        localStorage.setItem('username', username);
-        document.getElementById('username').disabled = true;  // Disable after setting
+        username = this.value;
+        localStorage.setItem('username', username); // Save username to localStorage
+        document.getElementById('username').disabled = true; // Lock username
       }
     });
 
-    // Fetch announcement from the raw GitHub URL
-    const announcementText = document.getElementById('announcement-text');
-    const announcementUrl = 'https://raw.githubusercontent.com/EpicSparkZ/ecl-changelog/main/announcementtxt.html'; // Corrected raw URL for the HTML file
-    const rainbowWordsUrl = 'https://raw.githubusercontent.com/EpicSparkZ/ecl-changelog/main/data/announcementtxtspecialwords.html';
-
-    fetch(rainbowWordsUrl)
-      .then(response => response.text())
-      .then(wordData => {
-        const rainbowWords = wordData
-          .split(',')
-          .map(w => w.trim())
-          .filter(w => w.length > 0);
-
-        fetch(announcementUrl)
-          .then(response => response.text())
-          .then(data => {
-            if (data) {
-              announcementText.innerHTML = applyRainbowEffect(data, rainbowWords);  // Apply rainbow effect
-            } else {
-              announcementText.innerText = 'No announcements available.';
-            }
-          })
-          .catch(err => {
-            console.error('Error fetching announcement:', err);
-            announcementText.innerText = 'Error loading announcement.';
-          });
+    let bannedWords = [];
+    fetch('https://raw.githubusercontent.com/EpicSparkZ/ecl-changelog/main/data/bannedwords.html')
+      .then(res => res.text())
+      .then(data => {
+        bannedWords = data.split(',').map(word => word.trim().toLowerCase());
       })
-      .catch(error => {
-        console.error('Error fetching special words:', error);
-      });
+      .catch(err => console.error('Failed to load banned words:', err));
 
-    // Function to apply the rainbow effect to special words
-    function applyRainbowEffect(text, rainbowWords) {
-      rainbowWords.forEach(word => {
-        const regex = new RegExp(`(${escapeRegExp(word)})`, 'gi');
-        text = text.replace(regex, '<span class="rainbow">$1</span>');
-      });
-      return text;
-    }
-
-    function escapeRegExp(string) {
-      return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    // Function to check if a message contains banned words
+    function containsBannedWords(message) {
+      const words = message.toLowerCase().split(/\s+/);
+      return words.some(word => bannedWords.includes(word));
     }
 
     // Load messages from localStorage
     function loadMessages() {
       const messages = JSON.parse(localStorage.getItem('messages') || '[]');
       const messageContainer = document.getElementById('message-container');
-      messageContainer.innerHTML = ''; // Clear existing messages before loading new ones
       messages.forEach(msg => {
         const messageElement = document.createElement('div');
         messageElement.classList.add('message');
-
+        
         const usernameElement = document.createElement('span');
         usernameElement.classList.add('username');
-        
         if (msg.username.toLowerCase() === 'epicsparkz') {
           usernameElement.classList.add('rainbow');
         }
-
         usernameElement.textContent = msg.username;
 
         const messageTextElement = document.createElement('span');
@@ -294,7 +261,7 @@
 
         messageContainer.appendChild(messageElement);
       });
-      messageContainer.scrollTop = messageContainer.scrollHeight; // Ensure we scroll to the bottom
+      messageContainer.scrollTop = messageContainer.scrollHeight;
     }
 
     // Save message to localStorage
@@ -304,18 +271,45 @@
       localStorage.setItem('messages', JSON.stringify(messages));
     }
 
-    // Send message
+    // Send a new message
     function sendMessage() {
-      const message = document.getElementById('message').value.trim();
-      if (message !== '') {
-        const user = document.getElementById('username').value.trim();
-        if (user) {
-          saveMessage(message, user);
-          loadMessages();
-          document.getElementById('message').value = '';
-        }
+      const message = document.getElementById('message').value;
+      if (!message || !username) return;
+
+      if (containsBannedWords(message)) {
+        alert("Your message contains a banned word and was not sent.");
+        return;
       }
+
+      saveMessage(message, username); // Save message to localStorage
+
+      const messageContainer = document.getElementById('message-container');
+      const messageElement = document.createElement('div');
+      messageElement.classList.add('message');
+
+      const usernameElement = document.createElement('span');
+      usernameElement.classList.add('username');
+      if (username.toLowerCase() === 'epicsparkz') {
+        usernameElement.classList.add('rainbow');
+      }
+      usernameElement.textContent = username;
+
+      const messageTextElement = document.createElement('span');
+      messageTextElement.classList.add('message-text');
+      messageTextElement.textContent = ': ' + message;
+
+      messageElement.appendChild(usernameElement);
+      messageElement.appendChild(messageTextElement);
+
+      messageContainer.appendChild(messageElement);
+      messageContainer.scrollTop = messageContainer.scrollHeight; // Auto-scroll to the latest message
+
+      document.getElementById('message').value = ''; // Clear the input field
     }
+
+    window.addEventListener('DOMContentLoaded', loadMessages); // Load messages when the page loads
+
   </script>
+
 </body>
 </html>
