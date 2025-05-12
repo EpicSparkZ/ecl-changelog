@@ -236,6 +236,19 @@
       return words.some(word => bannedWords.includes(word));
     }
 
+    // Function to apply rainbow effect to special words
+    function applyRainbowEffect(text) {
+      const specialWords = ['EpicSparkZ']; // Add more special words if needed
+      let modifiedText = text;
+
+      specialWords.forEach(word => {
+        const regex = new RegExp(`(${word})`, 'gi');
+        modifiedText = modifiedText.replace(regex, '<span class="rainbow">$1</span>');
+      });
+
+      return modifiedText;
+    }
+
     // Load messages from localStorage
     function loadMessages() {
       const messages = JSON.parse(localStorage.getItem('messages') || '[]');
@@ -253,7 +266,7 @@
 
         const messageTextElement = document.createElement('span');
         messageTextElement.classList.add('message-text');
-        messageTextElement.textContent = ': ' + msg.message;
+        messageTextElement.innerHTML = ': ' + applyRainbowEffect(msg.message);
 
         messageElement.appendChild(usernameElement);
         messageElement.appendChild(messageTextElement);
@@ -295,7 +308,7 @@
 
       const messageTextElement = document.createElement('span');
       messageTextElement.classList.add('message-text');
-      messageTextElement.textContent = ': ' + message;
+      messageTextElement.innerHTML = ': ' + applyRainbowEffect(message);
 
       messageElement.appendChild(usernameElement);
       messageElement.appendChild(messageTextElement);
@@ -317,7 +330,7 @@
     fetch('announcementtxt.html')
       .then(response => response.text())
       .then(data => {
-        document.getElementById('announcement-text').textContent = data;
+        document.getElementById('announcement-text').innerHTML = applyRainbowEffect(data);
       })
       .catch(error => {
         console.error('Error loading announcement text:', error);
