@@ -317,7 +317,7 @@
     fetch('announcementtxtspecialwords.html')
       .then(response => response.text())
       .then(data => {
-        specialWords = data.split(',').map(word => word.trim()).filter(word => word.length > 0);
+        specialWords = data.split(',').map(word => word.trim()).filter(word => word.length > 0); // Handle comma-separated usernames
         return fetch('announcementtxt.html');
       })
       .then(response => response.text())
