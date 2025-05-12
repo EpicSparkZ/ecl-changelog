@@ -355,6 +355,15 @@
     function escapeRegExp(string) {
       return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     }
+
+    // Add event listener for "Enter" key to send message
+    document.getElementById('message').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();  // Prevent the default action (creating a new line)
+        sendMessage();
+      }
+    });
+
   </script>
 
 </body>
