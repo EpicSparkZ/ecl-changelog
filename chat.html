@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <title>Chat</title>
   <link rel="icon" href="/list_icon.png">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Mobile support -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body {
       background-color: #121212;
@@ -13,6 +13,9 @@
       margin: 0;
       padding: 0;
       overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
     }
 
     .top-strip {
@@ -38,10 +41,6 @@
       overflow-wrap: break-word;
     }
 
-    .rainbow {
-      transition: color 0.5s linear;
-    }
-
     .input-bar {
       position: fixed;
       bottom: 0;
@@ -62,7 +61,7 @@
       border-radius: 5px;
       padding: 10px;
       font-size: 14px;
-      width: 35%; /* Smaller width for the username box */
+      width: 35%;
       min-width: 120px;
     }
 
@@ -110,7 +109,8 @@
       margin-bottom: 80px;
       padding: 20px;
       overflow-y: auto;
-      max-height: 300px;
+      max-height: 70%;
+      flex-grow: 1;
     }
 
     .message {
@@ -119,6 +119,7 @@
       margin-bottom: 10px;
       padding: 10px;
       color: white;
+      max-width: 90%;
     }
 
     .message .username {
@@ -161,6 +162,8 @@
     NOTICE: This feature is experimental and may not work at times. Do not expect this to always be here.
   </div>
 
+  <div id="message-container"></div>
+
   <div class="input-bar">
     <input type="text" id="username" placeholder="Enter your username" />
     <input type="text" id="message" placeholder="Enter your message" />
@@ -168,8 +171,6 @@
   </div>
 
   <button class="back-button" onclick="window.location.href='index.html';">Back</button>
-
-  <div id="message-container"></div>
 
   <script>
     let rainbowInterval;
