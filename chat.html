@@ -12,7 +12,7 @@
       font-family: sans-serif;
       margin: 0;
       padding: 0;
-      overflow-x: hidden; /* Prevent horizontal scroll */
+      overflow-x: hidden;
     }
 
     .top-strip {
@@ -28,7 +28,6 @@
       padding: 10px;
       box-sizing: border-box;
       text-align: center;
-      flex-wrap: wrap;
     }
 
     .announcement-text {
@@ -43,21 +42,53 @@
       transition: color 0.5s linear;
     }
 
-    button {
+    .input-bar {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      background-color: #222;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px;
+      box-sizing: border-box;
+      z-index: 1000;
+    }
+
+    .input-bar input {
+      background-color: #444;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      padding: 10px;
+      width: 35%;
+      font-size: 14px;
+    }
+
+    .input-bar button {
+      background-color: #444;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      padding: 10px 20px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .back-button {
       position: fixed;
       top: 10px;
-      right: 10px;
+      left: 10px;
       padding: 10px 20px;
-      font-size: 16px;
       background-color: #444;
       color: white;
       border: none;
       border-radius: 5px;
       cursor: pointer;
-      z-index: 1000;
+      z-index: 1001;
     }
 
-    button:hover {
+    .back-button:hover {
       background-color: #666;
     }
 
@@ -71,40 +102,11 @@
       padding: 10px;
       box-sizing: border-box;
       pointer-events: none;
-    }
-
-    .input-bar {
-      position: fixed;
-      bottom: 0;
-      width: 100%;
-      background-color: #222;
-      display: flex;
-      justify-content: space-between;
-      padding: 10px;
-      box-sizing: border-box;
-      z-index: 1001;
-    }
-
-    .input-bar input, .input-bar button {
-      background-color: #444;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      padding: 10px;
-    }
-
-    .input-bar input {
-      width: 50%;
-      margin-right: 10px;
-    }
-
-    .input-bar button {
-      width: 20%;
-      cursor: pointer;
+      z-index: 999;
     }
 
     #message-container {
-      margin-top: 80px; /* Ensuring the messages don't overlap the bar */
+      margin-bottom: 80px;
     }
 
     @media (max-width: 600px) {
@@ -112,19 +114,18 @@
         font-size: 16px;
       }
 
-      button {
+      .input-bar input {
+        font-size: 12px;
+      }
+
+      .input-bar button {
+        font-size: 12px;
         padding: 8px 16px;
-        font-size: 14px;
       }
 
       .notice {
         font-size: 12px;
         padding: 8px;
-      }
-
-      .input-bar input, .input-bar button {
-        padding: 8px;
-        font-size: 14px;
       }
     }
   </style>
@@ -145,7 +146,7 @@
     <button onclick="sendMessage()">Send</button>
   </div>
 
-  <button onclick="window.location.href='index.html';">Back</button>
+  <button class="back-button" onclick="window.location.href='index.html';">Back</button>
 
   <div id="message-container"></div>
 
