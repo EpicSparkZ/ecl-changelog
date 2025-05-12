@@ -94,12 +94,17 @@
     }
 
     .input-bar input {
-      width: 70%;
+      width: 50%;
+      margin-right: 10px;
     }
 
     .input-bar button {
       width: 20%;
       cursor: pointer;
+    }
+
+    #message-container {
+      margin-top: 80px; /* Ensuring the messages don't overlap the bar */
     }
 
     @media (max-width: 600px) {
@@ -185,6 +190,37 @@
 
       // Reset message input
       document.getElementById('message').value = '';
+    }
+
+    // Ensures announcement loads correctly
+    fetch('announcementtxtspecialwords.html')
+      .then(response => response.text())
+      .then(data => {
+        const specialWords = data.split(',').map(word => word.trim());
+        fetchAnnouncementText(specialWords);
+      })
+      .catch(error => {
+        console.error('Error loading special words:', error);
+      });
+
+    function fetchAnnouncementText(specialWords) {
+      fetch('announcementtxt.html')
+        .then(response => response.text())
+        .then(data => {
+          const modifiedText = applyRainbowEffect(data, specialWords);
+          document.getElementById('announcement-text').innerHTML = modifiedText;
+        })
+        .catch(error => {
+          console.error('Error loading announcement text:', error);
+        });
+    }
+
+    function applyRainbowEffect(text, specialWords) {
+      specialWords.forEach(word => {
+        const regex = new RegExp(`(${word})`, 'gi');
+        text = text.replace(regex, '<span class="rainbow">$1</span>');
+      });
+      return text;
     }
 
     window.addEventListener('DOMContentLoaded', () => {
