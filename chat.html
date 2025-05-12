@@ -150,7 +150,7 @@
     }
 
     .rainbow {
-      animation: rainbow 4s linear infinite;
+      animation: rainbow 4s linear infinite; /* Slow down the rainbow effect */
     }
 
     @keyframes rainbow {
@@ -212,14 +212,15 @@
     // Disable username input if it's already set
     if (username) {
       document.getElementById('username').value = username;
-      document.getElementById('username').disabled = true;
+      document.getElementById('username').disabled = true;  // Disable username input after setting it
     }
 
     document.getElementById('username').addEventListener('change', (e) => {
+      // If username is not set, save it to localStorage
       if (!username) {
         username = e.target.value;
         localStorage.setItem('username', username);
-        document.getElementById('username').disabled = true;
+        document.getElementById('username').disabled = true;  // Disable after setting
       }
     });
 
@@ -233,11 +234,13 @@
         console.error('Failed to load banned words:', err);
       });
 
+    // Check if the message contains banned words
     function containsBannedWords(message) {
       const words = message.toLowerCase().split(/\s+/);
       return words.some(word => bannedWords.includes(word));
     }
 
+    // Load messages from localStorage
     function loadMessages() {
       const messages = JSON.parse(localStorage.getItem('messages') || '[]');
       const messageContainer = document.getElementById('message-container');
@@ -266,12 +269,14 @@
       messageContainer.scrollTop = messageContainer.scrollHeight;
     }
 
+    // Save message to localStorage
     function saveMessage(message, username) {
       const messages = JSON.parse(localStorage.getItem('messages') || '[]');
       messages.push({ username, message });
       localStorage.setItem('messages', JSON.stringify(messages));
     }
 
+    // Send a new message
     function sendMessage() {
       const message = document.getElementById('message').value;
       if (!message || !username) return;
@@ -281,8 +286,10 @@
         return;
       }
 
+      // Save message
       saveMessage(message, username);
 
+      // Add message to UI
       const messageContainer = document.getElementById('message-container');
       const messageElement = document.createElement('div');
       messageElement.classList.add('message');
@@ -293,7 +300,7 @@
       if (username.toLowerCase() === 'epicsparkz') {
         usernameElement.classList.add('rainbow');
       }
-
+      
       usernameElement.textContent = username;
 
       const messageTextElement = document.createElement('span');
@@ -304,30 +311,37 @@
       messageElement.appendChild(messageTextElement);
 
       messageContainer.appendChild(messageElement);
+
+      // Automatically scroll to the latest message
       messageContainer.scrollTop = messageContainer.scrollHeight;
 
-      document.getElementById('message').value = '';
+      document.getElementById('message').value = ''; // Clear the message input field
     }
 
     // Load messages on page load
     window.onload = loadMessages;
 
-    // Handling the Enter key to send messages
-    document.getElementById('message').addEventListener('keypress', function(event) {
-      if (event.key === 'Enter') {
-        sendMessage();
-      }
-    });
-
-    // Fetching announcements
+    // Fetch announcement
     const announcementText = document.getElementById('announcement-text');
-    fetch('https://your-api-url-here') // Replace with actual announcement URL
-      .then(response => response.json())
+    const announcementUrl = 'https://your-api-url-here'; // <-- Update this with your actual URL
+
+    fetch(announcementUrl)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Failed to fetch announcement');
+        }
+        return response.json();
+      })
       .then(data => {
-        announcementText.innerText = data.announcement || 'No announcements available.';
+        if (data && data.announcement) {
+          announcementText.innerText = data.announcement;
+        } else {
+          announcementText.innerText = 'No announcements available.';
+        }
       })
       .catch(err => {
-        console.error('Failed to load announcement:', err);
+        console.error('Error fetching announcement:', err);
+        announcementText.innerText = 'Error loading announcement.';
       });
   </script>
 
