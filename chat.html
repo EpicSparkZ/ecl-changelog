@@ -61,8 +61,8 @@
       border: none;
       border-radius: 5px;
       padding: 10px;
-      width: 35%;
       font-size: 14px;
+      width: 35%;
     }
 
     .input-bar button {
@@ -94,7 +94,7 @@
 
     .notice {
       position: fixed;
-      bottom: 70px;  /* Adjusted to be just above the input bar */
+      bottom: 70px; /* Adjusted to be just above the input bar */
       width: 100%;
       text-align: center;
       color: #ccc;
@@ -107,6 +107,24 @@
 
     #message-container {
       margin-bottom: 80px;
+      padding: 20px;
+    }
+
+    .message {
+      background-color: #333;
+      border-radius: 5px;
+      margin-bottom: 10px;
+      padding: 10px;
+      color: white;
+    }
+
+    .message .username {
+      font-weight: bold;
+      margin-right: 5px;
+    }
+
+    .message .message-text {
+      color: #ccc;
     }
 
     @media (max-width: 600px) {
@@ -152,7 +170,10 @@
 
   <script>
     let rainbowInterval;
+    let usernameSet = false;
+    let username = "";
 
+    // Function to animate the rainbow color effect for username 'EpicSparkZ'
     function animateRainbow() {
       let hue = 0;
       rainbowInterval = setInterval(() => {
@@ -163,10 +184,22 @@
       }, 50);
     }
 
+    // Function to lock the username once it is set
+    function setUsername() {
+      if (!usernameSet) {
+        username = document.getElementById('username').value;
+        if (username) {
+          usernameSet = true;
+          document.getElementById('username').disabled = true;  // Disable the username input after it's set
+        }
+      }
+    }
+
+    // Function to send a message
     function sendMessage() {
-      const username = document.getElementById('username').value;
+      setUsername();  // Lock username if it's not already set
       const message = document.getElementById('message').value;
-      if (!username || !message) return;
+      if (!message || !username) return;  // Don't send empty messages
 
       const messageContainer = document.getElementById('message-container');
 
@@ -186,14 +219,14 @@
 
       messageElement.appendChild(usernameElement);
       messageElement.appendChild(messageTextElement);
-      
-      messageContainer.prepend(messageElement);
+
+      messageContainer.prepend(messageElement);  // New messages appear at the top
 
       // Reset message input
       document.getElementById('message').value = '';
     }
 
-    // Ensures announcement loads correctly
+    // Load and apply the special announcement text
     fetch('announcementtxtspecialwords.html')
       .then(response => response.text())
       .then(data => {
@@ -204,6 +237,7 @@
         console.error('Error loading special words:', error);
       });
 
+    // Fetch the announcement text and apply rainbow effect to special words
     function fetchAnnouncementText(specialWords) {
       fetch('announcementtxt.html')
         .then(response => response.text())
@@ -225,9 +259,9 @@
     }
 
     window.addEventListener('DOMContentLoaded', () => {
-      animateRainbow();
+      animateRainbow();  // Start the rainbow effect after the page loads
     });
   </script>
-  
+
 </body>
 </html>
