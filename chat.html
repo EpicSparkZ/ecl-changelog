@@ -118,13 +118,12 @@
 
     #message-container {
       position: fixed;
-      bottom: 80px; /* Position above the notice */
-      right: 10px; /* Align messages to the right */
-      width: 300px; /* Optional: Adjust width */
+      bottom: 80px; /* Positioned above the notice */
+      width: 100%; /* Make the container stretch across the screen */
       max-height: 50%; /* Limit the height */
       overflow-y: auto;
       display: flex;
-      flex-direction: column-reverse;
+      flex-direction: column-reverse; /* New messages appear at the bottom */
       z-index: 998; /* Ensure messages stay above notice */
     }
 
@@ -134,7 +133,8 @@
       margin-bottom: 10px;
       padding: 10px;
       color: white;
-      max-width: 100%;
+      width: 100%; /* Make the messages stretch across the screen */
+      box-sizing: border-box; /* Ensure the padding is included in the width */
     }
 
     .message .username {
@@ -166,7 +166,7 @@
       }
 
       #message-container {
-        width: 250px; /* Adjust the message container width for smaller screens */
+        width: 100%; /* Ensure message container stretches across small screens */
       }
     }
   </style>
