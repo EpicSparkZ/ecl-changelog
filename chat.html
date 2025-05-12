@@ -47,7 +47,7 @@
       overflow-y: auto;
       display: flex;
       flex-direction: column-reverse;
-      padding: 70px 10px 120px; /* Top for announcement, bottom for input + notice */
+      padding: 70px 10px 140px;
       box-sizing: border-box;
     }
 
@@ -72,17 +72,15 @@
     .message-bar {
       position: fixed;
       bottom: 30px;
-      left: 50%;
-      transform: translateX(-50%);
+      left: 0;
       width: 100%;
-      max-width: 800px;
       display: flex;
-      justify-content: space-between;
       gap: 10px;
       padding: 10px;
       background-color: #333;
       box-sizing: border-box;
       z-index: 2;
+      flex-wrap: wrap;
     }
 
     .message-bar input[type="text"] {
@@ -90,12 +88,16 @@
       font-size: 14px;
       border: none;
       border-radius: 5px;
-      flex: 1;
     }
 
-    .message-bar input#username {
-      max-width: 120px;
-      min-width: 60px;
+    #username {
+      width: 100px;
+      flex-shrink: 0;
+    }
+
+    #message {
+      flex: 1;
+      min-width: 0;
     }
 
     .message-bar button {
@@ -107,6 +109,7 @@
       border-radius: 5px;
       cursor: pointer;
       white-space: nowrap;
+      flex-shrink: 0;
     }
 
     .message-bar button:hover {
@@ -126,6 +129,24 @@
       z-index: 1;
     }
 
+    .back-button {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #444;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      z-index: 1000;
+    }
+
+    .back-button:hover {
+      background-color: #666;
+    }
+
     .rainbow {
       transition: color 0.5s linear;
     }
@@ -135,13 +156,22 @@
         font-size: 16px;
       }
 
-      .message-bar input[type="text"] {
-        font-size: 12px;
+      .message-bar {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      #username, #message {
+        width: 100%;
       }
 
       .message-bar button {
-        font-size: 12px;
-        padding: 6px 10px;
+        width: 100%;
+      }
+
+      .back-button {
+        padding: 8px 16px;
+        font-size: 14px;
       }
 
       .notice {
@@ -156,9 +186,9 @@
     <div class="announcement-text" id="announcement-text">Loading announcement...</div>
   </div>
 
-  <div class="chat-container" id="chat-container">
-    <!-- Messages will appear here -->
-  </div>
+  <button class="back-button" onclick="window.location.href='index.html';">Back</button>
+
+  <div class="chat-container" id="chat-container"></div>
 
   <div class="message-bar">
     <input type="text" id="username" placeholder="Username">
@@ -171,16 +201,13 @@
   </div>
 
   <script>
-    // Load and animate announcement
     fetch('announcementtxtspecialwords.html')
       .then(response => response.text())
       .then(data => {
         const specialWords = data.split(',').map(word => word.trim());
         fetchAnnouncementText(specialWords);
       })
-      .catch(error => {
-        console.error('Error loading special words:', error);
-      });
+      .catch(error => console.error('Error loading special words:', error));
 
     function fetchAnnouncementText(specialWords) {
       fetch('announcementtxt.html')
@@ -189,9 +216,7 @@
           const modifiedText = applyRainbowEffect(data, specialWords);
           document.getElementById('announcement-text').innerHTML = modifiedText;
         })
-        .catch(error => {
-          console.error('Error loading announcement text:', error);
-        });
+        .catch(error => console.error('Error loading announcement text:', error));
     }
 
     function applyRainbowEffect(text, specialWords) {
@@ -212,7 +237,6 @@
       }, 50);
     }
 
-    // Chat functionality
     function sendMessage() {
       const messageBox = document.getElementById('message');
       const usernameBox = document.getElementById('username');
@@ -244,14 +268,12 @@
       messageBox.value = '';
     }
 
-    // Handle Enter key
     document.getElementById('message').addEventListener('keydown', function (e) {
       if (e.key === 'Enter') {
         sendMessage();
       }
     });
 
-    // Load saved username
     window.addEventListener('DOMContentLoaded', () => {
       const saved = localStorage.getItem('savedUsername');
       if (saved) {
