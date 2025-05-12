@@ -266,12 +266,30 @@
     }
 
     function sendMessage() {
-      const message = document.getElementById('message').value;
+      const message = document.getElementById('message').value.trim();
       if (!message || !username) return;
+
       if (containsBannedWords(message)) {
         alert("Your message contains a banned word.");
         return;
       }
+
+      if (message.toLowerCase() === '/clearchat') {
+        fetch('https://raw.githubusercontent.com/EpicSparkZ/ecl-changelog/main/data/modusernames.html')
+          .then(res => res.text())
+          .then(modList => {
+            const mods = modList.split(',').map(name => name.trim().toLowerCase());
+            if (mods.includes(username.toLowerCase())) {
+              localStorage.removeItem('messages');
+              loadMessages();
+            } else {
+              alert("You don't have permission to clear chat.");
+            }
+          });
+        document.getElementById('message').value = '';
+        return;
+      }
+
       saveMessage(message, username);
       loadMessages();
       const container = document.getElementById('message-container');
