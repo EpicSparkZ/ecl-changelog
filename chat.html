@@ -150,7 +150,7 @@
     }
 
     .rainbow {
-      animation: rainbow 4s linear infinite; /* Slow down the rainbow effect */
+      animation: rainbow 4s linear infinite;
     }
 
     @keyframes rainbow {
@@ -208,18 +208,18 @@
   <script>
     // Check if username is already set in localStorage
     let username = localStorage.getItem('username') || '';
-    let hasSentMessage = false;
 
     // Disable username input if it's already set
     if (username) {
       document.getElementById('username').value = username;
+      document.getElementById('username').disabled = true;
     }
 
     document.getElementById('username').addEventListener('change', (e) => {
-      // If username is not set, save it to localStorage
       if (!username) {
         username = e.target.value;
         localStorage.setItem('username', username);
+        document.getElementById('username').disabled = true;
       }
     });
 
@@ -233,23 +233,11 @@
         console.error('Failed to load banned words:', err);
       });
 
-    let modCommands = [];
-    fetch('modcommands.html')
-      .then(res => res.text())
-      .then(data => {
-        modCommands = data.split(',').map(command => command.trim().toLowerCase());
-      })
-      .catch(err => {
-        console.error('Failed to load mod commands:', err);
-      });
-
-    // Check if the message contains banned words
     function containsBannedWords(message) {
       const words = message.toLowerCase().split(/\s+/);
       return words.some(word => bannedWords.includes(word));
     }
 
-    // Load messages from localStorage
     function loadMessages() {
       const messages = JSON.parse(localStorage.getItem('messages') || '[]');
       const messageContainer = document.getElementById('message-container');
@@ -278,58 +266,34 @@
       messageContainer.scrollTop = messageContainer.scrollHeight;
     }
 
-    // Save message to localStorage
     function saveMessage(message, username) {
       const messages = JSON.parse(localStorage.getItem('messages') || '[]');
       messages.push({ username, message });
       localStorage.setItem('messages', JSON.stringify(messages));
     }
 
-    // Send a new message
     function sendMessage() {
       const message = document.getElementById('message').value;
       if (!message || !username) return;
-
-      // Mark that the user has sent a message
-      if (!hasSentMessage) {
-        hasSentMessage = true;
-        document.getElementById('username').disabled = true; // Disable username input after first message
-      }
 
       if (containsBannedWords(message)) {
         alert("Your message contains a banned word and was not sent.");
         return;
       }
 
-      // Check if the message starts with a command
-      if (message.startsWith('/')) {
-        const command = message.slice(1).trim().toLowerCase();
-        
-        if (modCommands.includes(command)) {
-          if (command === 'clearchat' || command === 'clear') {
-            clearChat();
-            return;
-          }
-          // Add more command conditions here if needed
-        } else {
-          alert("Invalid command.");
-          return;
-        }
-      }
-
-      // Save message
       saveMessage(message, username);
 
-      // Add message to UI
       const messageContainer = document.getElementById('message-container');
       const messageElement = document.createElement('div');
       messageElement.classList.add('message');
 
       const usernameElement = document.createElement('span');
       usernameElement.classList.add('username');
+      
       if (username.toLowerCase() === 'epicsparkz') {
         usernameElement.classList.add('rainbow');
       }
+
       usernameElement.textContent = username;
 
       const messageTextElement = document.createElement('span');
@@ -340,42 +304,31 @@
       messageElement.appendChild(messageTextElement);
 
       messageContainer.appendChild(messageElement);
-
-      // Automatically scroll to the latest message
       messageContainer.scrollTop = messageContainer.scrollHeight;
 
-      document.getElementById('message').value = ''; // Clear the message input field
+      document.getElementById('message').value = '';
     }
 
-    // Clear chat function (for mod command)
-    function clearChat() {
-      document.getElementById('message-container').innerHTML = '';
-    }
+    // Load messages on page load
+    window.onload = loadMessages;
 
-    // Handle announcements
-    function loadAnnouncement() {
-      fetch('announcement.txt')
-        .then(response => response.text())
-        .then(data => {
-          document.getElementById('announcement-text').innerText = data;
-        })
-        .catch(err => {
-          console.error('Error loading announcement:', err);
-        });
-    }
-
-    // Listen for the Enter key press to send a message
-    document.getElementById('message').addEventListener('keypress', function(e) {
-      if (e.key === 'Enter') {
+    // Handling the Enter key to send messages
+    document.getElementById('message').addEventListener('keypress', function(event) {
+      if (event.key === 'Enter') {
         sendMessage();
       }
     });
 
-    // Load messages and announcements on page load
-    window.onload = () => {
-      loadMessages();
-      loadAnnouncement();
-    };
+    // Fetching announcements
+    const announcementText = document.getElementById('announcement-text');
+    fetch('https://your-api-url-here') // Replace with actual announcement URL
+      .then(response => response.json())
+      .then(data => {
+        announcementText.innerText = data.announcement || 'No announcements available.';
+      })
+      .catch(err => {
+        console.error('Failed to load announcement:', err);
+      });
   </script>
 
 </body>
