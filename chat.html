@@ -38,6 +38,8 @@
       font-weight: bold;
       max-width: 100%;
       overflow-wrap: break-word;
+      word-wrap: break-word;
+      white-space: pre-wrap;
     }
 
     .input-bar {
@@ -204,14 +206,22 @@
   <button class="back-button" onclick="window.location.href='index.html';">Back</button>
 
   <script>
+    // Check if username is already set in localStorage
     let username = localStorage.getItem('username') || '';
+
+    // Disable username input if it's already set
     if (username) {
       document.getElementById('username').value = username;
+      document.getElementById('username').disabled = true;  // Disable username input after setting it
     }
 
     document.getElementById('username').addEventListener('change', (e) => {
-      username = e.target.value;
-      localStorage.setItem('username', username);
+      // If username is not set, save it to localStorage
+      if (!username) {
+        username = e.target.value;
+        localStorage.setItem('username', username);
+        document.getElementById('username').disabled = true;  // Disable after setting
+      }
     });
 
     let bannedWords = [];
@@ -305,37 +315,15 @@
       // Automatically scroll to the latest message
       messageContainer.scrollTop = messageContainer.scrollHeight;
 
-      document.getElementById('message').value = '';
+      document.getElementById('message').value = ''; // Clear the message input field
     }
 
-    document.getElementById('message').addEventListener('keydown', function(event) {
-      if (event.key === 'Enter') {
-        sendMessage();
-      }
-    });
+    // Load messages on page load
+    window.onload = loadMessages;
 
-    // Load the saved messages when the page loads
-    window.addEventListener('DOMContentLoaded', loadMessages);
-
-    // Load announcement text
-    fetch('announcementtxt.html')
-      .then(response => response.text())
-      .then(data => {
-        const specialWords = ['special', 'words', 'here']; // Replace with actual special words
-        const modifiedText = applyRainbowEffect(data, specialWords);
-        document.getElementById('announcement-text').innerHTML = modifiedText;
-      })
-      .catch(error => {
-        console.error('Error loading announcement text:', error);
-      });
-
-    function applyRainbowEffect(text, specialWords) {
-      specialWords.forEach(word => {
-        const regex = new RegExp(`(${word})`, 'gi');
-        text = text.replace(regex, '<span class="rainbow">$1</span>');
-      });
-      return text;
-    }
+    // Rainbow effect for the announcement text
+    const announcementText = document.getElementById('announcement-text');
+    announcementText.innerHTML = announcementText.innerText.replace(/EpicSparkZ/gi, match => `<span class="rainbow">${match}</span>`);
   </script>
 
 </body>
