@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <title>Chat</title>
   <link rel="icon" href="/list_icon.png">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Mobile support -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body {
       background-color: #121212;
@@ -12,7 +12,7 @@
       font-family: sans-serif;
       margin: 0;
       padding: 0;
-      overflow-x: hidden; /* Prevent horizontal scroll */
+      overflow-x: hidden;
       display: flex;
       flex-direction: column;
       height: 100vh;
@@ -42,110 +42,92 @@
       overflow-wrap: break-word;
     }
 
-    .rainbow {
-      transition: color 0.5s linear;
+    .chat-container {
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column-reverse;
+      padding: 70px 10px 120px; /* Top for announcement, bottom for input + notice */
+      box-sizing: border-box;
     }
 
-    button {
+    .message {
+      background-color: #222;
+      margin: 5px 0;
+      padding: 8px 12px;
+      border-radius: 6px;
+      word-wrap: break-word;
+      max-width: 100%;
+    }
+
+    .username {
+      font-weight: bold;
+      background: linear-gradient(to right, #00f, #a0f);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 3px;
+      display: inline-block;
+    }
+
+    .message-bar {
       position: fixed;
-      top: 10px;
-      right: 10px;
-      padding: 10px 20px;
-      font-size: 16px;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 800px;
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 10px;
+      background-color: #333;
+      box-sizing: border-box;
+      z-index: 2;
+    }
+
+    .message-bar input[type="text"] {
+      padding: 8px;
+      font-size: 14px;
+      border: none;
+      border-radius: 5px;
+      flex: 1;
+    }
+
+    .message-bar input#username {
+      max-width: 120px;
+      min-width: 60px;
+    }
+
+    .message-bar button {
+      padding: 8px 12px;
+      font-size: 14px;
       background-color: #444;
       color: white;
       border: none;
       border-radius: 5px;
       cursor: pointer;
-      z-index: 1000;
+      white-space: nowrap;
     }
 
-    button:hover {
+    .message-bar button:hover {
       background-color: #666;
-    }
-
-    .message-bar {
-      position: fixed;
-      bottom: 60px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 100%;
-      background-color: #333;
-      padding: 15px 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      box-sizing: border-box;
-      z-index: 2; /* Make sure the input bar stays above the notice */
-    }
-
-    .message-bar input, .send-button {
-      background-color: #222;
-      border: none;
-      color: white;
-      border-radius: 5px;
-      font-size: 16px;
-      padding: 8px;
-    }
-
-    .message-input {
-      flex: 2; /* Make the message box take up more space */
-      margin-right: 10px; /* Spacing between message box and send button */
-    }
-
-    .username-input {
-      flex: 1; /* Make username box take less space */
-      margin-right: 10px; /* Spacing between username box and message box */
-    }
-
-    .send-button {
-      flex: 0.5; /* Adjust the send button size */
-      cursor: pointer;
-    }
-
-    .send-button:hover {
-      background-color: #666;
-    }
-
-    .message-list {
-      margin-top: 100px; /* Fixed spacing for message list */
-      padding: 10px;
-      overflow-y: auto;
-      height: calc(100vh - 200px); /* Adjust height so the messages don't overlap the input box */
-      display: flex;
-      flex-direction: column-reverse; /* New messages appear at the top */
-    }
-
-    .message-item {
-      background-color: #333;
-      padding: 10px;
-      margin: 5px 0;
-      border-radius: 5px;
-      max-width: 90%;
-      word-wrap: break-word;
-    }
-
-    .username {
-      color: #4a90e2; /* Blue */
-      font-weight: bold;
-      display: inline;
-    }
-
-    .username span {
-      color: #9b59b6; /* Purple */
     }
 
     .notice {
       position: fixed;
-      bottom: 10px; /* Adjust position of notice to be below the message input bar */
+      bottom: 0;
       width: 100%;
       text-align: center;
       color: #ccc;
-      font-size: 14px;
-      padding: 10px;
+      font-size: 13px;
+      padding: 4px;
+      background-color: #121212;
       box-sizing: border-box;
-      pointer-events: none;
-      z-index: 1; /* Keep the notice below the input bar */
+      z-index: 1;
+    }
+
+    .rainbow {
+      transition: color 0.5s linear;
     }
 
     @media (max-width: 600px) {
@@ -153,34 +135,17 @@
         font-size: 16px;
       }
 
-      button {
-        padding: 8px 16px;
-        font-size: 14px;
+      .message-bar input[type="text"] {
+        font-size: 12px;
+      }
+
+      .message-bar button {
+        font-size: 12px;
+        padding: 6px 10px;
       }
 
       .notice {
-        font-size: 12px;
-        padding: 8px;
-      }
-
-      .message-bar {
-        flex-direction: column;
-        padding: 10px;
-      }
-
-      .message-input {
-        width: 100%;
-        margin-bottom: 10px;
-      }
-
-      .username-input {
-        width: 100%;
-        margin-bottom: 10px;
-      }
-
-      .send-button {
-        width: 100%;
-        margin-top: 10px;
+        font-size: 11px;
       }
     }
   </style>
@@ -191,16 +156,14 @@
     <div class="announcement-text" id="announcement-text">Loading announcement...</div>
   </div>
 
-  <button onclick="window.location.href='index.html';">Back</button>
+  <div class="chat-container" id="chat-container">
+    <!-- Messages will appear here -->
+  </div>
 
-  <!-- Message List -->
-  <div class="message-list" id="message-list"></div>
-
-  <!-- Username Input, Message Box, and Send Button -->
   <div class="message-bar">
-    <input type="text" id="username-input" class="username-input" placeholder="Enter username" />
-    <input type="text" id="message-input" class="message-input" placeholder="Enter your message..." />
-    <button class="send-button" onclick="sendMessage()">Send</button>
+    <input type="text" id="username" placeholder="Username">
+    <input type="text" id="message" placeholder="Type your message...">
+    <button onclick="sendMessage()">Send</button>
   </div>
 
   <div class="notice">
@@ -208,46 +171,38 @@
   </div>
 
   <script>
-    // Check if a username is saved in localStorage
-    document.addEventListener("DOMContentLoaded", function () {
-      const savedUsername = localStorage.getItem("username");
-      if (savedUsername) {
-        document.getElementById("username-input").value = savedUsername;
-      }
+    // Load and animate announcement
+    fetch('announcementtxtspecialwords.html')
+      .then(response => response.text())
+      .then(data => {
+        const specialWords = data.split(',').map(word => word.trim());
+        fetchAnnouncementText(specialWords);
+      })
+      .catch(error => {
+        console.error('Error loading special words:', error);
+      });
 
-      // Fetch special words and announcement text
-      fetch('announcementtxtspecialwords.html')
+    function fetchAnnouncementText(specialWords) {
+      fetch('announcementtxt.html')
         .then(response => response.text())
         .then(data => {
-          const specialWords = data.split(',').map(word => word.trim());
-          fetchAnnouncementText(specialWords);
+          const modifiedText = applyRainbowEffect(data, specialWords);
+          document.getElementById('announcement-text').innerHTML = modifiedText;
         })
         .catch(error => {
-          console.error('Error loading special words:', error);
+          console.error('Error loading announcement text:', error);
         });
+    }
 
-      // Apply rainbow effect to the announcement text
-      function fetchAnnouncementText(specialWords) {
-        fetch('announcementtxt.html')
-          .then(response => response.text())
-          .then(data => {
-            const modifiedText = applyRainbowEffect(data, specialWords);
-            document.getElementById('announcement-text').innerHTML = modifiedText;
-          })
-          .catch(error => {
-            console.error('Error loading announcement text:', error);
-          });
-      }
+    function applyRainbowEffect(text, specialWords) {
+      specialWords.forEach(word => {
+        const regex = new RegExp(`(${word})`, 'gi');
+        text = text.replace(regex, '<span class="rainbow">$1</span>');
+      });
+      return text;
+    }
 
-      // Rainbow effect function
-      function applyRainbowEffect(text, specialWords) {
-        specialWords.forEach(word => {
-          const regex = new RegExp(`(${word})`, 'gi');
-          text = text.replace(regex, '<span class="rainbow">$1</span>');
-        });
-        return text;
-      }
-
+    function animateRainbow() {
       let hue = 0;
       setInterval(() => {
         document.querySelectorAll('.rainbow').forEach(el => {
@@ -255,47 +210,54 @@
         });
         hue = (hue + 2) % 360;
       }, 50);
-    });
-
-    // Function to send the message
-    function sendMessage() {
-      const messageInput = document.getElementById('message-input');
-      const messageList = document.getElementById('message-list');
-      const usernameInput = document.getElementById('username-input');
-      const username = usernameInput.value.trim();
-
-      // Save the username in localStorage
-      localStorage.setItem("username", username);
-
-      const messageText = messageInput.value.trim();
-
-      if (messageText && username) {
-        const messageItem = document.createElement('div');
-        messageItem.classList.add('message-item');
-
-        const usernameDisplay = document.createElement('div');
-        usernameDisplay.classList.add('username');
-        usernameDisplay.innerHTML = `<span>${username}</span>`;
-
-        const messageTextDisplay = document.createElement('div');
-        messageTextDisplay.textContent = messageText;
-
-        messageItem.appendChild(usernameDisplay);
-        messageItem.appendChild(messageTextDisplay);
-
-        // Insert the message at the top of the list
-        messageList.insertBefore(messageItem, messageList.firstChild);
-
-        // Clear the input box
-        messageInput.value = '';
-      }
     }
 
-    // Allow sending message with Enter key
-    document.getElementById('message-input').addEventListener('keypress', function (e) {
+    // Chat functionality
+    function sendMessage() {
+      const messageBox = document.getElementById('message');
+      const usernameBox = document.getElementById('username');
+      const message = messageBox.value.trim();
+      const username = usernameBox.value.trim();
+
+      if (message === '') return;
+      if (username === '') {
+        alert('Please enter a username.');
+        return;
+      }
+
+      localStorage.setItem('savedUsername', username);
+
+      const chatContainer = document.getElementById('chat-container');
+      const messageElement = document.createElement('div');
+      const usernameElement = document.createElement('div');
+      usernameElement.className = 'username';
+      usernameElement.innerText = username;
+
+      const textElement = document.createElement('div');
+      textElement.className = 'message';
+      textElement.innerText = message;
+
+      messageElement.appendChild(usernameElement);
+      messageElement.appendChild(textElement);
+      chatContainer.insertBefore(messageElement, chatContainer.firstChild);
+
+      messageBox.value = '';
+    }
+
+    // Handle Enter key
+    document.getElementById('message').addEventListener('keydown', function (e) {
       if (e.key === 'Enter') {
         sendMessage();
       }
+    });
+
+    // Load saved username
+    window.addEventListener('DOMContentLoaded', () => {
+      const saved = localStorage.getItem('savedUsername');
+      if (saved) {
+        document.getElementById('username').value = saved;
+      }
+      animateRainbow();
     });
   </script>
 
