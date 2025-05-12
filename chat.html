@@ -185,7 +185,6 @@
   </style>
 </head>
 <body>
-
   <div class="top-strip">
     <div class="announcement-text" id="announcement-text">Loading announcement...</div>
   </div>
@@ -206,7 +205,6 @@
 
   <script>
     let username = localStorage.getItem('username') || '';
-
     if (username) {
       document.getElementById('username').value = username;
       document.getElementById('username').disabled = true;
@@ -225,22 +223,26 @@
       .then(res => res.text())
       .then(data => {
         bannedWords = data.split(',').map(word => word.trim().toLowerCase());
-      });
+      })
+      .catch(err => console.error('Failed to load banned words:', err));
 
     function containsBannedWords(message) {
       const words = message.toLowerCase().split(/\s+/);
       return words.some(word => bannedWords.includes(word));
     }
 
-    function applyRainbowEffect(text, specialWords) {
-      const regex = new RegExp(`\\b(${specialWords.join('|')})\\b`, 'gi');
-      return text.replace(regex, match => `<span class="rainbow">${match}</span>`);
+    function applyRainbowEffect(text) {
+      let modifiedText = text;
+      specialWords.forEach(word => {
+        const regex = new RegExp(`(${word})`, 'gi');
+        modifiedText = modifiedText.replace(regex, '<span class="rainbow">$1</span>');
+      });
+      return modifiedText;
     }
 
     function loadMessages() {
       const messages = JSON.parse(localStorage.getItem('messages') || '[]');
       const messageContainer = document.getElementById('message-container');
-      messageContainer.innerHTML = '';
       messages.forEach(msg => {
         const messageElement = document.createElement('div');
         messageElement.classList.add('message');
@@ -254,7 +256,7 @@
 
         const messageTextElement = document.createElement('span');
         messageTextElement.classList.add('message-text');
-        messageTextElement.innerHTML = ': ' + msg.message;
+        messageTextElement.innerHTML = ': ' + applyRainbowEffect(msg.message);
 
         messageElement.appendChild(usernameElement);
         messageElement.appendChild(messageTextElement);
@@ -294,7 +296,7 @@
 
       const messageTextElement = document.createElement('span');
       messageTextElement.classList.add('message-text');
-      messageTextElement.innerHTML = ': ' + message;
+      messageTextElement.innerHTML = ': ' + applyRainbowEffect(message);
 
       messageElement.appendChild(usernameElement);
       messageElement.appendChild(messageTextElement);
@@ -311,15 +313,20 @@
       }
     });
 
-    Promise.all([
-      fetch('announcementtxt.html').then(res => res.text()),
-      fetch('announcementtxtspecialwords.html').then(res => res.text())
-    ]).then(([announcement, specialWordsText]) => {
-      const specialWords = specialWordsText.split(',').map(word => word.trim());
-      document.getElementById('announcement-text').innerHTML = applyRainbowEffect(announcement, specialWords);
-    }).catch(err => {
-      console.error('Error loading announcement or special words:', err);
-    });
+    let specialWords = [];
+    fetch('announcementtxtspecialwords.html')
+      .then(response => response.text())
+      .then(data => {
+        specialWords = data.split(',').map(word => word.trim()).filter(word => word.length > 0);
+        return fetch('announcementtxt.html');
+      })
+      .then(response => response.text())
+      .then(data => {
+        document.getElementById('announcement-text').innerHTML = applyRainbowEffect(data);
+      })
+      .catch(error => {
+        console.error('Error loading special words or announcement text:', error);
+      });
 
     loadMessages();
   </script>
