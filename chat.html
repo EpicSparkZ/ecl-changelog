@@ -268,7 +268,7 @@
 
         messageContainer.appendChild(messageElement);
       });
-      messageContainer.scrollTop = messageContainer.scrollHeight;
+      messageContainer.scrollTop = messageContainer.scrollHeight; // Ensure we scroll to the bottom
     }
 
     // Save message to localStorage
@@ -315,9 +315,16 @@
       document.getElementById('message').value = ''; // Clear the message input field
     }
 
+    // Listen for Enter key press to send message
+    document.getElementById('message').addEventListener('keydown', function(event) {
+      if (event.key === 'Enter') {
+        event.preventDefault(); // Prevent the default behavior
+        sendMessage(); // Send the message
+      }
+    });
+
     // Load messages on page load
     window.onload = loadMessages;
-
   </script>
 
 </body>
