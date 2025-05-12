@@ -64,23 +64,9 @@
       background-color: #666;
     }
 
-    .notice {
-      position: fixed;
-      bottom: 60px; /* Move the notice text up so it's not covered by the input bar */
-      width: 100%;
-      text-align: center;
-      color: #ccc;
-      font-size: 14px;
-      padding: 10px;
-      box-sizing: border-box;
-      pointer-events: none;
-      z-index: 1; /* Make sure it's above the input bar */
-    }
-
-    /* Message bar holding the username, message input, and send button */
     .message-bar {
       position: fixed;
-      bottom: 0;
+      bottom: 60px;
       left: 50%;
       transform: translateX(-50%);
       width: 100%;
@@ -90,7 +76,7 @@
       justify-content: space-between;
       align-items: center;
       box-sizing: border-box;
-      z-index: 2; /* Ensure it's below the notice */
+      z-index: 2; /* Make sure the input bar stays above the notice */
     }
 
     .message-input {
@@ -155,6 +141,19 @@
       color: #9b59b6; /* Purple */
     }
 
+    .notice {
+      position: fixed;
+      bottom: 10px; /* Adjust position of notice to be below the message input bar */
+      width: 100%;
+      text-align: center;
+      color: #ccc;
+      font-size: 14px;
+      padding: 10px;
+      box-sizing: border-box;
+      pointer-events: none;
+      z-index: 1; /* Keep the notice below the input bar */
+    }
+
     @media (max-width: 600px) {
       .announcement-text {
         font-size: 16px;
@@ -195,10 +194,6 @@
 
   <button onclick="window.location.href='index.html';">Back</button>
 
-  <div class="notice">
-    NOTICE: This feature is experimental and may not work at times. Do not expect this to always be here.
-  </div>
-
   <!-- Message List -->
   <div class="message-list" id="message-list"></div>
 
@@ -207,6 +202,10 @@
     <input type="text" id="username-input" class="username-input" placeholder="Enter username" />
     <input type="text" id="message-input" class="message-input" placeholder="Enter your message..." />
     <button class="send-button" onclick="sendMessage()">Send</button>
+  </div>
+
+  <div class="notice">
+    NOTICE: This feature is experimental and may not work at times. Do not expect this to always be here.
   </div>
 
   <script>
