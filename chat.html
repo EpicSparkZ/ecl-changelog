@@ -168,13 +168,16 @@
       .announcement-text {
         font-size: 16px;
       }
+
       .input-bar input {
         font-size: 12px;
       }
+
       .input-bar button {
         font-size: 12px;
         padding: 8px 16px;
       }
+
       .notice {
         font-size: 12px;
         padding: 8px;
@@ -204,8 +207,9 @@
 
   <script>
     let username = localStorage.getItem('username') || '';
-    let modUsers = [];
+    let modUsernames = [];
 
+    // Disable username input if it's already set
     if (username) {
       document.getElementById('username').value = username;
       document.getElementById('username').disabled = true;
@@ -219,94 +223,130 @@
       }
     });
 
+    // Fetch announcement from the raw GitHub URL
     const announcementText = document.getElementById('announcement-text');
     const announcementUrl = 'https://raw.githubusercontent.com/EpicSparkZ/ecl-changelog/main/announcementtxt.html';
 
     fetch(announcementUrl)
       .then(response => response.text())
       .then(data => {
-        const specialWords = ['IMPORTANT', 'NEW', 'UPDATE', 'ALERT'];
-        const escaped = data.replace(/</g, "&lt;").replace(/>/g, "&gt;");
-        const highlighted = escaped.replace(
-          new RegExp(`\\b(${specialWords.join('|')})\\b`, 'gi'),
-          '<span class="rainbow">$1</span>'
-        );
-        announcementText.innerHTML = highlighted;
+        if (data) {
+          announcementText.innerHTML = data;
+        } else {
+          announcementText.innerText = 'No announcements available.';
+        }
       })
       .catch(err => {
         console.error('Error fetching announcement:', err);
         announcementText.innerText = 'Error loading announcement.';
       });
 
-    fetch('modusernames.html')
-      .then(response => response.text())
+    // Load moderator usernames from the raw GitHub URL
+    fetch('https://raw.githubusercontent.com/EpicSparkZ/ecl-changelog/main/data/modusernames.html')
+      .then(res => res.text())
       .then(data => {
-        modUsers = data.split(/\r?\n/).map(u => u.trim().toLowerCase());
-      });
+        modUsernames = data.split(/\s+/).map(name => name.trim().toLowerCase()).filter(Boolean);
+      })
+      .catch(err => console.error('Error fetching mod usernames:', err));
 
+    // Load messages from localStorage
     function loadMessages() {
       const messages = JSON.parse(localStorage.getItem('messages') || '[]');
-      const container = document.getElementById('message-container');
-      container.innerHTML = '';
+      const messageContainer = document.getElementById('message-container');
+      messageContainer.innerHTML = ''; 
       messages.forEach(msg => {
-        const msgDiv = document.createElement('div');
-        msgDiv.classList.add('message');
+        const messageElement = document.createElement('div');
+        messageElement.classList.add('message');
 
-        const userEl = document.createElement('span');
-        userEl.classList.add('username');
-        if (msg.username.toLowerCase() === 'epicsparkz') userEl.classList.add('rainbow');
-        userEl.textContent = msg.username;
+        const usernameElement = document.createElement('span');
+        usernameElement.classList.add('username');
+        
+        if (msg.username.toLowerCase() === 'epicsparkz') {
+          usernameElement.classList.add('rainbow');
+        }
 
-        const textEl = document.createElement('span');
-        textEl.classList.add('message-text');
-        textEl.textContent = ': ' + msg.message;
+        usernameElement.textContent = msg.username;
 
-        msgDiv.appendChild(userEl);
-        msgDiv.appendChild(textEl);
-        container.appendChild(msgDiv);
+        const messageTextElement = document.createElement('span');
+        messageTextElement.classList.add('message-text');
+        messageTextElement.textContent = ': ' + msg.message;
+
+        messageElement.appendChild(usernameElement);
+        messageElement.appendChild(messageTextElement);
+
+        messageContainer.appendChild(messageElement);
       });
-      container.scrollTop = container.scrollHeight;
+      messageContainer.scrollTop = messageContainer.scrollHeight; 
     }
 
+    // Save message to localStorage
     function saveMessage(message, username) {
       const messages = JSON.parse(localStorage.getItem('messages') || '[]');
       messages.push({ username, message });
       localStorage.setItem('messages', JSON.stringify(messages));
     }
 
-    function clearChat() {
-      localStorage.setItem('messages', '[]');
-      loadMessages();
-    }
-
+    // Send a new message
     function sendMessage() {
-      const msgInput = document.getElementById('message');
-      const msg = msgInput.value.trim();
-      if (!msg || !username) return;
+      const message = document.getElementById('message').value;
+      if (!message || !username) return;
 
-      if (msg.startsWith('/clearchat')) {
-        if (modUsers.includes(username.toLowerCase())) {
-          clearChat();
-        } else {
-          alert("You are not allowed to use this command.");
-        }
-        msgInput.value = '';
-        return;
+      saveMessage(message, username);
+
+      const messageContainer = document.getElementById('message-container');
+      const messageElement = document.createElement('div');
+      messageElement.classList.add('message');
+
+      const usernameElement = document.createElement('span');
+      usernameElement.classList.add('username');
+      
+      if (username.toLowerCase() === 'epicsparkz') {
+        usernameElement.classList.add('rainbow');
       }
 
-      saveMessage(msg, username);
-      msgInput.value = '';
-      loadMessages();
+      usernameElement.textContent = username;
+
+      const messageTextElement = document.createElement('span');
+      messageTextElement.classList.add('message-text');
+      messageTextElement.textContent = ': ' + message;
+
+      messageElement.appendChild(usernameElement);
+      messageElement.appendChild(messageTextElement);
+
+      messageContainer.appendChild(messageElement);
+      messageContainer.scrollTop = messageContainer.scrollHeight;
+
+      document.getElementById('message').value = ''; 
     }
 
-    document.getElementById('message').addEventListener('keydown', function(e) {
+    // Listen for Enter key press to send message
+    document.getElementById('message').addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {
         e.preventDefault();
         sendMessage();
       }
     });
 
-    window.onload = loadMessages;
+    // Load messages when the page loads
+    loadMessages();
+
+    // Implementing /clearchat command
+    function clearChat() {
+      if (modUsernames.includes(username.toLowerCase())) {
+        localStorage.removeItem('messages');
+        loadMessages();
+      }
+    }
+
+    // Listen for /clearchat command
+    document.getElementById('message').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        const message = document.getElementById('message').value.trim();
+        if (message === '/clearchat') {
+          clearChat();
+        }
+      }
+    });
   </script>
 
 </body>
