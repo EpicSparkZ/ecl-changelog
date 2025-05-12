@@ -6,34 +6,224 @@
   <link rel="icon" href="/list_icon.png">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    /* Your existing styles here... */
+    body {
+      background-color: #121212;
+      color: white;
+      font-family: sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+
+    .top-strip {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      min-height: 60px;
+      background-color: black;
+      z-index: 999;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 10px;
+      box-sizing: border-box;
+      text-align: center;
+    }
+
+    .announcement-text {
+      color: white;
+      font-size: 18px;
+      font-weight: bold;
+      max-width: 100%;
+      overflow-wrap: break-word;
+      word-wrap: break-word;
+      white-space: pre-wrap;
+    }
+
+    .input-bar {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      background-color: #222;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px;
+      gap: 10px;
+      box-sizing: border-box;
+      z-index: 1000;
+    }
+
+    .input-bar input {
+      background-color: #444;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      padding: 10px;
+      font-size: 14px;
+      min-width: 120px;
+      word-wrap: break-word;
+    }
+
+    .input-bar #username {
+      width: 7%;
+    }
+
+    .input-bar #message {
+      width: 83%;
+    }
+
+    .input-bar button {
+      background-color: #444;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      padding: 10px 20px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .back-button {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      padding: 10px 20px;
+      background-color: #444;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      z-index: 1001;
+    }
+
+    .back-button:hover {
+      background-color: #666;
+    }
+
+    .notice {
+      position: fixed;
+      bottom: 55px;
+      width: 100%;
+      text-align: center;
+      color: #ccc;
+      font-size: 14px;
+      padding: 10px;
+      box-sizing: border-box;
+      pointer-events: none;
+      z-index: 999;
+    }
+
+    #message-container {
+      position: absolute;
+      top: 60px;
+      bottom: 80px;
+      width: 100%;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 10px;
+      box-sizing: border-box;
+    }
+
+    .message {
+      background-color: #333;
+      border-radius: 5px;
+      margin-bottom: 10px;
+      padding: 10px;
+      color: white;
+      width: 100%;
+      box-sizing: border-box;
+      word-wrap: break-word;
+    }
+
+    .message .username {
+      font-weight: bold;
+      margin-right: 5px;
+    }
+
+    .message .message-text {
+      color: #ccc;
+    }
+
+    .rainbow {
+      animation: rainbow 4s linear infinite; /* Slow down the rainbow effect */
+    }
+
+    @keyframes rainbow {
+      0% { color: red; }
+      14% { color: orange; }
+      28% { color: yellow; }
+      42% { color: green; }
+      57% { color: blue; }
+      71% { color: indigo; }
+      85% { color: violet; }
+      100% { color: red; }
+    }
+
+    @media (max-width: 600px) {
+      .announcement-text {
+        font-size: 16px;
+      }
+
+      .input-bar input {
+        font-size: 12px;
+      }
+
+      .input-bar button {
+        font-size: 12px;
+        padding: 8px 16px;
+      }
+
+      .notice {
+        font-size: 12px;
+        padding: 8px;
+      }
+    }
   </style>
 </head>
 <body>
 
-  <!-- Your existing structure here... -->
+  <div class="top-strip">
+    <div class="announcement-text" id="announcement-text">Loading announcement...</div>
+  </div>
+
+  <div class="notice">
+    NOTICE: This feature is experimental and may not work at times. Chats are currently Local Side. Do not expect this to always be here.
+  </div>
+
+  <div id="message-container"></div>
+
+  <div class="input-bar">
+    <input type="text" id="username" placeholder="Enter your username" />
+    <input type="text" id="message" placeholder="Enter your message" />
+    <button onclick="sendMessage()">Send</button>
+  </div>
+
+  <button class="back-button" onclick="window.location.href='index.html';">Back</button>
 
   <script>
     // Check if username is already set in localStorage
     let username = localStorage.getItem('username') || '';
-    let modUsernames = [];
-    let commands = {};
-    let functions = {};
 
-    // Fetch the list of authorized usernames from modusernames.html
+    // Fetch mod usernames and commands
+    let modUsernames = [];
+    let modCommands = {};
+
     fetch('modusernames.html')
-      .then(response => response.text())  // Get the raw text from modusernames.html
+      .then(response => response.text())
       .then(data => {
-        modUsernames = data.split(',').map(username => username.trim());  // Split and trim usernames
+        modUsernames = data.split(',').map(username => username.trim());
       })
       .catch(err => console.error('Error loading modusernames.html:', err));
 
-    // Fetch the commands and functions from modcommands.html
     fetch('modcommands.html')
-      .then(response => response.json())  // Parse the JSON from modcommands.html
+      .then(response => response.json())
       .then(data => {
-        commands = data.commands;
-        functions = data.function;
+        modCommands = data;
       })
       .catch(err => console.error('Error loading modcommands.html:', err));
 
@@ -68,49 +258,32 @@
       return words.some(word => bannedWords.includes(word));
     }
 
-    // Handle the sending of commands
-    function sendMessage() {
-      const message = document.getElementById('message').value;
-      if (!message || !username) return;
-
-      // Check if user is authorized to use commands
-      if (modUsernames.includes(username)) {
-        // If the message is a valid command
-        if (commands[message]) {
-          // Execute the corresponding function from modcommands.html
-          eval(functions[commands[message]]);
-          addChatMessage(`Command executed: ${message}`);
-        } else {
-          addChatMessage(`Unknown command: ${message}`);
-        }
-      } else {
-        // Check for banned words
-        if (containsBannedWords(message)) {
-          alert("Your message contains a banned word and was not sent.");
-          return;
-        }
-
-        // Save and display message as normal
-        saveMessage(message, username);
-        addChatMessage(`${username}: ${message}`);
-      }
-
-      // Clear the message input
-      document.getElementById('message').value = '';
-    }
-
-    // Add a message to the chat box
-    function addChatMessage(message) {
+    // Load messages from localStorage
+    function loadMessages() {
+      const messages = JSON.parse(localStorage.getItem('messages') || '[]');
       const messageContainer = document.getElementById('message-container');
-      const messageElement = document.createElement('div');
-      messageElement.classList.add('message');
-      
-      const usernameElement = document.createElement('span');
-      usernameElement.classList.add('username');
-      usernameElement.textContent = message;
-      
-      messageElement.appendChild(usernameElement);
-      messageContainer.appendChild(messageElement);
+      messages.forEach(msg => {
+        const messageElement = document.createElement('div');
+        messageElement.classList.add('message');
+
+        const usernameElement = document.createElement('span');
+        usernameElement.classList.add('username');
+        
+        if (msg.username.toLowerCase() === 'epicsparkz') {
+          usernameElement.classList.add('rainbow');
+        }
+
+        usernameElement.textContent = msg.username;
+
+        const messageTextElement = document.createElement('span');
+        messageTextElement.classList.add('message-text');
+        messageTextElement.textContent = ': ' + msg.message;
+
+        messageElement.appendChild(usernameElement);
+        messageElement.appendChild(messageTextElement);
+
+        messageContainer.appendChild(messageElement);
+      });
       messageContainer.scrollTop = messageContainer.scrollHeight;
     }
 
@@ -121,32 +294,55 @@
       localStorage.setItem('messages', JSON.stringify(messages));
     }
 
+    // Send a new message
+    function sendMessage() {
+      const message = document.getElementById('message').value;
+      if (!message || !username) return;
+
+      if (containsBannedWords(message)) {
+        alert("Your message contains a banned word and was not sent.");
+        return;
+      }
+
+      // Save message
+      saveMessage(message, username);
+
+      // Add message to UI
+      const messageContainer = document.getElementById('message-container');
+      const messageElement = document.createElement('div');
+      messageElement.classList.add('message');
+
+      const usernameElement = document.createElement('span');
+      usernameElement.classList.add('username');
+      
+      if (username.toLowerCase() === 'epicsparkz') {
+        usernameElement.classList.add('rainbow');
+      }
+      
+      usernameElement.textContent = username;
+
+      const messageTextElement = document.createElement('span');
+      messageTextElement.classList.add('message-text');
+      messageTextElement.textContent = ': ' + message;
+
+      messageElement.appendChild(usernameElement);
+      messageElement.appendChild(messageTextElement);
+
+      messageContainer.appendChild(messageElement);
+
+      // Automatically scroll to the latest message
+      messageContainer.scrollTop = messageContainer.scrollHeight;
+
+      document.getElementById('message').value = ''; // Clear the message input field
+    }
+
     // Load messages on page load
     window.onload = loadMessages;
 
-    // Load previously saved messages
-    function loadMessages() {
-      const messages = JSON.parse(localStorage.getItem('messages') || '[]');
-      const messageContainer = document.getElementById('message-container');
-      messages.forEach(msg => {
-        const messageElement = document.createElement('div');
-        messageElement.classList.add('message');
-
-        const usernameElement = document.createElement('span');
-        usernameElement.classList.add('username');
-        usernameElement.textContent = msg.username;
-
-        const messageTextElement = document.createElement('span');
-        messageTextElement.classList.add('message-text');
-        messageTextElement.textContent = ': ' + msg.message;
-
-        messageElement.appendChild(usernameElement);
-        messageElement.appendChild(messageTextElement);
-        messageContainer.appendChild(messageElement);
-      });
-      messageContainer.scrollTop = messageContainer.scrollHeight;
-    }
-
+    // Rainbow effect for the announcement text
+    const announcementText = document.getElementById('announcement-text');
+    announcementText.innerHTML = announcementText.innerText.replace(/EpicSparkZ/gi, match => `<span class="rainbow">${match}</span>`);
   </script>
+
 </body>
 </html>
