@@ -219,12 +219,31 @@
     });
 
     let bannedWords = [];
+    let modUsernames = [];
+    let specialWords = [];
+
     fetch('https://raw.githubusercontent.com/EpicSparkZ/ecl-changelog/main/data/bannedwords.html')
       .then(res => res.text())
       .then(data => {
         bannedWords = data.split(',').map(word => word.trim().toLowerCase());
+      });
+
+    fetch('modusernames.html')
+      .then(res => res.text())
+      .then(data => {
+        modUsernames = data.split(',').map(name => name.trim().toLowerCase());
+      });
+
+    fetch('announcementtxtspecialwords.html')
+      .then(res => res.text())
+      .then(data => {
+        specialWords = data.split(',').map(w => w.trim());
+        return fetch('announcementtxt.html');
       })
-      .catch(err => console.error('Failed to load banned words:', err));
+      .then(res => res.text())
+      .then(data => {
+        document.getElementById('announcement-text').innerHTML = applyRainbowEffect(data);
+      });
 
     function containsBannedWords(message) {
       const words = message.toLowerCase().split(/\s+/);
@@ -232,44 +251,56 @@
     }
 
     function applyRainbowEffect(text) {
-      let modifiedText = text;
+      let modified = text;
       specialWords.forEach(word => {
         const regex = new RegExp(`(${word})`, 'gi');
-        modifiedText = modifiedText.replace(regex, '<span class="rainbow">$1</span>');
+        modified = modified.replace(regex, '<span class="rainbow">$1</span>');
       });
-      return modifiedText;
-    }
-
-    function loadMessages() {
-      const messages = JSON.parse(localStorage.getItem('messages') || '[]');
-      const messageContainer = document.getElementById('message-container');
-      messages.forEach(msg => {
-        const messageElement = document.createElement('div');
-        messageElement.classList.add('message');
-
-        const usernameElement = document.createElement('span');
-        usernameElement.classList.add('username');
-        if (msg.username.toLowerCase() === 'epicsparkz') {
-          usernameElement.classList.add('rainbow');
-        }
-        usernameElement.textContent = msg.username;
-
-        const messageTextElement = document.createElement('span');
-        messageTextElement.classList.add('message-text');
-        messageTextElement.innerHTML = ': ' + applyRainbowEffect(msg.message);
-
-        messageElement.appendChild(usernameElement);
-        messageElement.appendChild(messageTextElement);
-
-        messageContainer.appendChild(messageElement);
-      });
-      messageContainer.scrollTop = messageContainer.scrollHeight;
+      return modified;
     }
 
     function saveMessage(message, username) {
       const messages = JSON.parse(localStorage.getItem('messages') || '[]');
       messages.push({ username, message });
       localStorage.setItem('messages', JSON.stringify(messages));
+    }
+
+    function createMessageElement(message, username) {
+      const isMod = modUsernames.includes(username.toLowerCase());
+
+      const messageElement = document.createElement('div');
+      messageElement.classList.add('message');
+
+      const usernameElement = document.createElement('span');
+      usernameElement.classList.add('username');
+      if (username.toLowerCase() === 'epicsparkz') {
+        usernameElement.classList.add('rainbow');
+      }
+      usernameElement.textContent = (isMod ? '🛡️ ' : '') + username;
+
+      const messageTextElement = document.createElement('span');
+      messageTextElement.classList.add('message-text');
+      messageTextElement.innerHTML = ': ' + applyRainbowEffect(message);
+
+      messageElement.appendChild(usernameElement);
+      messageElement.appendChild(messageTextElement);
+
+      return messageElement;
+    }
+
+    function loadMessages() {
+      const messages = JSON.parse(localStorage.getItem('messages') || '[]');
+      const messageContainer = document.getElementById('message-container');
+      messageContainer.innerHTML = '';
+
+      messages.forEach(msg => {
+        const el = createMessageElement(msg.message, msg.username);
+        messageContainer.appendChild(el);
+      });
+
+      setTimeout(() => {
+        messageContainer.scrollTop = messageContainer.scrollHeight;
+      }, 0);
     }
 
     function sendMessage() {
@@ -284,25 +315,12 @@
       saveMessage(message, username);
 
       const messageContainer = document.getElementById('message-container');
-      const messageElement = document.createElement('div');
-      messageElement.classList.add('message');
+      const el = createMessageElement(message, username);
+      messageContainer.appendChild(el);
 
-      const usernameElement = document.createElement('span');
-      usernameElement.classList.add('username');
-      if (username.toLowerCase() === 'epicsparkz') {
-        usernameElement.classList.add('rainbow');
-      }
-      usernameElement.textContent = username;
-
-      const messageTextElement = document.createElement('span');
-      messageTextElement.classList.add('message-text');
-      messageTextElement.innerHTML = ': ' + applyRainbowEffect(message);
-
-      messageElement.appendChild(usernameElement);
-      messageElement.appendChild(messageTextElement);
-
-      messageContainer.appendChild(messageElement);
-      messageContainer.scrollTop = messageContainer.scrollHeight;
+      setTimeout(() => {
+        messageContainer.scrollTop = messageContainer.scrollHeight;
+      }, 0);
 
       document.getElementById('message').value = '';
     }
@@ -313,23 +331,7 @@
       }
     });
 
-    let specialWords = [];
-    fetch('announcementtxtspecialwords.html')
-      .then(response => response.text())
-      .then(data => {
-        specialWords = data.split(',').map(word => word.trim()).filter(word => word.length > 0); // Handle comma-separated usernames
-        return fetch('announcementtxt.html');
-      })
-      .then(response => response.text())
-      .then(data => {
-        document.getElementById('announcement-text').innerHTML = applyRainbowEffect(data);
-      })
-      .catch(error => {
-        console.error('Error loading special words or announcement text:', error);
-      });
-
-    loadMessages();
+    window.addEventListener('load', loadMessages);
   </script>
-
 </body>
 </html>
