@@ -205,7 +205,6 @@
 
   <script>
     let username = localStorage.getItem('username') || '';
-
     if (username) {
       document.getElementById('username').value = username;
     }
@@ -225,11 +224,49 @@
         console.error('Failed to load banned words:', err);
       });
 
+    // Check if the message contains banned words
     function containsBannedWords(message) {
       const words = message.toLowerCase().split(/\s+/);
       return words.some(word => bannedWords.includes(word));
     }
 
+    // Load messages from localStorage
+    function loadMessages() {
+      const messages = JSON.parse(localStorage.getItem('messages') || '[]');
+      const messageContainer = document.getElementById('message-container');
+      messages.forEach(msg => {
+        const messageElement = document.createElement('div');
+        messageElement.classList.add('message');
+
+        const usernameElement = document.createElement('span');
+        usernameElement.classList.add('username');
+        
+        if (msg.username.toLowerCase() === 'epicsparkz') {
+          usernameElement.classList.add('rainbow');
+        }
+
+        usernameElement.textContent = msg.username;
+
+        const messageTextElement = document.createElement('span');
+        messageTextElement.classList.add('message-text');
+        messageTextElement.textContent = ': ' + msg.message;
+
+        messageElement.appendChild(usernameElement);
+        messageElement.appendChild(messageTextElement);
+
+        messageContainer.appendChild(messageElement);
+      });
+      messageContainer.scrollTop = messageContainer.scrollHeight;
+    }
+
+    // Save message to localStorage
+    function saveMessage(message, username) {
+      const messages = JSON.parse(localStorage.getItem('messages') || '[]');
+      messages.push({ username, message });
+      localStorage.setItem('messages', JSON.stringify(messages));
+    }
+
+    // Send a new message
     function sendMessage() {
       const message = document.getElementById('message').value;
       if (!message || !username) return;
@@ -239,6 +276,10 @@
         return;
       }
 
+      // Save message
+      saveMessage(message, username);
+
+      // Add message to UI
       const messageContainer = document.getElementById('message-container');
       const messageElement = document.createElement('div');
       messageElement.classList.add('message');
@@ -273,7 +314,10 @@
       }
     });
 
-    // Load the announcement text and apply rainbow effect to special words
+    // Load the saved messages when the page loads
+    window.addEventListener('DOMContentLoaded', loadMessages);
+
+    // Load announcement text
     fetch('announcementtxt.html')
       .then(response => response.text())
       .then(data => {
