@@ -76,7 +76,7 @@
     /* Message box at the bottom */
     .message-box {
       position: fixed;
-      bottom: 80px; /* Adjusted position to lower the input box */
+      bottom: 20px; /* Moved down */
       left: 50%;
       transform: translateX(-50%);
       width: 80%;
@@ -86,10 +86,21 @@
       color: white;
       display: flex;
       justify-content: space-between;
+      align-items: center;
     }
 
-    .message-input, .username-input {
-      width: 40%;
+    .message-input {
+      width: 80%;  /* Make the message box longer */
+      padding: 8px;
+      background-color: #222;
+      border: none;
+      color: white;
+      border-radius: 5px;
+      font-size: 16px;
+    }
+
+    .username-input {
+      width: 20%; /* Make the username box way smaller */
       padding: 8px;
       background-color: #222;
       border: none;
@@ -99,10 +110,10 @@
     }
 
     .message-list {
-      margin-top: 180px; /* Start the list lower to avoid overlap */
+      margin-top: 100px; /* Fixed spacing for message list */
       padding: 10px;
       overflow-y: auto;
-      height: calc(100vh - 250px);
+      height: calc(100vh - 200px); /* Adjust height so the messages don't overlap the input box */
       display: flex;
       flex-direction: column-reverse; /* New messages appear at the top */
     }
@@ -161,7 +172,7 @@
 
   <!-- Username Input and Message Input Box -->
   <div class="message-box">
-    <input type="text" id="username-input" class="username-input" placeholder="Enter your username" />
+    <input type="text" id="username-input" class="username-input" placeholder="Enter username" />
     <input type="text" id="message-input" class="message-input" placeholder="Enter your message..." />
     <button onclick="sendMessage()">Send</button>
   </div>
