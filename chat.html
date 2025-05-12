@@ -60,7 +60,7 @@
       border-radius: 5px;
       padding: 10px;
       font-size: 14px;
-      width: 10%; /* Username input box shorter */
+      width: 7%; /* Username input box shorter */
       min-width: 120px;
     }
 
@@ -71,7 +71,7 @@
       border-radius: 5px;
       padding: 10px;
       font-size: 14px;
-      width: 80%; /* Message box longer */
+      width: 91%; /* Message box longer */
       min-width: 200px;
     }
 
@@ -105,7 +105,7 @@
 
     .notice {
       position: fixed;
-      bottom: 50px; /* Positioned closer to the bottom */
+      bottom: 40px; /* Positioned closer to the bottom */
       width: 100%;
       text-align: center;
       color: #ccc;
@@ -117,12 +117,15 @@
     }
 
     #message-container {
-      flex-grow: 1;
-      padding: 20px;
+      position: fixed;
+      bottom: 80px; /* Position above the notice */
+      right: 10px; /* Align messages to the right */
+      width: 300px; /* Optional: Adjust width */
+      max-height: 50%; /* Limit the height */
       overflow-y: auto;
-      max-height: 70%;
       display: flex;
-      flex-direction: column-reverse;  /* Messages appear at the bottom and move up */
+      flex-direction: column-reverse;
+      z-index: 998; /* Ensure messages stay above notice */
     }
 
     .message {
@@ -131,7 +134,7 @@
       margin-bottom: 10px;
       padding: 10px;
       color: white;
-      max-width: 90%;
+      max-width: 100%;
     }
 
     .message .username {
@@ -160,6 +163,10 @@
       .notice {
         font-size: 12px;
         padding: 8px;
+      }
+
+      #message-container {
+        width: 250px; /* Adjust the message container width for smaller screens */
       }
     }
   </style>
