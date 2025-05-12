@@ -47,7 +47,7 @@
       overflow-y: auto;
       display: flex;
       flex-direction: column-reverse;
-      padding: 70px 10px 140px;
+      padding: 70px 10px 130px;
       box-sizing: border-box;
     }
 
@@ -71,7 +71,7 @@
 
     .message-bar {
       position: fixed;
-      bottom: 30px;
+      bottom: 0;
       left: 0;
       width: 100%;
       display: flex;
@@ -118,7 +118,7 @@
 
     .notice {
       position: fixed;
-      bottom: 0;
+      bottom: 55px;
       width: 100%;
       text-align: center;
       color: #ccc;
@@ -190,14 +190,14 @@
 
   <div class="chat-container" id="chat-container"></div>
 
+  <div class="notice">
+    NOTICE: This feature is experimental and may not work at times. Do not expect this to always be here.
+  </div>
+
   <div class="message-bar">
     <input type="text" id="username" placeholder="Username">
     <input type="text" id="message" placeholder="Type your message...">
     <button onclick="sendMessage()">Send</button>
-  </div>
-
-  <div class="notice">
-    NOTICE: This feature is experimental and may not work at times. Do not expect this to always be here.
   </div>
 
   <script>
