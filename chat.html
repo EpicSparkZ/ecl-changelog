@@ -150,7 +150,7 @@
     }
 
     .rainbow {
-      animation: rainbow 4s linear infinite;
+      animation: rainbow 4s linear infinite; /* Slow down the rainbow effect */
     }
 
     @keyframes rainbow {
@@ -240,6 +240,24 @@
       return words.some(word => bannedWords.includes(word));
     }
 
+    // Fetch announcement from the raw GitHub URL
+    const announcementText = document.getElementById('announcement-text');
+    const announcementUrl = 'https://raw.githubusercontent.com/EpicSparkZ/ecl-changelog/main/announcementtxt.html'; // Corrected raw URL for the HTML file
+
+    fetch(announcementUrl)
+      .then(response => response.text())
+      .then(data => {
+        if (data) {
+          announcementText.innerHTML = data;  // Use innerHTML to render HTML content
+        } else {
+          announcementText.innerText = 'No announcements available.';
+        }
+      })
+      .catch(err => {
+        console.error('Error fetching announcement:', err);
+        announcementText.innerText = 'Error loading announcement.';
+      });
+
     // Load messages from localStorage
     function loadMessages() {
       const messages = JSON.parse(localStorage.getItem('messages') || '[]');
@@ -321,32 +339,9 @@
     // Load messages on page load
     window.onload = loadMessages;
 
-    // Fetch announcement from the URL
+    // Rainbow effect for the announcement text
     const announcementText = document.getElementById('announcement-text');
-    const announcementUrl = 'https://your-api-url-here'; // <-- Add your correct URL for announcements
-
-    fetch(announcementUrl)
-      .then(response => response.json())
-      .then(data => {
-        if (data && data.announcement) {
-          announcementText.innerText = data.announcement;
-        } else {
-          announcementText.innerText = 'No announcements available.';
-        }
-      })
-      .catch(err => {
-        console.error('Error fetching announcement:', err);
-        announcementText.innerText = 'Error loading announcement.';
-      });
-
-    // Handle Enter key for sending messages
-    document.getElementById('message').addEventListener('keypress', function(event) {
-      if (event.key === 'Enter') {
-        sendMessage();
-        event.preventDefault();
-      }
-    });
-
+    announcementText.innerHTML = announcementText.innerText.replace(/EpicSparkZ/gi, match => <span class="rainbow">${match}</span>);
   </script>
 
 </body>
