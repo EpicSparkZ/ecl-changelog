@@ -301,6 +301,22 @@
         return;
       }
 
+      // Check if the message starts with a command
+      if (message.startsWith('/')) {
+        const command = message.slice(1).trim().toLowerCase();
+        
+        if (modCommands.includes(command)) {
+          if (command === 'clearchat' || command === 'clear') {
+            clearChat();
+            return;
+          }
+          // Add more command conditions here if needed
+        } else {
+          alert("Invalid command.");
+          return;
+        }
+      }
+
       // Save message
       saveMessage(message, username);
 
@@ -329,6 +345,11 @@
       messageContainer.scrollTop = messageContainer.scrollHeight;
 
       document.getElementById('message').value = ''; // Clear the message input field
+    }
+
+    // Clear chat function (for mod command)
+    function clearChat() {
+      document.getElementById('message-container').innerHTML = '';
     }
 
     // Handle announcements
