@@ -13,6 +13,9 @@
       margin: 0;
       padding: 0;
       overflow-x: hidden; /* Prevent horizontal scroll */
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
     }
 
     .top-strip {
@@ -63,7 +66,7 @@
 
     .notice {
       position: fixed;
-      bottom: 10px;
+      bottom: 60px; /* Move the notice text up so it's not covered by the input bar */
       width: 100%;
       text-align: center;
       color: #ccc;
@@ -71,26 +74,27 @@
       padding: 10px;
       box-sizing: border-box;
       pointer-events: none;
+      z-index: 1; /* Make sure it's above the input bar */
     }
 
-    /* Message box at the bottom */
-    .message-box {
+    /* Message bar holding the username, message input, and send button */
+    .message-bar {
       position: fixed;
-      bottom: 20px; /* Moved down */
+      bottom: 0;
       left: 50%;
       transform: translateX(-50%);
-      width: 80%;
-      padding: 10px;
+      width: 100%;
       background-color: #333;
-      border-radius: 5px;
-      color: white;
+      padding: 15px 20px;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      box-sizing: border-box;
+      z-index: 2; /* Ensure it's below the notice */
     }
 
     .message-input {
-      width: 80%;  /* Make the message box longer */
+      width: 70%;  /* Make the message box longer */
       padding: 8px;
       background-color: #222;
       border: none;
@@ -100,13 +104,27 @@
     }
 
     .username-input {
-      width: 20%; /* Make the username box way smaller */
+      width: 25%; /* Keep the username box small but enough to see it */
       padding: 8px;
       background-color: #222;
       border: none;
       color: white;
       border-radius: 5px;
       font-size: 16px;
+    }
+
+    .send-button {
+      padding: 8px 16px;
+      font-size: 16px;
+      background-color: #444;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .send-button:hover {
+      background-color: #666;
     }
 
     .message-list {
@@ -152,8 +170,19 @@
         padding: 8px;
       }
 
-      .message-box {
-        width: 90%;
+      .message-bar {
+        flex-direction: column;
+        padding: 10px;
+      }
+
+      .message-input {
+        width: 100%;
+        margin-bottom: 10px;
+      }
+
+      .username-input {
+        width: 100%;
+        margin-bottom: 10px;
       }
     }
   </style>
@@ -170,48 +199,57 @@
     NOTICE: This feature is experimental and may not work at times. Do not expect this to always be here.
   </div>
 
-  <!-- Username Input and Message Input Box -->
-  <div class="message-box">
-    <input type="text" id="username-input" class="username-input" placeholder="Enter username" />
-    <input type="text" id="message-input" class="message-input" placeholder="Enter your message..." />
-    <button onclick="sendMessage()">Send</button>
-  </div>
-
   <!-- Message List -->
   <div class="message-list" id="message-list"></div>
 
-  <script>
-    fetch('announcementtxtspecialwords.html')
-      .then(response => response.text())
-      .then(data => {
-        const specialWords = data.split(',').map(word => word.trim());
-        fetchAnnouncementText(specialWords);
-      })
-      .catch(error => {
-        console.error('Error loading special words:', error);
-      });
+  <!-- Username Input, Message Box, and Send Button -->
+  <div class="message-bar">
+    <input type="text" id="username-input" class="username-input" placeholder="Enter username" />
+    <input type="text" id="message-input" class="message-input" placeholder="Enter your message..." />
+    <button class="send-button" onclick="sendMessage()">Send</button>
+  </div>
 
-    function fetchAnnouncementText(specialWords) {
-      fetch('announcementtxt.html')
+  <script>
+    // Check if a username is saved in localStorage
+    document.addEventListener("DOMContentLoaded", function () {
+      const savedUsername = localStorage.getItem("username");
+      if (savedUsername) {
+        document.getElementById("username-input").value = savedUsername;
+      }
+
+      // Fetch special words and announcement text
+      fetch('announcementtxtspecialwords.html')
         .then(response => response.text())
         .then(data => {
-          const modifiedText = applyRainbowEffect(data, specialWords);
-          document.getElementById('announcement-text').innerHTML = modifiedText;
+          const specialWords = data.split(',').map(word => word.trim());
+          fetchAnnouncementText(specialWords);
         })
         .catch(error => {
-          console.error('Error loading announcement text:', error);
+          console.error('Error loading special words:', error);
         });
-    }
 
-    function applyRainbowEffect(text, specialWords) {
-      specialWords.forEach(word => {
-        const regex = new RegExp(`(${word})`, 'gi');
-        text = text.replace(regex, '<span class="rainbow">$1</span>');
-      });
-      return text;
-    }
+      // Apply rainbow effect to the announcement text
+      function fetchAnnouncementText(specialWords) {
+        fetch('announcementtxt.html')
+          .then(response => response.text())
+          .then(data => {
+            const modifiedText = applyRainbowEffect(data, specialWords);
+            document.getElementById('announcement-text').innerHTML = modifiedText;
+          })
+          .catch(error => {
+            console.error('Error loading announcement text:', error);
+          });
+      }
 
-    function animateRainbow() {
+      // Rainbow effect function
+      function applyRainbowEffect(text, specialWords) {
+        specialWords.forEach(word => {
+          const regex = new RegExp(`(${word})`, 'gi');
+          text = text.replace(regex, '<span class="rainbow">$1</span>');
+        });
+        return text;
+      }
+
       let hue = 0;
       setInterval(() => {
         document.querySelectorAll('.rainbow').forEach(el => {
@@ -219,10 +257,6 @@
         });
         hue = (hue + 2) % 360;
       }, 50);
-    }
-
-    window.addEventListener('DOMContentLoaded', () => {
-      animateRainbow();
     });
 
     // Function to send the message
@@ -230,9 +264,12 @@
       const messageInput = document.getElementById('message-input');
       const messageList = document.getElementById('message-list');
       const usernameInput = document.getElementById('username-input');
+      const username = usernameInput.value.trim();
+
+      // Save the username in localStorage
+      localStorage.setItem("username", username);
 
       const messageText = messageInput.value.trim();
-      const username = usernameInput.value.trim();
 
       if (messageText && username) {
         const messageItem = document.createElement('div');
@@ -251,9 +288,8 @@
         // Insert the message at the top of the list
         messageList.insertBefore(messageItem, messageList.firstChild);
 
-        // Clear the input boxes
+        // Clear the input box
         messageInput.value = '';
-        usernameInput.value = '';
       }
     }
 
