@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <title>Chat</title>
   <link rel="icon" href="/list_icon.png">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Mobile support -->
   <style>
     body {
       background-color: #121212;
@@ -12,10 +12,7 @@
       font-family: sans-serif;
       margin: 0;
       padding: 0;
-      overflow-x: hidden;
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
+      overflow-x: hidden; /* Prevent horizontal scroll */
     }
 
     .top-strip {
@@ -42,94 +39,11 @@
       overflow-wrap: break-word;
     }
 
-    .chat-container {
-      flex: 1;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column-reverse;
-      padding: 70px 10px 130px;
-      box-sizing: border-box;
+    .rainbow {
+      transition: color 0.5s linear;
     }
 
-    .message {
-      background-color: #222;
-      margin: 5px 0;
-      padding: 8px 12px;
-      border-radius: 6px;
-      word-wrap: break-word;
-      max-width: 100%;
-    }
-
-    .username {
-      font-weight: bold;
-      background: linear-gradient(to right, #00f, #a0f);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      margin-bottom: 3px;
-      display: inline-block;
-    }
-
-    .message-bar {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      display: flex;
-      gap: 10px;
-      padding: 10px;
-      background-color: #333;
-      box-sizing: border-box;
-      z-index: 2;
-      flex-wrap: wrap;
-    }
-
-    .message-bar input[type="text"] {
-      padding: 8px;
-      font-size: 14px;
-      border: none;
-      border-radius: 5px;
-    }
-
-    #username {
-      width: 100px;
-      flex-shrink: 0;
-    }
-
-    #message {
-      flex: 1;
-      min-width: 0;
-    }
-
-    .message-bar button {
-      padding: 8px 12px;
-      font-size: 14px;
-      background-color: #444;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      white-space: nowrap;
-      flex-shrink: 0;
-    }
-
-    .message-bar button:hover {
-      background-color: #666;
-    }
-
-    .notice {
-      position: fixed;
-      bottom: 55px;
-      width: 100%;
-      text-align: center;
-      color: #ccc;
-      font-size: 13px;
-      padding: 4px;
-      background-color: #121212;
-      box-sizing: border-box;
-      z-index: 1;
-    }
-
-    .back-button {
+    button {
       position: fixed;
       top: 10px;
       right: 10px;
@@ -143,12 +57,49 @@
       z-index: 1000;
     }
 
-    .back-button:hover {
+    button:hover {
       background-color: #666;
     }
 
-    .rainbow {
-      transition: color 0.5s linear;
+    .notice {
+      position: fixed;
+      bottom: 10px;
+      width: 100%;
+      text-align: center;
+      color: #ccc;
+      font-size: 14px;
+      padding: 10px;
+      box-sizing: border-box;
+      pointer-events: none;
+    }
+
+    .input-bar {
+      position: fixed;
+      bottom: 50px;
+      width: 100%;
+      background-color: #222;
+      display: flex;
+      justify-content: space-between;
+      padding: 10px;
+      box-sizing: border-box;
+      z-index: 1001;
+    }
+
+    .input-bar input, .input-bar button {
+      background-color: #444;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      padding: 10px;
+    }
+
+    .input-bar input {
+      width: 70%;
+    }
+
+    .input-bar button {
+      width: 20%;
+      cursor: pointer;
     }
 
     @media (max-width: 600px) {
@@ -156,26 +107,19 @@
         font-size: 16px;
       }
 
-      .message-bar {
-        flex-direction: column;
-        align-items: stretch;
-      }
-
-      #username, #message {
-        width: 100%;
-      }
-
-      .message-bar button {
-        width: 100%;
-      }
-
-      .back-button {
+      button {
         padding: 8px 16px;
         font-size: 14px;
       }
 
       .notice {
-        font-size: 11px;
+        font-size: 12px;
+        padding: 8px;
+      }
+
+      .input-bar input, .input-bar button {
+        padding: 8px;
+        font-size: 14px;
       }
     }
   </style>
@@ -186,47 +130,21 @@
     <div class="announcement-text" id="announcement-text">Loading announcement...</div>
   </div>
 
-  <button class="back-button" onclick="window.location.href='index.html';">Back</button>
-
-  <div class="chat-container" id="chat-container"></div>
-
   <div class="notice">
     NOTICE: This feature is experimental and may not work at times. Do not expect this to always be here.
   </div>
 
-  <div class="message-bar">
-    <input type="text" id="username" placeholder="Username">
-    <input type="text" id="message" placeholder="Type your message...">
+  <div class="input-bar">
+    <input type="text" id="username" placeholder="Enter your username" />
+    <input type="text" id="message" placeholder="Enter your message" />
     <button onclick="sendMessage()">Send</button>
   </div>
 
+  <button onclick="window.location.href='index.html';">Back</button>
+
+  <div id="message-container"></div>
+
   <script>
-    fetch('announcementtxtspecialwords.html')
-      .then(response => response.text())
-      .then(data => {
-        const specialWords = data.split(',').map(word => word.trim());
-        fetchAnnouncementText(specialWords);
-      })
-      .catch(error => console.error('Error loading special words:', error));
-
-    function fetchAnnouncementText(specialWords) {
-      fetch('announcementtxt.html')
-        .then(response => response.text())
-        .then(data => {
-          const modifiedText = applyRainbowEffect(data, specialWords);
-          document.getElementById('announcement-text').innerHTML = modifiedText;
-        })
-        .catch(error => console.error('Error loading announcement text:', error));
-    }
-
-    function applyRainbowEffect(text, specialWords) {
-      specialWords.forEach(word => {
-        const regex = new RegExp(`(${word})`, 'gi');
-        text = text.replace(regex, '<span class="rainbow">$1</span>');
-      });
-      return text;
-    }
-
     function animateRainbow() {
       let hue = 0;
       setInterval(() => {
@@ -238,50 +156,39 @@
     }
 
     function sendMessage() {
-      const messageBox = document.getElementById('message');
-      const usernameBox = document.getElementById('username');
-      const message = messageBox.value.trim();
-      const username = usernameBox.value.trim();
+      const username = document.getElementById('username').value;
+      const message = document.getElementById('message').value;
+      if (!username || !message) return;
 
-      if (message === '') return;
-      if (username === '') {
-        alert('Please enter a username.');
-        return;
-      }
+      const messageContainer = document.getElementById('message-container');
 
-      localStorage.setItem('savedUsername', username);
-
-      const chatContainer = document.getElementById('chat-container');
       const messageElement = document.createElement('div');
-      const usernameElement = document.createElement('div');
-      usernameElement.className = 'username';
-      usernameElement.innerText = username;
+      messageElement.classList.add('message');
+      
+      const usernameElement = document.createElement('span');
+      usernameElement.classList.add('username');
+      if (username.toLowerCase() === 'epicsparkz') {
+        usernameElement.classList.add('rainbow');
+      }
+      usernameElement.textContent = username;
 
-      const textElement = document.createElement('div');
-      textElement.className = 'message';
-      textElement.innerText = message;
+      const messageTextElement = document.createElement('span');
+      messageTextElement.classList.add('message-text');
+      messageTextElement.textContent = ': ' + message;
 
       messageElement.appendChild(usernameElement);
-      messageElement.appendChild(textElement);
-      chatContainer.insertBefore(messageElement, chatContainer.firstChild);
+      messageElement.appendChild(messageTextElement);
+      
+      messageContainer.prepend(messageElement);
 
-      messageBox.value = '';
+      // Reset message input
+      document.getElementById('message').value = '';
     }
 
-    document.getElementById('message').addEventListener('keydown', function (e) {
-      if (e.key === 'Enter') {
-        sendMessage();
-      }
-    });
-
     window.addEventListener('DOMContentLoaded', () => {
-      const saved = localStorage.getItem('savedUsername');
-      if (saved) {
-        document.getElementById('username').value = saved;
-      }
       animateRainbow();
     });
   </script>
-
+  
 </body>
 </html>
