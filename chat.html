@@ -147,6 +147,21 @@
       color: #ccc;
     }
 
+    .rainbow {
+      animation: rainbow 2s linear infinite;
+    }
+
+    @keyframes rainbow {
+      0% { color: red; }
+      14% { color: orange; }
+      28% { color: yellow; }
+      42% { color: green; }
+      57% { color: blue; }
+      71% { color: indigo; }
+      85% { color: violet; }
+      100% { color: red; }
+    }
+
     @media (max-width: 600px) {
       .announcement-text {
         font-size: 16px;
@@ -189,22 +204,18 @@
   <button class="back-button" onclick="window.location.href='index.html';">Back</button>
 
   <script>
-    // Check if a username is already stored, otherwise set one
     let username = localStorage.getItem('username') || '';
 
     if (username) {
       document.getElementById('username').value = username;
     }
 
-    // Store the username when it changes
     document.getElementById('username').addEventListener('change', (e) => {
       username = e.target.value;
       localStorage.setItem('username', username);
     });
 
     let bannedWords = [];
-    
-    // Load the banned words list
     fetch('https://raw.githubusercontent.com/EpicSparkZ/ecl-changelog/main/data/bannedwords.html')
       .then(res => res.text())
       .then(data => {
@@ -214,7 +225,6 @@
         console.error('Failed to load banned words:', err);
       });
 
-    // Check if a message contains banned words
     function containsBannedWords(message) {
       const words = message.toLowerCase().split(/\s+/);
       return words.some(word => bannedWords.includes(word));
@@ -235,6 +245,11 @@
 
       const usernameElement = document.createElement('span');
       usernameElement.classList.add('username');
+      
+      if (username.toLowerCase() === 'epicsparkz') {
+        usernameElement.classList.add('rainbow');
+      }
+      
       usernameElement.textContent = username;
 
       const messageTextElement = document.createElement('span');
@@ -252,13 +267,21 @@
       document.getElementById('message').value = '';
     }
 
-    // Send the message when the Enter key is pressed
     document.getElementById('message').addEventListener('keydown', function(event) {
       if (event.key === 'Enter') {
         sendMessage();
       }
     });
 
+    // Load the announcement text
+    fetch('announcementtxt.html')
+      .then(response => response.text())
+      .then(data => {
+        document.getElementById('announcement-text').innerHTML = data;
+      })
+      .catch(error => {
+        console.error('Error loading announcement text:', error);
+      });
   </script>
 
 </body>
