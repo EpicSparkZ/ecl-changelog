@@ -205,20 +205,18 @@
   <button class="back-button" onclick="window.location.href='index.html';">Back</button>
 
   <script>
-    let username = localStorage.getItem('username') || ''; // Load the username from localStorage
+    let username = localStorage.getItem('username') || '';
 
-    // Disable username input if it's already set
     if (username) {
       document.getElementById('username').value = username;
       document.getElementById('username').disabled = true;
     }
 
-    // Listen for changes to the username input
     document.getElementById('username').addEventListener('change', function() {
       if (!username) {
         username = this.value;
-        localStorage.setItem('username', username); // Save username to localStorage
-        document.getElementById('username').disabled = true; // Lock username
+        localStorage.setItem('username', username);
+        document.getElementById('username').disabled = true;
       }
     });
 
@@ -227,32 +225,26 @@
       .then(res => res.text())
       .then(data => {
         bannedWords = data.split(',').map(word => word.trim().toLowerCase());
-      })
-      .catch(err => console.error('Failed to load banned words:', err));
+      });
 
-    // Function to check if a message contains banned words
     function containsBannedWords(message) {
       const words = message.toLowerCase().split(/\s+/);
       return words.some(word => bannedWords.includes(word));
     }
 
-    // Function to apply rainbow effect to special words
-    function applyRainbowEffect(text) {
-      const specialWords = ['EpicSparkZ']; // Add more special words if needed
-      return text.replace(new RegExp(`\\b(${specialWords.join('|')})\\b`, 'gi'), match => {
-        return `<span class="rainbow">${match}</span>`;
-      });
+    function applyRainbowEffect(text, specialWords) {
+      const regex = new RegExp(`\\b(${specialWords.join('|')})\\b`, 'gi');
+      return text.replace(regex, match => `<span class="rainbow">${match}</span>`);
     }
 
-    // Load messages from localStorage
     function loadMessages() {
       const messages = JSON.parse(localStorage.getItem('messages') || '[]');
       const messageContainer = document.getElementById('message-container');
-      messageContainer.innerHTML = ''; // Clear previous messages
+      messageContainer.innerHTML = '';
       messages.forEach(msg => {
         const messageElement = document.createElement('div');
         messageElement.classList.add('message');
-        
+
         const usernameElement = document.createElement('span');
         usernameElement.classList.add('username');
         if (msg.username.toLowerCase() === 'epicsparkz') {
@@ -262,24 +254,22 @@
 
         const messageTextElement = document.createElement('span');
         messageTextElement.classList.add('message-text');
-        messageTextElement.innerHTML = ': ' + applyRainbowEffect(msg.message);
+        messageTextElement.innerHTML = ': ' + msg.message;
 
         messageElement.appendChild(usernameElement);
         messageElement.appendChild(messageTextElement);
 
         messageContainer.appendChild(messageElement);
       });
-      messageContainer.scrollTop = messageContainer.scrollHeight; // Auto-scroll to the latest message
+      messageContainer.scrollTop = messageContainer.scrollHeight;
     }
 
-    // Save message to localStorage
     function saveMessage(message, username) {
       const messages = JSON.parse(localStorage.getItem('messages') || '[]');
       messages.push({ username, message });
       localStorage.setItem('messages', JSON.stringify(messages));
     }
 
-    // Send a new message
     function sendMessage() {
       const message = document.getElementById('message').value;
       if (!message || !username) return;
@@ -289,7 +279,7 @@
         return;
       }
 
-      saveMessage(message, username); // Save message to localStorage
+      saveMessage(message, username);
 
       const messageContainer = document.getElementById('message-container');
       const messageElement = document.createElement('div');
@@ -304,35 +294,33 @@
 
       const messageTextElement = document.createElement('span');
       messageTextElement.classList.add('message-text');
-      messageTextElement.innerHTML = ': ' + applyRainbowEffect(message);
+      messageTextElement.innerHTML = ': ' + message;
 
       messageElement.appendChild(usernameElement);
       messageElement.appendChild(messageTextElement);
 
       messageContainer.appendChild(messageElement);
-      messageContainer.scrollTop = messageContainer.scrollHeight; // Auto-scroll to the latest message
+      messageContainer.scrollTop = messageContainer.scrollHeight;
 
-      document.getElementById('message').value = ''; // Clear the input field
+      document.getElementById('message').value = '';
     }
 
-    // Listen for "Enter" key to send a message
     document.getElementById('message').addEventListener('keydown', function(event) {
       if (event.key === 'Enter') {
         sendMessage();
       }
     });
 
-    // Fetch the announcement text
-    fetch('announcementtxt.html')
-      .then(response => response.text())
-      .then(data => {
-        document.getElementById('announcement-text').innerHTML = applyRainbowEffect(data);
-      })
-      .catch(error => {
-        console.error('Error loading announcement text:', error);
-      });
+    Promise.all([
+      fetch('announcementtxt.html').then(res => res.text()),
+      fetch('announcementtxtspecialwords.html').then(res => res.text())
+    ]).then(([announcement, specialWordsText]) => {
+      const specialWords = specialWordsText.split(',').map(word => word.trim());
+      document.getElementById('announcement-text').innerHTML = applyRainbowEffect(announcement, specialWords);
+    }).catch(err => {
+      console.error('Error loading announcement or special words:', err);
+    });
 
-    // Load existing messages when the page loads
     loadMessages();
   </script>
 
