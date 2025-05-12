@@ -123,7 +123,7 @@
       overflow-y: auto;
       display: flex;
       flex-direction: column;
-      justify-content: flex-start;
+      align-items: flex-start;
       padding: 10px;
       box-sizing: border-box;
     }
@@ -162,14 +162,37 @@
       85% { color: violet; }
       100% { color: red; }
     }
+
+    @media (max-width: 600px) {
+      .announcement-text {
+        font-size: 16px;
+      }
+
+      .input-bar input {
+        font-size: 12px;
+      }
+
+      .input-bar button {
+        font-size: 12px;
+        padding: 8px 16px;
+      }
+
+      .notice {
+        font-size: 12px;
+        padding: 8px;
+      }
+    }
   </style>
 </head>
 <body>
+
   <div class="top-strip">
     <div class="announcement-text" id="announcement-text">Loading announcement...</div>
   </div>
 
-  <div class="notice">NOTICE: This feature is experimental and may not work at times.</div>
+  <div class="notice">
+    NOTICE: This feature is experimental and may not work at times. Do not expect this to always be here.
+  </div>
 
   <div id="message-container"></div>
 
@@ -183,11 +206,13 @@
 
   <script>
     let username = localStorage.getItem('username') || '';
+
     if (username) {
       document.getElementById('username').value = username;
       document.getElementById('username').disabled = true;
     }
-    document.getElementById('username').addEventListener('change', function () {
+
+    document.getElementById('username').addEventListener('change', function() {
       if (!username) {
         username = this.value;
         localStorage.setItem('username', username);
@@ -209,35 +234,29 @@
 
     function applyRainbowEffect(text) {
       const specialWords = ['EpicSparkZ'];
-      specialWords.forEach(word => {
-        const regex = new RegExp(`(${word})`, 'gi');
-        text = text.replace(regex, '<span class="rainbow">$1</span>');
+      return text.replace(new RegExp(`\\b(${specialWords.join('|')})\\b`, 'gi'), match => {
+        return `<span class="rainbow">${match}</span>`;
       });
-      return text;
     }
 
     function loadMessages() {
       const messages = JSON.parse(localStorage.getItem('messages') || '[]');
       const container = document.getElementById('message-container');
       container.innerHTML = '';
-      messages.forEach(({ username, message }) => {
-        const msgEl = document.createElement('div');
-        msgEl.className = 'message';
-
-        const nameEl = document.createElement('span');
-        nameEl.className = 'username';
-        if (username.toLowerCase() === 'epicsparkz') nameEl.classList.add('rainbow');
-        nameEl.textContent = username;
-
-        const textEl = document.createElement('span');
-        textEl.className = 'message-text';
-        textEl.innerHTML = ': ' + applyRainbowEffect(message);
-
-        msgEl.appendChild(nameEl);
-        msgEl.appendChild(textEl);
-        container.appendChild(msgEl);
+      messages.forEach(msg => {
+        const el = document.createElement('div');
+        el.className = 'message';
+        const user = document.createElement('span');
+        user.className = 'username';
+        if (msg.username.toLowerCase() === 'epicsparkz') user.classList.add('rainbow');
+        user.textContent = msg.username;
+        const msgText = document.createElement('span');
+        msgText.className = 'message-text';
+        msgText.innerHTML = ': ' + applyRainbowEffect(msg.message);
+        el.appendChild(user);
+        el.appendChild(msgText);
+        container.appendChild(el);
       });
-      container.scrollTop = container.scrollHeight;
     }
 
     function saveMessage(message, username) {
@@ -246,36 +265,22 @@
       localStorage.setItem('messages', JSON.stringify(messages));
     }
 
-    async function sendMessage() {
-      const input = document.getElementById('message');
-      const message = input.value;
+    function sendMessage() {
+      const message = document.getElementById('message').value;
       if (!message || !username) return;
-
       if (containsBannedWords(message)) {
-        alert('Your message contains a banned word and was not sent.');
+        alert("Your message contains a banned word.");
         return;
       }
-
-      if (message === '/clearchat') {
-        const mods = await fetch('https://raw.githubusercontent.com/EpicSparkZ/ecl-changelog/main/data/modusernames.html').then(r => r.text());
-        const modList = mods.split(',').map(x => x.trim().toLowerCase());
-        if (modList.includes(username.toLowerCase())) {
-          localStorage.setItem('messages', '[]');
-          loadMessages();
-        } else {
-          alert('You are not authorized to use this command.');
-        }
-        input.value = '';
-        return;
-      }
-
       saveMessage(message, username);
       loadMessages();
-      input.value = '';
+      const container = document.getElementById('message-container');
+      container.scrollTop = container.scrollHeight;
+      document.getElementById('message').value = '';
     }
 
-    document.getElementById('message').addEventListener('keydown', function (event) {
-      if (event.key === 'Enter') sendMessage();
+    document.getElementById('message').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') sendMessage();
     });
 
     fetch('announcementtxt.html')
@@ -286,8 +291,6 @@
 
     loadMessages();
   </script>
-</body>
-</html>
 
 </body>
 </html>
