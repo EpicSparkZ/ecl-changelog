@@ -15,6 +15,7 @@
       display: flex;
       flex-direction: column;
       height: 100vh;
+      overflow: hidden;
     }
 
     .top-strip {
@@ -127,6 +128,7 @@
       justify-content: flex-end;
       padding: 10px;
       box-sizing: border-box;
+      max-height: calc(100vh - 140px);  /* Allow the messages to scroll above the input bar */
     }
 
     .message {
@@ -339,9 +341,6 @@
     // Load messages on page load
     window.onload = loadMessages;
 
-    // Rainbow effect for the announcement text
-    const announcementText = document.getElementById('announcement-text');
-    announcementText.innerHTML = announcementText.innerText.replace(/EpicSparkZ/gi, match => <span class="rainbow">${match}</span>);
   </script>
 
 </body>
