@@ -105,7 +105,7 @@
 
     .notice {
       position: fixed;
-      bottom: 40px; /* Positioned closer to the bottom */
+      bottom: 65px; /* Positioned closer to the bottom */
       width: 100%;
       text-align: center;
       color: #ccc;
@@ -123,7 +123,7 @@
       max-height: 50%; /* Limit the height */
       overflow-y: auto;
       display: flex;
-      flex-direction: column-reverse; /* New messages appear at the bottom */
+      flex-direction: column; /* This ensures new messages appear above */
       z-index: 998; /* Ensure messages stay above notice */
     }
 
@@ -232,13 +232,13 @@
       messageElement.appendChild(usernameElement);
       messageElement.appendChild(messageTextElement);
 
-      messageContainer.appendChild(messageElement);  // New messages will appear below
+      messageContainer.insertBefore(messageElement, messageContainer.firstChild);  // Insert new message at the top
 
       // Reset message input
       document.getElementById('message').value = '';
       
-      // Ensure the view scrolls to the bottom of the container
-      messageContainer.scrollTop = messageContainer.scrollHeight;
+      // Ensure the view scrolls to the top of the container
+      messageContainer.scrollTop = 0;
     }
 
     // Allow pressing 'Enter' to send message
