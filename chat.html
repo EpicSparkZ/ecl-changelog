@@ -1,116 +1,295 @@
-<!-- ...everything before remains unchanged... -->
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-  import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-analytics.js";
-
-  const firebaseConfig = {
-    apiKey: "AIzaSyDtux10LqHTpjpAyn-W9u7fTod8iRERn-c",
-    authDomain: "eclchangelog.firebaseapp.com",
-    databaseURL: "https://eclchangelog-default-rtdb.firebaseio.com",
-    projectId: "eclchangelog",
-    storageBucket: "eclchangelog.firebasestorage.app",
-    messagingSenderId: "1046210037396",
-    appId: "1:1046210037396:web:299af227e910b308c35681",
-    measurementId: "G-YZLMXR7F9E"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const analytics = getAnalytics(app);
-  const database = getDatabase(app);
-
-  const usernameInput = document.getElementById('username');
-  const messageInput = document.getElementById('message');
-  const messageContainer = document.getElementById('message-container');
-  const announcementText = document.getElementById('announcement-text');
-
-  // Load username from localStorage
-  if (localStorage.getItem('username')) {
-    usernameInput.value = localStorage.getItem('username');
-  }
-
-  usernameInput.addEventListener('input', () => {
-    localStorage.setItem('username', usernameInput.value);
-  });
-
-  function sendMessage() {
-    const username = usernameInput.value.trim();
-    const message = messageInput.value.trim();
-    if (username && message) {
-      const messageRef = ref(database, 'messages/' + Date.now());
-      set(messageRef, {
-        username: username,
-        message: message,
-        timestamp: Date.now()
-      }).then(() => {
-        messageInput.value = '';
-        // Lock the username after the first message
-        if (!localStorage.getItem('usernameLocked')) {
-          usernameInput.readOnly = true;
-          localStorage.setItem('usernameLocked', 'true');
-        }
-      }).catch((error) => {
-        console.error("Error sending message:", error);
-      });
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Chat</title>
+  <link rel="icon" href="/chat_icon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      background-color: #121212;
+      color: white;
+      font-family: sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
     }
-  }
 
-  // Live message listener
-  function loadMessagesLive() {
-    const messagesRef = ref(database, 'messages/');
-    onValue(messagesRef, (snapshot) => {
-      messageContainer.innerHTML = '';
-      snapshot.forEach((childSnapshot) => {
-        const messageData = childSnapshot.val();
-        const messageElement = document.createElement('div');
-        messageElement.classList.add('message');
+    .top-strip {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      min-height: 60px;
+      background-color: black;
+      z-index: 999;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 10px;
+      box-sizing: border-box;
+      text-align: center;
+    }
 
-        const usernameSpan = document.createElement('span');
-        usernameSpan.classList.add('username');
-        usernameSpan.textContent = `${messageData.username}:`;
+    .announcement-text {
+      color: white;
+      font-size: 18px;
+      font-weight: bold;
+      max-width: 100%;
+      overflow-wrap: break-word;
+      white-space: pre-wrap;
+    }
 
-        if (messageData.username === "EpicSparkZ") {
-          usernameSpan.classList.add('rainbow');
-        }
+    .input-bar {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      background-color: #222;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px;
+      gap: 10px;
+      box-sizing: border-box;
+      z-index: 1000;
+    }
 
-        const messageSpan = document.createElement('span');
-        messageSpan.classList.add('message-text');
-        messageSpan.textContent = ` ${messageData.message}`;
+    .input-bar input {
+      background-color: #444;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      padding: 10px;
+      font-size: 14px;
+      min-width: 120px;
+      word-wrap: break-word;
+    }
 
-        messageElement.appendChild(usernameSpan);
-        messageElement.appendChild(messageSpan);
-        messageContainer.appendChild(messageElement);
-      });
+    .input-bar #username {
+      width: 7%;
+    }
 
-      // Scroll to bottom
+    .input-bar #message {
+      width: 83%;
+    }
+
+    .input-bar button {
+      background-color: #444;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      padding: 10px 20px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .back-button {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      padding: 10px 20px;
+      background-color: #444;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      z-index: 1001;
+    }
+
+    .back-button:hover {
+      background-color: #666;
+    }
+
+    .notice {
+      position: fixed;
+      bottom: 50px;
+      width: 100%;
+      text-align: center;
+      color: #ccc;
+      font-size: 14px;
+      padding: 10px;
+      box-sizing: border-box;
+      pointer-events: none;
+      z-index: 999;
+    }
+
+    #message-container {
+      flex-grow: 1;
+      margin-top: 60px;
+      margin-bottom: 80px;
+      overflow-y: auto;
+      padding: 10px;
+      box-sizing: border-box;
+    }
+
+    .message {
+      background-color: #333;
+      border-radius: 5px;
+      margin-bottom: 10px;
+      padding: 10px;
+      color: white;
+      box-sizing: border-box;
+      word-wrap: break-word;
+    }
+
+    .message .username {
+      font-weight: bold;
+      margin-right: 5px;
+    }
+
+    .message .message-text {
+      color: #ccc;
+    }
+
+    .rainbow {
+      animation: rainbow 4s linear infinite;
+    }
+
+    @keyframes rainbow {
+      0% { color: red; }
+      14% { color: orange; }
+      28% { color: yellow; }
+      42% { color: green; }
+      57% { color: blue; }
+      71% { color: indigo; }
+      85% { color: violet; }
+      100% { color: red; }
+    }
+
+    @media (max-width: 600px) {
+      .announcement-text {
+        font-size: 16px;
+      }
+
+      .input-bar input {
+        font-size: 12px;
+      }
+
+      .input-bar button {
+        font-size: 12px;
+        padding: 8px 16px;
+      }
+
+      .notice {
+        font-size: 12px;
+        padding: 8px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="top-strip">
+    <div class="announcement-text" id="announcement-text">Loading announcement...</div>
+  </div>
+
+  <div class="notice">
+    NOTICE: This feature is experimental and may not work at times. Do not expect this to always be here.
+  </div>
+
+  <div id="message-container"></div>
+
+  <div class="input-bar">
+    <input type="text" id="username" placeholder="Enter Username" />
+    <input type="text" id="message" placeholder="Enter your message here" />
+    <button onclick="sendMessage()">Send</button>
+  </div>
+
+  <button class="back-button" onclick="window.location.href='index.html';">Back</button>
+
+  <!-- Firebase compat libraries -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyDtux10LqHTpjpAyn-W9u7fTod8iRERn-c",
+      authDomain: "eclchangelog.firebaseapp.com",
+      databaseURL: "https://eclchangelog-default-rtdb.firebaseio.com",
+      projectId: "eclchangelog",
+      storageBucket: "eclchangelog.appspot.com",
+      messagingSenderId: "1046210037396",
+      appId: "1:1046210037396:web:299af227e910b308c35681",
+      measurementId: "G-YZLMXR7F9E"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+
+    const messageContainer = document.getElementById('message-container');
+    const usernameInput = document.getElementById('username');
+
+    // Load saved username
+    if (localStorage.getItem('chatUsername')) {
+      usernameInput.value = localStorage.getItem('chatUsername');
+    }
+
+    // Lock username field after first message
+    function lockUsername() {
+      if (!localStorage.getItem('usernameLocked')) {
+        usernameInput.readOnly = true;
+        localStorage.setItem('usernameLocked', 'true');
+      }
+    }
+
+    function sendMessage() {
+      const username = usernameInput.value.trim();
+      const message = document.getElementById('message').value.trim();
+
+      if (username && message) {
+        localStorage.setItem('chatUsername', username);
+        firebase.database().ref('messages/' + Date.now()).set({
+          username: username,
+          message: message,
+          timestamp: Date.now()
+        });
+        document.getElementById('message').value = '';
+
+        // Lock the username after the first message
+        lockUsername();
+      }
+    }
+
+    function addMessageToDOM(data) {
+      const messageData = data.val();
+      const messageElement = document.createElement('div');
+      messageElement.classList.add('message');
+
+      let usernameClass = "username";
+      if (messageData.username === "EpicSparkZ") {
+        usernameClass += " rainbow";
+      }
+
+      messageElement.innerHTML = `
+        <span class="${usernameClass}">${messageData.username}:</span>
+        <span class="message-text">${messageData.message}</span>
+      `;
+
+      messageContainer.appendChild(messageElement);
       messageContainer.scrollTop = messageContainer.scrollHeight;
-    });
-  }
+    }
 
-  // Load announcement from Firebase
-  function loadAnnouncement() {
-    const annRef = ref(database, 'announcement/');
-    onValue(annRef, (snapshot) => {
-      if (snapshot.exists()) {
-        announcementText.textContent = snapshot.val();
-      } else {
-        announcementText.textContent = 'No announcement.';
+    // Live updates
+    firebase.database().ref('messages').on('child_added', addMessageToDOM);
+
+    // Enter to send
+    document.getElementById('message').addEventListener('keydown', function(event) {
+      if (event.key === 'Enter') {
+        sendMessage();
       }
     });
-  }
 
-  // Enter key triggers send
-  messageInput.addEventListener('keydown', function(event) {
-    if (event.key === 'Enter') {
-      sendMessage();
-    }
-  });
-
-  // Init
-  window.onload = () => {
-    loadMessagesLive();
-    loadAnnouncement();
-  };
-</script>
+    // Load announcement
+    fetch('announcement.txt')
+      .then(response => response.text())
+      .then(text => {
+        document.getElementById('announcement-text').textContent = text;
+      })
+      .catch(error => {
+        console.error("Failed to load announcement:", error);
+        document.getElementById('announcement-text').textContent = "Failed to load announcement.";
+      });
+  </script>
 </body>
 </html>
