@@ -6,7 +6,109 @@
   <link rel="icon" href="/chat_icon.png">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    /* Your existing CSS code */
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #121212;
+      color: #f1f1f1;
+      margin: 0;
+      padding: 0;
+    }
+
+    .top-strip {
+      background-color: #333;
+      padding: 10px;
+      text-align: center;
+      color: white;
+    }
+
+    .notice {
+      background-color: #ff9800;
+      color: black;
+      padding: 10px;
+      font-size: 16px;
+      text-align: center;
+    }
+
+    #message-container {
+      max-height: 500px;
+      overflow-y: scroll;
+      padding: 10px;
+      margin-top: 10px;
+    }
+
+    .message {
+      background-color: #333;
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 5px;
+    }
+
+    .message-text {
+      font-size: 16px;
+    }
+
+    .username {
+      font-weight: bold;
+    }
+
+    .rainbow {
+      background: linear-gradient(90deg, #ff0000, #ff9900, #33cc33, #0099ff, #9900cc, #ff0066);
+      -webkit-background-clip: text;
+      color: transparent;
+    }
+
+    .input-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background-color: #333;
+      padding: 10px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .input-bar input {
+      width: 45%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+
+    .input-bar button {
+      padding: 10px 20px;
+      background-color: #555;
+      border: none;
+      border-radius: 5px;
+      color: white;
+      cursor: pointer;
+    }
+
+    .input-bar button:hover {
+      background-color: #888;
+    }
+
+    .back-button {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      padding: 10px 20px;
+      background-color: #333;
+      border: none;
+      color: white;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+
+    .back-button:hover {
+      background-color: #888;
+    }
+
+    .announcement-text {
+      color: #f1f1f1;
+      font-size: 16px;
+    }
+
   </style>
 </head>
 <body>
@@ -32,7 +134,6 @@
   <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database.js"></script>
 
   <script>
-    // Firebase configuration
     const firebaseConfig = {
       apiKey: "your-api-key",
       authDomain: "your-auth-domain",
@@ -60,7 +161,6 @@
       }
     });
 
-    // Function to send a message to Firebase
     function sendMessage() {
       const msgInput = document.getElementById('message');
       const message = msgInput.value.trim();
@@ -71,15 +171,12 @@
         message: message
       };
 
-      // Push the message to Firebase
       const newMessageRef = database.ref('messages').push();
       newMessageRef.set(messageData);
 
-      // Reset the message input
       msgInput.value = '';
     }
 
-    // Function to create and append message elements
     function createMessageElement(username, message) {
       const msgEl = document.createElement('div');
       msgEl.className = 'message';
@@ -103,12 +200,10 @@
       return msgEl;
     }
 
-    // Function to load messages from Firebase
     function loadMessages() {
       const messageContainer = document.getElementById('message-container');
       messageContainer.innerHTML = '';
 
-      // Get messages from Firebase
       const messagesRef = database.ref('messages');
       messagesRef.on('child_added', (snapshot) => {
         const messageData = snapshot.val();
@@ -116,14 +211,11 @@
         messageContainer.appendChild(el);
       });
 
-      // Scroll to the bottom
       messageContainer.scrollTop = messageContainer.scrollHeight;
     }
 
-    // Load messages when the page loads
     loadMessages();
 
-    // Listen for new messages in real-time
     database.ref('messages').on('child_added', (snapshot) => {
       const messageData = snapshot.val();
       const messageContainer = document.getElementById('message-container');
