@@ -1,97 +1,183 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Chat</title>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+  <title>Login / Sign Up</title>
+  <link rel="icon" href="/chat_icon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      background-color: #121212;
+      color: white;
+      font-family: sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+
+    .top-strip {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      min-height: 60px;
+      background-color: black;
+      z-index: 999;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 10px;
+      box-sizing: border-box;
+      text-align: center;
+    }
+
+    .announcement-text {
+      color: white;
+      font-size: 18px;
+      font-weight: bold;
+      max-width: 100%;
+      overflow-wrap: break-word;
+      white-space: pre-wrap;
+    }
+
+    .auth-container {
+      margin-top: 80px;
+      margin-bottom: 40px;
+      padding: 20px;
+      box-sizing: border-box;
+      width: 100%;
+      max-width: 400px;
+      align-self: center;
+      background-color: #1e1e1e;
+      border-radius: 10px;
+    }
+
+    .auth-container h2 {
+      text-align: center;
+    }
+
+    .auth-container input {
+      width: 100%;
+      margin-bottom: 10px;
+      padding: 10px;
+      font-size: 14px;
+      background-color: #333;
+      color: white;
+      border: none;
+      border-radius: 5px;
+    }
+
+    .auth-container button {
+      width: 100%;
+      padding: 10px;
+      background-color: #444;
+      color: white;
+      font-size: 14px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .auth-container button:hover {
+      background-color: #666;
+    }
+
+    .back-button {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      padding: 10px 20px;
+      background-color: #444;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      z-index: 1001;
+    }
+
+    .back-button:hover {
+      background-color: #666;
+    }
+
+    .notice {
+      position: fixed;
+      bottom: 10px;
+      width: 100%;
+      text-align: center;
+      color: #ccc;
+      font-size: 14px;
+      padding: 10px;
+      box-sizing: border-box;
+      pointer-events: none;
+    }
+  </style>
 </head>
 <body>
+  <div class="top-strip">
+    <div class="announcement-text" id="announcement-text">Loading announcement...</div>
+  </div>
 
-<!-- Sign Up Form -->
-<div id="sign-up-form">
-  <h2>Sign Up</h2>
-  <input type="email" id="sign-up-email" placeholder="Email" />
-  <input type="password" id="sign-up-password" placeholder="Password" />
-  <button onclick="signUp()">Sign Up</button>
-</div>
+  <div class="auth-container">
+    <h2>Login / Sign Up</h2>
+    <input type="email" id="email" placeholder="Email" />
+    <input type="password" id="password" placeholder="Password" />
+    <button onclick="signUp()">Sign Up</button>
+    <button onclick="login()">Login</button>
+  </div>
 
-<!-- Login Form -->
-<div id="login-form" style="display: none;">
-  <h2>Log In</h2>
-  <input type="email" id="login-email" placeholder="Email" />
-  <input type="password" id="login-password" placeholder="Password" />
-  <button onclick="logIn()">Log In</button>
-</div>
+  <button class="back-button" onclick="window.location.href='index.html';">Back</button>
 
-<!-- Your existing chat HTML content goes below -->
-<div id="message-container" style="display:none;">
-  <!-- Messages will show here -->
-</div>
-<div id="input-bar" style="display:none;">
-  <!-- Your chat input UI -->
-</div>
+  <div class="notice">NOTICE: This is an experimental login system.</div>
 
-<script>
-  const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_AUTH_DOMAIN",
-    databaseURL: "YOUR_DATABASE_URL",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_STORAGE_BUCKET",
-    messagingSenderId: "YOUR_SENDER_ID",
-    appId: "YOUR_APP_ID"
-  };
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
 
-  firebase.initializeApp(firebaseConfig);
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyDtux10LqHTpjpAyn-W9u7fTod8iRERn-c",
+      authDomain: "eclchangelog.firebaseapp.com",
+      databaseURL: "https://eclchangelog-default-rtdb.firebaseio.com",
+      projectId: "eclchangelog",
+      storageBucket: "eclchangelog.appspot.com",
+      messagingSenderId: "1046210037396",
+      appId: "1:1046210037396:web:299af227e910b308c35681",
+      measurementId: "G-YZLMXR7F9E"
+    };
 
-  function signUp() {
-    const email = document.getElementById('sign-up-email').value;
-    const password = document.getElementById('sign-up-password').value;
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
 
-    firebase.auth().createUserWithEmailAndPassword(email, password)
-      .then((userCredential) => {
-        alert('Sign-up successful!');
-        document.getElementById('sign-up-form').style.display = 'none';
-        document.getElementById('login-form').style.display = 'block';
-      })
-      .catch((error) => {
-        alert('Error: ' + error.message);
-      });
-  }
-
-  function logIn() {
-    const email = document.getElementById('login-email').value;
-    const password = document.getElementById('login-password').value;
-
-    firebase.auth().signInWithEmailAndPassword(email, password)
-      .then((userCredential) => {
-        alert('Login successful!');
-        document.getElementById('login-form').style.display = 'none';
-        showChat();
-      })
-      .catch((error) => {
-        alert('Error: ' + error.message);
-      });
-  }
-
-  firebase.auth().onAuthStateChanged((user) => {
-    if (user) {
-      showChat();
-    } else {
-      document.getElementById('sign-up-form').style.display = 'block';
-      document.getElementById('login-form').style.display = 'block';
+    function signUp() {
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value.trim();
+      auth.createUserWithEmailAndPassword(email, password)
+        .then(() => alert("Account created!"))
+        .catch(error => alert("Error: " + error.message));
     }
-  });
 
-  function showChat() {
-    document.getElementById('message-container').style.display = 'block';
-    document.getElementById('input-bar').style.display = 'block';
-    document.getElementById('sign-up-form').style.display = 'none';
-    document.getElementById('login-form').style.display = 'none';
-  }
-</script>
+    function login() {
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value.trim();
+      auth.signInWithEmailAndPassword(email, password)
+        .then(() => {
+          alert("Logged in!");
+          window.location.href = "chat.html";
+        })
+        .catch(error => alert("Error: " + error.message));
+    }
 
+    // Load announcement text
+    fetch('announcementtxt.html')
+      .then(response => response.text())
+      .then(text => {
+        document.getElementById('announcement-text').textContent = text;
+      })
+      .catch(error => {
+        console.error("Failed to load announcement:", error);
+        document.getElementById('announcement-text').textContent = "Failed to load announcement.";
+      });
+  </script>
 </body>
 </html>
