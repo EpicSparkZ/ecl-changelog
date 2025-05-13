@@ -97,10 +97,18 @@
       font-size: 1rem;
       flex: 1;
       min-width: 0;
+      width: 100%;
+      box-sizing: border-box;
     }
 
     .input-bar #username {
-      max-width: 150px;
+      flex: 0 0 7%;
+      min-width: 60px;
+    }
+
+    .input-bar #message {
+      flex: 1;
+      min-width: 100px;
     }
 
     .input-bar button {
@@ -178,7 +186,6 @@
     <button onclick="sendMessage()">Send</button>
   </div>
 
-  <!-- ✅ Moved Notice Bar to the Bottom -->
   <div class="notice">
     NOTICE: This feature is experimental and may not work at times. Do not expect this to always be here.
   </div>
