@@ -6,185 +6,9 @@
   <link rel="icon" href="/chat_icon.png">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    /* Styles remain unchanged */
-    body {
-      background-color: #121212;
-      color: white;
-      font-family: sans-serif;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
-    }
-
-    .top-strip {
-      position: fixed;
-      top: 0;
-      width: 100%;
-      min-height: 60px;
-      background-color: black;
-      z-index: 999;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 10px;
-      box-sizing: border-box;
-      text-align: center;
-    }
-
-    .announcement-text {
-      color: white;
-      font-size: 18px;
-      font-weight: bold;
-      max-width: 100%;
-      overflow-wrap: break-word;
-      white-space: pre-wrap;
-    }
-
-    .input-bar {
-      position: fixed;
-      bottom: 0;
-      width: 100%;
-      background-color: #222;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 10px;
-      gap: 10px;
-      box-sizing: border-box;
-      z-index: 1000;
-    }
-
-    .input-bar input {
-      background-color: #444;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      padding: 10px;
-      font-size: 14px;
-      min-width: 120px;
-      word-wrap: break-word;
-    }
-
-    .input-bar #username {
-      width: 7%;
-    }
-
-    .input-bar #message {
-      width: 83%;
-    }
-
-    .input-bar button {
-      background-color: #444;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      padding: 10px 20px;
-      cursor: pointer;
-      font-size: 14px;
-    }
-
-    .back-button {
-      position: fixed;
-      top: 10px;
-      right: 10px;
-      padding: 10px 20px;
-      background-color: #444;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      font-size: 16px;
-      z-index: 1001;
-    }
-
-    .back-button:hover {
-      background-color: #666;
-    }
-
-    .notice {
-      position: fixed;
-      bottom: 50px;
-      width: 100%;
-      text-align: center;
-      color: #ccc;
-      font-size: 14px;
-      padding: 10px;
-      box-sizing: border-box;
-      pointer-events: none;
-      z-index: 999;
-    }
-
-    #message-container {
-      flex-grow: 1;
-      margin-top: 60px;
-      margin-bottom: 80px;
-      overflow-y: auto;
-      padding: 10px;
-      box-sizing: border-box;
-    }
-
-    .message {
-      background-color: #333;
-      border-radius: 5px;
-      margin-bottom: 10px;
-      padding: 10px;
-      color: white;
-      box-sizing: border-box;
-      word-wrap: break-word;
-    }
-
-    .message .username {
-      font-weight: bold;
-      margin-right: 5px;
-    }
-
-    .message .message-text {
-      color: #ccc;
-    }
-
-    .rainbow {
-      animation: rainbow 4s linear infinite;
-    }
-
-    @keyframes rainbow {
-      0% { color: red; }
-      14% { color: orange; }
-      28% { color: yellow; }
-      42% { color: green; }
-      57% { color: blue; }
-      71% { color: indigo; }
-      85% { color: violet; }
-      100% { color: red; }
-    }
-
-    @media (max-width: 600px) {
-      .announcement-text {
-        font-size: 16px;
-      }
-
-      .input-bar input {
-        font-size: 12px;
-      }
-
-      .input-bar button {
-        font-size: 12px;
-        padding: 8px 16px;
-      }
-
-      .notice {
-        font-size: 12px;
-        padding: 8px;
-      }
-    }
+    /* Your existing CSS code */
   </style>
-
-  <!-- Firebase SDK Setup (using compat version) -->
-  <script src="https://www.gstatic.com/firebasejs/9.18.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.18.0/firebase-database-compat.js"></script>
 </head>
-
 <body>
   <div class="top-strip">
     <div class="announcement-text" id="announcement-text">Loading announcement...</div>
@@ -204,22 +28,23 @@
 
   <button class="back-button" onclick="window.location.href='index.html';">Back</button>
 
+  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database.js"></script>
+
   <script>
-    // Firebase Configuration
+    // Firebase configuration
     const firebaseConfig = {
-      apiKey: "AIzaSyDtux10LqHTpjpAyn-W9u7fTod8iRERn-c",
-      authDomain: "eclchangelog.firebaseapp.com",
-      databaseURL: "https://eclchangelog-default-rtdb.firebaseio.com",
-      projectId: "eclchangelog",
-      storageBucket: "eclchangelog.firebasestorage.app",
-      messagingSenderId: "1046210037396",
-      appId: "1:1046210037396:web:299af227e910b308c35681",
-      measurementId: "G-YZLMXR7F9E"
+      apiKey: "your-api-key",
+      authDomain: "your-auth-domain",
+      databaseURL: "your-database-url",
+      projectId: "your-project-id",
+      storageBucket: "your-storage-bucket",
+      messagingSenderId: "your-sender-id",
+      appId: "your-app-id"
     };
 
-    // Initialize Firebase
-    firebase.initializeApp(firebaseConfig);
-    const database = firebase.database();
+    const app = firebase.initializeApp(firebaseConfig);
+    const database = firebase.database(app);
 
     let username = localStorage.getItem('username') || '';
     if (username) {
@@ -235,54 +60,26 @@
       }
     });
 
-    let bannedWords = [];
-    let specialWords = [];
-    let modUsernames = [];
+    // Function to send a message to Firebase
+    function sendMessage() {
+      const msgInput = document.getElementById('message');
+      const message = msgInput.value.trim();
+      if (!message || !username) return;
 
-    fetch('https://raw.githubusercontent.com/EpicSparkZ/ecl-changelog/main/data/bannedwords.html')
-      .then(res => res.text())
-      .then(data => {
-        bannedWords = data.split(',').map(w => w.trim().toLowerCase());
-      });
-
-    fetch('announcementtxtspecialwords.html')
-      .then(res => res.text())
-      .then(data => {
-        specialWords = data.split(',').map(w => w.trim());
-        return fetch('announcementtxt.html');
-      })
-      .then(res => res.text())
-      .then(announcement => {
-        document.getElementById('announcement-text').innerHTML = applyRainbowEffectToAnnouncement(announcement);
-      });
-
-    fetch('modusernames.html')
-      .then(res => res.text())
-      .then(data => {
-        modUsernames = data.split(',').map(name => name.trim().toLowerCase());
-      });
-
-    function containsBannedWords(message) {
-      return message.toLowerCase().split(/\s+/).some(w => bannedWords.includes(w));
-    }
-
-    function applyRainbowEffectToAnnouncement(text) {
-      let result = text;
-      specialWords.forEach(word => {
-        const regex = new RegExp(`(${word})`, 'gi');
-        result = result.replace(regex, '<span class="rainbow">$1</span>');
-      });
-      return result;
-    }
-
-    function saveMessage(message, username) {
-      const messageRef = database.ref('messages').push();
-      messageRef.set({
+      const messageData = {
         username: username,
         message: message
-      });
+      };
+
+      // Push the message to Firebase
+      const newMessageRef = database.ref('messages').push();
+      newMessageRef.set(messageData);
+
+      // Reset the message input
+      msgInput.value = '';
     }
 
+    // Function to create and append message elements
     function createMessageElement(username, message) {
       const msgEl = document.createElement('div');
       msgEl.className = 'message';
@@ -306,41 +103,35 @@
       return msgEl;
     }
 
+    // Function to load messages from Firebase
     function loadMessages() {
       const messageContainer = document.getElementById('message-container');
       messageContainer.innerHTML = '';
+
+      // Get messages from Firebase
       const messagesRef = database.ref('messages');
-      messagesRef.on('child_added', function(snapshot) {
-        const msg = snapshot.val();
-        const el = createMessageElement(msg.username, msg.message);
+      messagesRef.on('child_added', (snapshot) => {
+        const messageData = snapshot.val();
+        const el = createMessageElement(messageData.username, messageData.message);
         messageContainer.appendChild(el);
       });
+
+      // Scroll to the bottom
       messageContainer.scrollTop = messageContainer.scrollHeight;
     }
 
-    function sendMessage() {
-      const msgInput = document.getElementById('message');
-      const message = msgInput.value.trim();
-      if (!message || !username) return;
+    // Load messages when the page loads
+    loadMessages();
 
-      if (containsBannedWords(message)) {
-        alert("Your message contains a banned word and was not sent.");
-        return;
-      }
-
-      saveMessage(message, username);
-      const el = createMessageElement(username, message);
-      document.getElementById('message-container').appendChild(el);
-      document.getElementById('message-container').scrollTop = document.getElementById('message-container').scrollHeight;
-
-      msgInput.value = '';
-    }
-
-    document.getElementById('message').addEventListener('keydown', e => {
-      if (e.key === 'Enter') sendMessage();
+    // Listen for new messages in real-time
+    database.ref('messages').on('child_added', (snapshot) => {
+      const messageData = snapshot.val();
+      const messageContainer = document.getElementById('message-container');
+      const el = createMessageElement(messageData.username, messageData.message);
+      messageContainer.appendChild(el);
+      messageContainer.scrollTop = messageContainer.scrollHeight;
     });
 
-    loadMessages();
   </script>
 </body>
 </html>
