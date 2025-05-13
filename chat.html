@@ -178,7 +178,12 @@
       }
     }
   </style>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
 </head>
+
 <body>
   <div class="top-strip">
     <div class="announcement-text" id="announcement-text">Loading announcement...</div>
@@ -199,6 +204,21 @@
   <button class="back-button" onclick="window.location.href='index.html';">Back</button>
 
   <script>
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+      databaseURL: "https://YOUR_PROJECT_ID.firebaseio.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT_ID.appspot.com",
+      messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+      appId: "YOUR_APP_ID",
+      measurementId: "YOUR_MEASUREMENT_ID"
+    };
+
+    // Initialize Firebase
+    const app = firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
     let username = localStorage.getItem('username') || '';
     if (username) {
       document.getElementById('username').value = username;
@@ -254,9 +274,11 @@
     }
 
     function saveMessage(message, username) {
-      const messages = JSON.parse(localStorage.getItem('messages') || '[]');
-      messages.push({ username, message });
-      localStorage.setItem('messages', JSON.stringify(messages));
+      db.ref('messages').push({
+        username: username,
+        message: message,
+        timestamp: firebase.database.ServerValue.TIMESTAMP
+      });
     }
 
     function createMessageElement(username, message) {
@@ -285,12 +307,12 @@
     function loadMessages() {
       const messageContainer = document.getElementById('message-container');
       messageContainer.innerHTML = '';
-      const messages = JSON.parse(localStorage.getItem('messages') || '[]');
-      messages.forEach(msg => {
-        const el = createMessageElement(msg.username, msg.message);
+      
+      db.ref('messages').orderByChild('timestamp').on('child_added', function(snapshot) {
+        const msgData = snapshot.val();
+        const el = createMessageElement(msgData.username, msgData.message);
         messageContainer.appendChild(el);
       });
-      messageContainer.scrollTop = messageContainer.scrollHeight;
     }
 
     function sendMessage() {
@@ -304,10 +326,6 @@
       }
 
       saveMessage(message, username);
-      const el = createMessageElement(username, message);
-      document.getElementById('message-container').appendChild(el);
-      document.getElementById('message-container').scrollTop = document.getElementById('message-container').scrollHeight;
-
       msgInput.value = '';
     }
 
@@ -315,7 +333,7 @@
       if (e.key === 'Enter') sendMessage();
     });
 
-    loadMessages();
+    loadMessages();  // Start loading messages
   </script>
 </body>
 </html>
