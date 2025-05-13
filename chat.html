@@ -178,12 +178,7 @@
       }
     }
   </style>
-
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
 </head>
-
 <body>
   <div class="top-strip">
     <div class="announcement-text" id="announcement-text">Loading announcement...</div>
@@ -203,21 +198,26 @@
 
   <button class="back-button" onclick="window.location.href='index.html';">Back</button>
 
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.17.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.17.0/firebase-database.js"></script>
+
   <script>
-const firebaseConfig = {
-  apiKey: "AIzaSyDtux10LqHTpjpAyn-W9u7fTod8iRERn-c", // This is your API key
-  authDomain: "eclchangelog.firebaseapp.com",
-  databaseURL: "https://eclchangelog-default-rtdb.firebaseio.com",
-  projectId: "eclchangelog",
-  storageBucket: "eclchangelog.firebasestorage.app",
-  messagingSenderId: "1046210037396",
-  appId: "1:1046210037396:web:299af227e910b308c35681",
-  measurementId: "G-YZLMXR7F9E"
-};
+    // Your Firebase config
+    const firebaseConfig = {
+      apiKey: "AIzaSyDtux10LqHTpjpAyn-W9u7fTod8iRERn-c",
+      authDomain: "eclchangelog.firebaseapp.com",
+      databaseURL: "https://eclchangelog-default-rtdb.firebaseio.com",
+      projectId: "eclchangelog",
+      storageBucket: "eclchangelog.firebasestorage.app",
+      messagingSenderId: "1046210037396",
+      appId: "1:1046210037396:web:299af227e910b308c35681",
+      measurementId: "G-YZLMXR7F9E"
+    };
 
     // Initialize Firebase
     const app = firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
+    const database = firebase.database(app);
 
     let username = localStorage.getItem('username') || '';
     if (username) {
@@ -274,10 +274,11 @@ const firebaseConfig = {
     }
 
     function saveMessage(message, username) {
-      db.ref('messages').push({
+      const messagesRef = database.ref('messages');
+      messagesRef.push({
         username: username,
         message: message,
-        timestamp: firebase.database.ServerValue.TIMESTAMP
+        timestamp: Date.now()
       });
     }
 
@@ -307,12 +308,13 @@ const firebaseConfig = {
     function loadMessages() {
       const messageContainer = document.getElementById('message-container');
       messageContainer.innerHTML = '';
-      
-      db.ref('messages').orderByChild('timestamp').on('child_added', function(snapshot) {
-        const msgData = snapshot.val();
-        const el = createMessageElement(msgData.username, msgData.message);
+      const messagesRef = database.ref('messages');
+      messagesRef.orderByChild('timestamp').on('child_added', snapshot => {
+        const msg = snapshot.val();
+        const el = createMessageElement(msg.username, msg.message);
         messageContainer.appendChild(el);
       });
+      messageContainer.scrollTop = messageContainer.scrollHeight;
     }
 
     function sendMessage() {
@@ -326,6 +328,10 @@ const firebaseConfig = {
       }
 
       saveMessage(message, username);
+      const el = createMessageElement(username, message);
+      document.getElementById('message-container').appendChild(el);
+      document.getElementById('message-container').scrollTop = document.getElementById('message-container').scrollHeight;
+
       msgInput.value = '';
     }
 
@@ -333,7 +339,7 @@ const firebaseConfig = {
       if (e.key === 'Enter') sendMessage();
     });
 
-    loadMessages();  // Start loading messages
+    loadMessages();
   </script>
 </body>
 </html>
