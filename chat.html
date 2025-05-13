@@ -235,11 +235,48 @@
         }).then(() => {
           // Clear the message input after sending
           document.getElementById('message').value = '';
+          loadMessages(); // Reload messages after sending a new one
         }).catch((error) => {
           console.error("Error sending message:", error);
         });
       }
     }
+
+    // Function to load the previous messages from Firebase
+    function loadMessages() {
+      const messageContainer = document.getElementById('message-container');
+      const messagesRef = ref(database, 'messages/');
+      
+      get(messagesRef).then((snapshot) => {
+        if (snapshot.exists()) {
+          messageContainer.innerHTML = ''; // Clear current messages
+          snapshot.forEach((childSnapshot) => {
+            const messageData = childSnapshot.val();
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('message');
+            messageElement.innerHTML = `
+              <span class="username">${messageData.username}:</span>
+              <span class="message-text">${messageData.message}</span>
+            `;
+            messageContainer.appendChild(messageElement);
+          });
+        } else {
+          console.log("No messages found");
+        }
+      }).catch((error) => {
+        console.error("Error loading messages:", error);
+      });
+    }
+
+    // Load messages when the page is loaded
+    window.onload = loadMessages;
+
+    // Allow Enter to trigger sendMessage
+    document.getElementById('message').addEventListener('keydown', function(event) {
+      if (event.key === 'Enter') {
+        sendMessage();
+      }
+    });
   </script>
 </body>
 </html>
