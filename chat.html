@@ -219,24 +219,57 @@
 
     const messageContainer = document.getElementById('message-container');
     const usernameInput = document.getElementById('username');
+    const messageInput = document.getElementById('message');
+    let isUsernameLocked = false;
 
-    // Load saved username
+    // Load saved username from localStorage
     if (localStorage.getItem('chatUsername')) {
       usernameInput.value = localStorage.getItem('chatUsername');
+      isUsernameLocked = true;
+      usernameInput.disabled = true;
     }
+
+    // Save username to localStorage when it's entered
+    usernameInput.addEventListener('input', () => {
+      if (!isUsernameLocked) {
+        localStorage.setItem('chatUsername', usernameInput.value);
+      }
+    });
 
     function sendMessage() {
       const username = usernameInput.value.trim();
-      const message = document.getElementById('message').value.trim();
+      const message = messageInput.value.trim();
 
       if (username && message) {
-        localStorage.setItem('chatUsername', username);
-        firebase.database().ref('messages/' + Date.now()).set({
-          username: username,
-          message: message,
-          timestamp: Date.now()
+        // Check if username already exists in the database
+        firebase.database().ref('messages').once('value', snapshot => {
+          let usernameTaken = false;
+          snapshot.forEach(childSnapshot => {
+            const messageData = childSnapshot.val();
+            if (messageData.username === username) {
+              usernameTaken = true;
+            }
+          });
+
+          if (usernameTaken) {
+            alert("This username is already taken, please choose another one.");
+          } else {
+            // Lock the username if it's not already locked
+            isUsernameLocked = true;
+            usernameInput.disabled = true;
+
+            localStorage.setItem('chatUsername', username);
+
+            // Send the message to Firebase
+            firebase.database().ref('messages/' + Date.now()).set({
+              username: username,
+              message: message,
+              timestamp: Date.now()
+            });
+
+            messageInput.value = '';
+          }
         });
-        document.getElementById('message').value = '';
       }
     }
 
@@ -263,23 +296,17 @@
     firebase.database().ref('messages').on('child_added', addMessageToDOM);
 
     // Enter to send
-    document.getElementById('message').addEventListener('keydown', function(event) {
+    messageInput.addEventListener('keydown', function(event) {
       if (event.key === 'Enter') {
         sendMessage();
       }
     });
 
-    // Load announcement from announcementtxt.html
-    fetch('announcementtxt.html')
+    // Load announcement
+    fetch('announcement.txt')
       .then(response => response.text())
       .then(text => {
-        // Extract the content of the div or the body of the HTML file
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(text, 'text/html');
-        const announcementContent = doc.body.innerHTML.trim(); // Extract body content
-
-        // Update the announcement text in the top strip
-        document.getElementById('announcement-text').innerHTML = announcementContent;
+        document.getElementById('announcement-text').textContent = text;
       })
       .catch(error => {
         console.error("Failed to load announcement:", error);
