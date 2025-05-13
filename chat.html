@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Login / Sign Up</title>
+  <title>Login / Signup</title>
   <link rel="icon" href="/chat_icon.png">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
@@ -41,69 +41,59 @@
       white-space: pre-wrap;
     }
 
-    .auth-container {
-      margin-top: 80px;
-      margin-bottom: 40px;
+    #form-container {
+      flex-grow: 1;
+      margin-top: 60px;
+      margin-bottom: 80px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
       padding: 20px;
       box-sizing: border-box;
-      width: 100%;
-      max-width: 400px;
-      align-self: center;
-      background-color: #1e1e1e;
-      border-radius: 10px;
     }
 
-    .auth-container h2 {
-      text-align: center;
-    }
-
-    .auth-container input {
-      width: 100%;
-      margin-bottom: 10px;
-      padding: 10px;
-      font-size: 14px;
-      background-color: #333;
-      color: white;
-      border: none;
-      border-radius: 5px;
-    }
-
-    .auth-container button {
-      width: 100%;
-      padding: 10px;
-      background-color: #444;
-      color: white;
-      font-size: 14px;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-
-    .auth-container button:hover {
-      background-color: #666;
-    }
-
-    .back-button {
+    .input-bar {
       position: fixed;
-      top: 10px;
-      right: 10px;
-      padding: 10px 20px;
+      bottom: 0;
+      width: 100%;
+      background-color: #222;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 10px;
+      gap: 10px;
+      box-sizing: border-box;
+      z-index: 1000;
+    }
+
+    .input-bar input {
       background-color: #444;
       color: white;
       border: none;
       border-radius: 5px;
-      cursor: pointer;
-      font-size: 16px;
-      z-index: 1001;
+      padding: 10px;
+      font-size: 14px;
+      min-width: 180px;
     }
 
-    .back-button:hover {
+    .input-bar button {
+      background-color: #444;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      padding: 10px 20px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .input-bar button:hover {
       background-color: #666;
     }
 
     .notice {
       position: fixed;
-      bottom: 10px;
+      bottom: 50px;
       width: 100%;
       text-align: center;
       color: #ccc;
@@ -111,6 +101,27 @@
       padding: 10px;
       box-sizing: border-box;
       pointer-events: none;
+      z-index: 999;
+    }
+
+    @media (max-width: 600px) {
+      .announcement-text {
+        font-size: 16px;
+      }
+
+      .input-bar input {
+        font-size: 12px;
+      }
+
+      .input-bar button {
+        font-size: 12px;
+        padding: 8px 16px;
+      }
+
+      .notice {
+        font-size: 12px;
+        padding: 8px;
+      }
     }
   </style>
 </head>
@@ -119,17 +130,18 @@
     <div class="announcement-text" id="announcement-text">Loading announcement...</div>
   </div>
 
-  <div class="auth-container">
-    <h2>Login / Sign Up</h2>
-    <input type="email" id="email" placeholder="Email" />
-    <input type="password" id="password" placeholder="Password" />
-    <button onclick="signUp()">Sign Up</button>
-    <button onclick="login()">Login</button>
+  <div id="form-container">
+    <h2>Login or Sign Up</h2>
   </div>
 
-  <button class="back-button" onclick="window.location.href='index.html';">Back</button>
+  <div class="notice">Use your email and password to create or log into your account.</div>
 
-  <div class="notice">NOTICE: This is an experimental login system.</div>
+  <div class="input-bar">
+    <input type="email" id="email" placeholder="Email" />
+    <input type="password" id="password" placeholder="Password" />
+    <button onclick="login()">Login</button>
+    <button onclick="signup()">Sign Up</button>
+  </div>
 
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
@@ -138,7 +150,6 @@
     const firebaseConfig = {
       apiKey: "AIzaSyDtux10LqHTpjpAyn-W9u7fTod8iRERn-c",
       authDomain: "eclchangelog.firebaseapp.com",
-      databaseURL: "https://eclchangelog-default-rtdb.firebaseio.com",
       projectId: "eclchangelog",
       storageBucket: "eclchangelog.appspot.com",
       messagingSenderId: "1046210037396",
@@ -149,33 +160,29 @@
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
 
-    function signUp() {
-      const email = document.getElementById("email").value.trim();
-      const password = document.getElementById("password").value.trim();
-      auth.createUserWithEmailAndPassword(email, password)
-        .then(() => alert("Account created!"))
-        .catch(error => alert("Error: " + error.message));
-    }
-
     function login() {
-      const email = document.getElementById("email").value.trim();
-      const password = document.getElementById("password").value.trim();
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
       auth.signInWithEmailAndPassword(email, password)
-        .then(() => {
-          alert("Logged in!");
-          window.location.href = "chat.html";
-        })
-        .catch(error => alert("Error: " + error.message));
+        .then(() => window.location.href = 'chat.html')
+        .catch(err => alert(err.message));
     }
 
-    // Load announcement text
+    function signup() {
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      auth.createUserWithEmailAndPassword(email, password)
+        .then(() => window.location.href = 'chat.html')
+        .catch(err => alert(err.message));
+    }
+
+    // Load announcement
     fetch('announcementtxt.html')
       .then(response => response.text())
       .then(text => {
         document.getElementById('announcement-text').textContent = text;
       })
-      .catch(error => {
-        console.error("Failed to load announcement:", error);
+      .catch(() => {
         document.getElementById('announcement-text').textContent = "Failed to load announcement.";
       });
   </script>
