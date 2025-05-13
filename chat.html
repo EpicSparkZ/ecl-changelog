@@ -2,9 +2,9 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Chat</title>
   <link rel="icon" href="/chat_icon.png">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body {
       background-color: #121212;
@@ -66,14 +66,6 @@
       word-wrap: break-word;
     }
 
-    .input-bar #username {
-      width: 7%;
-    }
-
-    .input-bar #message {
-      width: 83%;
-    }
-
     .input-bar button {
       background-color: #444;
       color: white;
@@ -102,19 +94,6 @@
       background-color: #666;
     }
 
-    .notice {
-      position: fixed;
-      bottom: 50px;
-      width: 100%;
-      text-align: center;
-      color: #ccc;
-      font-size: 14px;
-      padding: 10px;
-      box-sizing: border-box;
-      pointer-events: none;
-      z-index: 999;
-    }
-
     #message-container {
       flex-grow: 1;
       margin-top: 60px;
@@ -134,58 +113,11 @@
       word-wrap: break-word;
     }
 
-    .message .username {
-      font-weight: bold;
-      margin-right: 5px;
-    }
-
-    .message .message-text {
-      color: #ccc;
-    }
-
-    .rainbow {
-      animation: rainbow 4s linear infinite;
-    }
-
-    @keyframes rainbow {
-      0% { color: red; }
-      14% { color: orange; }
-      28% { color: yellow; }
-      42% { color: green; }
-      57% { color: blue; }
-      71% { color: indigo; }
-      85% { color: violet; }
-      100% { color: red; }
-    }
-
-    @media (max-width: 600px) {
-      .announcement-text {
-        font-size: 16px;
-      }
-
-      .input-bar input {
-        font-size: 12px;
-      }
-
-      .input-bar button {
-        font-size: 12px;
-        padding: 8px 16px;
-      }
-
-      .notice {
-        font-size: 12px;
-        padding: 8px;
-      }
-    }
   </style>
 </head>
 <body>
   <div class="top-strip">
     <div class="announcement-text" id="announcement-text">Loading announcement...</div>
-  </div>
-
-  <div class="notice">
-    NOTICE: This feature is experimental and may not work at times. Do not expect this to always be here.
   </div>
 
   <div id="message-container"></div>
@@ -214,88 +146,29 @@
       measurementId: "G-YZLMXR7F9E"
     };
 
+    // Initialize Firebase
     const app = firebase.initializeApp(firebaseConfig);
     const database = firebase.database();
 
-    let username = localStorage.getItem('username') || '';
-    if (username) {
-      document.getElementById('username').value = username;
-      document.getElementById('username').disabled = true;
-    }
-
-    document.getElementById('username').addEventListener('change', function() {
-      if (!username) {
-        username = this.value;
-        localStorage.setItem('username', username);
-        document.getElementById('username').disabled = true;
-      }
-    });
-
-    let bannedWords = [];
-    let specialWords = [];
-    let modUsernames = [];
-
-    fetch('https://raw.githubusercontent.com/EpicSparkZ/ecl-changelog/main/data/bannedwords.html')
-      .then(res => res.text())
-      .then(data => {
-        bannedWords = data.split(',').map(w => w.trim().toLowerCase());
-      });
-
-    fetch('announcementtxtspecialwords.html')
-      .then(res => res.text())
-      .then(data => {
-        specialWords = data.split(',').map(w => w.trim());
-        return fetch('announcementtxt.html');
-      })
-      .then(res => res.text())
-      .then(announcement => {
-        document.getElementById('announcement-text').innerHTML = applyRainbowEffectToAnnouncement(announcement);
-      })
-      .catch(err => {
-        console.error("Error loading announcement:", err);
-        document.getElementById('announcement-text').innerHTML = "Announcement failed to load.";
-      });
-
-    fetch('modusernames.html')
-      .then(res => res.text())
-      .then(data => {
-        modUsernames = data.split(',').map(name => name.trim().toLowerCase());
-      });
-
-    function containsBannedWords(message) {
-      return message.toLowerCase().split(/\s+/).some(w => bannedWords.includes(w));
-    }
-
-    function applyRainbowEffectToAnnouncement(text) {
-      let result = text;
-      specialWords.forEach(word => {
-        const regex = new RegExp(`(${word})`, 'gi');
-        result = result.replace(regex, '<span class="rainbow">$1</span>');
-      });
-      return result;
-    }
-
-    function saveMessage(message, username) {
+    // Load messages from Firebase
+    function loadMessages() {
+      const messageContainer = document.getElementById('message-container');
       const messagesRef = database.ref('messages');
-      messagesRef.push({
-        username: username,
-        message: message,
-        timestamp: Date.now()
+      messagesRef.orderByChild('timestamp').on('child_added', function(snapshot) {
+        const msgData = snapshot.val();
+        const msgEl = createMessageElement(msgData.username, msgData.message);
+        messageContainer.appendChild(msgEl);
+        messageContainer.scrollTop = messageContainer.scrollHeight;
       });
     }
 
+    // Create message element
     function createMessageElement(username, message) {
       const msgEl = document.createElement('div');
       msgEl.className = 'message';
 
       const userEl = document.createElement('span');
       userEl.className = 'username';
-
-      const lowerUsername = username.toLowerCase();
-      if (lowerUsername === 'epicsparkz') {
-        userEl.classList.add('rainbow');
-      }
-
       userEl.textContent = username;
 
       const msgText = document.createElement('span');
@@ -307,29 +180,25 @@
       return msgEl;
     }
 
-    function loadMessages() {
-      const messageContainer = document.getElementById('message-container');
-      messageContainer.innerHTML = '';
-      const messagesRef = database.ref('messages');
-      messagesRef.orderByChild('timestamp').limitToLast(10).on('child_added', function(snapshot) {
-        const msgData = snapshot.val();
-        const msgEl = createMessageElement(msgData.username, msgData.message);
-        messageContainer.appendChild(msgEl);
-        messageContainer.scrollTop = messageContainer.scrollHeight;
-      });
-    }
-
+    // Send message to Firebase
     function sendMessage() {
-      const messageInput = document.getElementById('message');
-      const message = messageInput.value.trim();
-      if (message && !containsBannedWords(message)) {
-        saveMessage(message, username);
-        messageInput.value = '';
+      const username = document.getElementById('username').value;
+      const message = document.getElementById('message').value.trim();
+
+      if (username && message) {
+        const messagesRef = database.ref('messages');
+        messagesRef.push({
+          username: username,
+          message: message,
+          timestamp: Date.now()
+        });
+        document.getElementById('message').value = ''; // Clear message input
       } else {
-        alert('Your message contains banned words or is empty.');
+        alert("Please enter a username and a message.");
       }
     }
 
+    // Initialize messages
     loadMessages();
   </script>
 </body>
