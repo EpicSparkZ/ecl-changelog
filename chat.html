@@ -225,14 +225,6 @@
       usernameInput.value = localStorage.getItem('chatUsername');
     }
 
-    // Lock username field after first message
-    function lockUsername() {
-      if (!localStorage.getItem('usernameLocked')) {
-        usernameInput.readOnly = true;
-        localStorage.setItem('usernameLocked', 'true');
-      }
-    }
-
     function sendMessage() {
       const username = usernameInput.value.trim();
       const message = document.getElementById('message').value.trim();
@@ -245,9 +237,6 @@
           timestamp: Date.now()
         });
         document.getElementById('message').value = '';
-
-        // Lock the username after the first message
-        lockUsername();
       }
     }
 
@@ -280,11 +269,17 @@
       }
     });
 
-    // Load announcement
-    fetch('announcement.txt')
+    // Load announcement from announcementtxt.html
+    fetch('announcementtxt.html')
       .then(response => response.text())
       .then(text => {
-        document.getElementById('announcement-text').textContent = text;
+        // Extract the content of the div or the body of the HTML file
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(text, 'text/html');
+        const announcementContent = doc.body.innerHTML.trim(); // Extract body content
+
+        // Update the announcement text in the top strip
+        document.getElementById('announcement-text').innerHTML = announcementContent;
       })
       .catch(error => {
         console.error("Failed to load announcement:", error);
