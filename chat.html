@@ -1,151 +1,152 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Firebase Chat</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      background-color: #f4f4f9;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Firebase Chat</title>
+    <style>
+        /* Your original layout styles */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f9;
+        }
 
-    .chat-container {
-      width: 100%;
-      max-width: 600px;
-      background-color: white;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    }
+        .chat-container {
+            width: 100%;
+            max-width: 600px;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
 
-    #message-container {
-      max-height: 400px;
-      overflow-y: auto;
-      margin-bottom: 20px;
-      border: 1px solid #ddd;
-      padding: 10px;
-      background-color: #fafafa;
-    }
+        #message-container {
+            max-height: 400px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            padding: 10px;
+            background-color: #fafafa;
+        }
 
-    .message {
-      margin-bottom: 10px;
-    }
+        .message {
+            margin-bottom: 10px;
+        }
 
-    .username {
-      font-weight: bold;
-    }
+        .username {
+            font-weight: bold;
+        }
 
-    .message-text {
-      color: #555;
-    }
+        .message-text {
+            color: #555;
+        }
 
-    input[type="text"] {
-      width: 100%;
-      padding: 10px;
-      margin: 10px 0;
-      border: 1px solid #ddd;
-      border-radius: 5px;
-      font-size: 16px;
-    }
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
 
-    button {
-      padding: 10px 15px;
-      background-color: #4CAF50;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
+        button {
+            padding: 10px 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
 
-    button:hover {
-      background-color: #45a049;
-    }
+        button:hover {
+            background-color: #45a049;
+        }
 
-  </style>
+    </style>
 </head>
 <body>
 
 <div class="chat-container">
-  <h2>Chat Room</h2>
-  <div id="message-container"></div>
-  <input type="text" id="username" placeholder="Enter your username" />
-  <input type="text" id="message" placeholder="Enter your message" />
-  <button onclick="sendMessage()">Send</button>
+    <h2>Chat Room</h2>
+    <div id="message-container"></div>
+    <input type="text" id="username" placeholder="Enter your username" />
+    <input type="text" id="message" placeholder="Enter your message" />
+    <button onclick="sendMessage()">Send</button>
 </div>
 
 <script type="module">
-  import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.1.3/firebase-app.js';
-  import { getDatabase, ref, push, onChildAdded } from 'https://www.gstatic.com/firebasejs/9.1.3/firebase-database.js';
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.1.3/firebase-app.js';
+    import { getDatabase, ref, push, onChildAdded } from 'https://www.gstatic.com/firebasejs/9.1.3/firebase-database.js';
 
-  // Firebase configuration
-  const firebaseConfig = {
-    apiKey: "AIzaSyDtux10LqHTpjpAyn-W9u7fTod8iRERn-c",
-    authDomain: "eclchangelog.firebaseapp.com",
-    databaseURL: "https://eclchangelog-default-rtdb.firebaseio.com",
-    projectId: "eclchangelog",
-    storageBucket: "eclchangelog.firebasestorage.app",
-    messagingSenderId: "1046210037396",
-    appId: "1:1046210037396:web:299af227e910b308c35681",
-    measurementId: "G-YZLMXR7F9E"
-  };
+    // Firebase configuration
+    const firebaseConfig = {
+        apiKey: "AIzaSyDtux10LqHTpjpAyn-W9u7fTod8iRERn-c",
+        authDomain: "eclchangelog.firebaseapp.com",
+        databaseURL: "https://eclchangelog-default-rtdb.firebaseio.com",
+        projectId: "eclchangelog",
+        storageBucket: "eclchangelog.firebasestorage.app",
+        messagingSenderId: "1046210037396",
+        appId: "1:1046210037396:web:299af227e910b308c35681",
+        measurementId: "G-YZLMXR7F9E"
+    };
 
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-  const database = getDatabase(app);
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const database = getDatabase(app);
 
-  // Load messages from Firebase
-  function loadMessages() {
-    const messageContainer = document.getElementById('message-container');
-    const messagesRef = ref(database, 'messages');
-    onChildAdded(messagesRef, (snapshot) => {
-      const msgData = snapshot.val();
-      const msgEl = createMessageElement(msgData.username, msgData.message);
-      messageContainer.appendChild(msgEl);
-      messageContainer.scrollTop = messageContainer.scrollHeight;
-    });
-  }
-
-  // Create message element
-  function createMessageElement(username, message) {
-    const msgEl = document.createElement('div');
-    msgEl.className = 'message';
-    const userEl = document.createElement('span');
-    userEl.className = 'username';
-    userEl.textContent = username;
-    const msgText = document.createElement('span');
-    msgText.className = 'message-text';
-    msgText.innerHTML = ': ' + message;
-    msgEl.appendChild(userEl);
-    msgEl.appendChild(msgText);
-    return msgEl;
-  }
-
-  // Send message to Firebase
-  function sendMessage() {
-    const username = document.getElementById('username').value;
-    const message = document.getElementById('message').value.trim();
-    if (username && message) {
-      const messagesRef = ref(database, 'messages');
-      push(messagesRef, {
-        username: username,
-        message: message,
-        timestamp: Date.now()
-      });
-      document.getElementById('message').value = ''; // Clear message input
-    } else {
-      alert("Please enter a username and a message.");
+    // Load messages from Firebase
+    function loadMessages() {
+        const messageContainer = document.getElementById('message-container');
+        const messagesRef = ref(database, 'messages');
+        onChildAdded(messagesRef, (snapshot) => {
+            const msgData = snapshot.val();
+            const msgEl = createMessageElement(msgData.username, msgData.message);
+            messageContainer.appendChild(msgEl);
+            messageContainer.scrollTop = messageContainer.scrollHeight;
+        });
     }
-  }
 
-  // Initialize messages
-  loadMessages();
+    // Create message element
+    function createMessageElement(username, message) {
+        const msgEl = document.createElement('div');
+        msgEl.className = 'message';
+        const userEl = document.createElement('span');
+        userEl.className = 'username';
+        userEl.textContent = username;
+        const msgText = document.createElement('span');
+        msgText.className = 'message-text';
+        msgText.innerHTML = ': ' + message;
+        msgEl.appendChild(userEl);
+        msgEl.appendChild(msgText);
+        return msgEl;
+    }
+
+    // Send message to Firebase
+    function sendMessage() {
+        const username = document.getElementById('username').value;
+        const message = document.getElementById('message').value.trim();
+        if (username && message) {
+            const messagesRef = ref(database, 'messages');
+            push(messagesRef, {
+                username: username,
+                message: message,
+                timestamp: Date.now()
+            });
+            document.getElementById('message').value = ''; // Clear message input
+        } else {
+            alert("Please enter a username and a message.");
+        }
+    }
+
+    // Initialize messages
+    loadMessages();
 </script>
 
 </body>
