@@ -6,6 +6,7 @@
   <link rel="icon" href="/chat_icon.png">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
+    /* Styles remain unchanged */
     body {
       background-color: #121212;
       color: white;
@@ -178,10 +179,12 @@
       }
     }
   </style>
-  <!-- Add Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/9.18.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.18.0/firebase-database.js"></script>
+
+  <!-- Firebase SDK Setup (using compat version) -->
+  <script src="https://www.gstatic.com/firebasejs/9.18.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.18.0/firebase-database-compat.js"></script>
 </head>
+
 <body>
   <div class="top-strip">
     <div class="announcement-text" id="announcement-text">Loading announcement...</div>
@@ -214,8 +217,9 @@
       measurementId: "G-YZLMXR7F9E"
     };
 
-    const app = firebase.initializeApp(firebaseConfig);
-    const database = firebase.database(app);
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
 
     let username = localStorage.getItem('username') || '';
     if (username) {
