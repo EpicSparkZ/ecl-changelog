@@ -199,132 +199,27 @@
   <button class="back-button" onclick="window.location.href='index.html';">Back</button>
 
   <script type="module">
-    import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js';
-    import { getDatabase, ref, set, get, child } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-database.js';
-
+    // Import the functions you need from the SDKs you need
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+    import { getDatabase, ref, set, get, child } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-analytics.js";
+    
+    // Your web app's Firebase configuration
     const firebaseConfig = {
-      apiKey: "your-api-key",
-      authDomain: "your-auth-domain",
-      databaseURL: "your-database-url",
-      projectId: "your-project-id",
-      storageBucket: "your-storage-bucket",
-      messagingSenderId: "your-sender-id",
-      appId: "your-app-id"
+      apiKey: "AIzaSyDtux10LqHTpjpAyn-W9u7fTod8iRERn-c",
+      authDomain: "eclchangelog.firebaseapp.com",
+      databaseURL: "https://eclchangelog-default-rtdb.firebaseio.com",
+      projectId: "eclchangelog",
+      storageBucket: "eclchangelog.firebasestorage.app",
+      messagingSenderId: "1046210037396",
+      appId: "1:1046210037396:web:299af227e910b308c35681",
+      measurementId: "G-YZLMXR7F9E"
     };
 
+    // Initialize Firebase
     const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
     const database = getDatabase(app);
-
-    let username = localStorage.getItem('username') || '';
-    if (username) {
-      document.getElementById('username').value = username;
-      document.getElementById('username').disabled = true;
-    }
-
-    document.getElementById('username').addEventListener('change', function() {
-      if (!username) {
-        username = this.value;
-        localStorage.setItem('username', username);
-        document.getElementById('username').disabled = true;
-      }
-    });
-
-    let bannedWords = [];
-    let specialWords = [];
-    let modUsernames = [];
-
-    fetch('https://raw.githubusercontent.com/EpicSparkZ/ecl-changelog/main/data/bannedwords.html')
-      .then(res => res.text())
-      .then(data => {
-        bannedWords = data.split(',').map(w => w.trim().toLowerCase());
-      });
-
-    fetch('announcementtxtspecialwords.html')
-      .then(res => res.text())
-      .then(data => {
-        specialWords = data.split(',').map(w => w.trim());
-        return fetch('announcementtxt.html');
-      })
-      .then(res => res.text())
-      .then(announcement => {
-        document.getElementById('announcement-text').innerHTML = applyRainbowEffectToAnnouncement(announcement);
-      });
-
-    fetch('modusernames.html')
-      .then(res => res.text())
-      .then(data => {
-        modUsernames = data.split(',').map(name => name.trim().toLowerCase());
-      });
-
-    function containsBannedWords(message) {
-      return message.toLowerCase().split(/\s+/).some(w => bannedWords.includes(w));
-    }
-
-    function applyRainbowEffectToAnnouncement(text) {
-      let result = text;
-      specialWords.forEach(word => {
-        const regex = new RegExp(`(${word})`, 'gi');
-        result = result.replace(regex, '<span class="rainbow">$1</span>');
-      });
-      return result;
-    }
-
-    function saveMessage(message, username) {
-      const messages = JSON.parse(localStorage.getItem('messages') || '[]');
-      messages.push({ username, message });
-      localStorage.setItem('messages', JSON.stringify(messages));
-    }
-
-    function createMessageElement(username, message) {
-      const msgEl = document.createElement('div');
-      msgEl.className = 'message';
-
-      const userEl = document.createElement('span');
-      userEl.className = 'username';
-
-      const lowerUsername = username.toLowerCase();
-      if (lowerUsername === 'epicsparkz') {
-        userEl.classList.add('rainbow');
-      }
-
-      userEl.textContent = username;
-
-      const msgText = document.createElement('span');
-      msgText.className = 'message-text';
-      msgText.innerHTML = ': ' + message;
-
-      msgEl.appendChild(userEl);
-      msgEl.appendChild(msgText);
-      return msgEl;
-    }
-
-    function loadMessages() {
-      const messageContainer = document.getElementById('message-container');
-      messageContainer.innerHTML = '';
-      const messages = JSON.parse(localStorage.getItem('messages') || '[]');
-      messages.forEach(msg => {
-        const el = createMessageElement(msg.username, msg.message);
-        messageContainer.appendChild(el);
-      });
-      messageContainer.scrollTop = messageContainer.scrollHeight;
-    }
-
-    function sendMessage() {
-      const msgInput = document.getElementById('message');
-      const message = msgInput.value.trim();
-      if (!message) return;
-
-      if (containsBannedWords(message)) {
-        alert('Your message contains banned words.');
-        return;
-      }
-
-      saveMessage(message, username);
-      loadMessages();
-      msgInput.value = '';
-    }
-
-    loadMessages();
   </script>
 </body>
 </html>
