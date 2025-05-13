@@ -199,12 +199,10 @@
   <button class="back-button" onclick="window.location.href='index.html';">Back</button>
 
   <script type="module">
-    // Import the functions you need from the SDKs you need
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-    import { getDatabase, ref, set, get, child } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+    import { getDatabase, ref, set, onChildAdded } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
     import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-analytics.js";
-    
-    // Your web app's Firebase configuration
+
     const firebaseConfig = {
       apiKey: "AIzaSyDtux10LqHTpjpAyn-W9u7fTod8iRERn-c",
       authDomain: "eclchangelog.firebaseapp.com",
@@ -216,67 +214,75 @@
       measurementId: "G-YZLMXR7F9E"
     };
 
-    // Initialize Firebase
     const app = initializeApp(firebaseConfig);
     const analytics = getAnalytics(app);
     const database = getDatabase(app);
 
-    // Function to send a message to Firebase
+    const messageContainer = document.getElementById('message-container');
+    const usernameInput = document.getElementById('username');
+
+    if (localStorage.getItem('chatUsername')) {
+      usernameInput.value = localStorage.getItem('chatUsername');
+    }
+
     function sendMessage() {
-      const username = document.getElementById('username').value;
+      const username = usernameInput.value;
       const message = document.getElementById('message').value;
 
       if (username && message) {
+        localStorage.setItem('chatUsername', username);
+
         const messageRef = ref(database, 'messages/' + Date.now());
         set(messageRef, {
           username: username,
           message: message,
           timestamp: Date.now()
         }).then(() => {
-          // Clear the message input after sending
           document.getElementById('message').value = '';
-          loadMessages(); // Reload messages after sending a new one
         }).catch((error) => {
           console.error("Error sending message:", error);
         });
       }
     }
 
-    // Function to load the previous messages from Firebase
-    function loadMessages() {
-      const messageContainer = document.getElementById('message-container');
-      const messagesRef = ref(database, 'messages/');
-      
-      get(messagesRef).then((snapshot) => {
-        if (snapshot.exists()) {
-          messageContainer.innerHTML = ''; // Clear current messages
-          snapshot.forEach((childSnapshot) => {
-            const messageData = childSnapshot.val();
-            const messageElement = document.createElement('div');
-            messageElement.classList.add('message');
-            messageElement.innerHTML = `
-              <span class="username">${messageData.username}:</span>
-              <span class="message-text">${messageData.message}</span>
-            `;
-            messageContainer.appendChild(messageElement);
-          });
-        } else {
-          console.log("No messages found");
-        }
-      }).catch((error) => {
-        console.error("Error loading messages:", error);
-      });
+    function addMessageToDOM(data) {
+      const messageData = data.val();
+      const messageElement = document.createElement('div');
+      messageElement.classList.add('message');
+
+      let usernameClass = "username";
+      if (messageData.username === "EpicSparkZ") {
+        usernameClass += " rainbow";
+      }
+
+      messageElement.innerHTML = `
+        <span class="${usernameClass}">${messageData.username}:</span>
+        <span class="message-text">${messageData.message}</span>
+      `;
+
+      messageContainer.appendChild(messageElement);
+      messageContainer.scrollTop = messageContainer.scrollHeight;
     }
 
-    // Load messages when the page is loaded
-    window.onload = loadMessages;
+    const messagesRef = ref(database, 'messages/');
+    onChildAdded(messagesRef, addMessageToDOM);
 
-    // Allow Enter to trigger sendMessage
     document.getElementById('message').addEventListener('keydown', function(event) {
       if (event.key === 'Enter') {
         sendMessage();
       }
     });
+
+    // Load announcement
+    fetch('announcement.txt')
+      .then(response => response.text())
+      .then(data => {
+        document.getElementById('announcement-text').textContent = data;
+      })
+      .catch(error => {
+        console.error("Error loading announcement:", error);
+        document.getElementById('announcement-text').textContent = "Failed to load announcement.";
+      });
   </script>
 </body>
 </html>
