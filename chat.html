@@ -1,290 +1,97 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
   <meta charset="UTF-8">
   <title>Chat</title>
-  <link rel="icon" href="/chat_icon.png">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    body {
-      background-color: #121212;
-      color: white;
-      font-family: sans-serif;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
-    }
-
-    .top-strip {
-      position: fixed;
-      top: 0;
-      width: 100%;
-      min-height: 60px;
-      background-color: black;
-      z-index: 999;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 10px;
-      box-sizing: border-box;
-      text-align: center;
-    }
-
-    .announcement-text {
-      color: white;
-      font-size: 18px;
-      font-weight: bold;
-      max-width: 100%;
-      overflow-wrap: break-word;
-      white-space: pre-wrap;
-    }
-
-    .input-bar {
-      position: fixed;
-      bottom: 0;
-      width: 100%;
-      background-color: #222;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 10px;
-      gap: 10px;
-      box-sizing: border-box;
-      z-index: 1000;
-    }
-
-    .input-bar input {
-      background-color: #444;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      padding: 10px;
-      font-size: 14px;
-      min-width: 120px;
-      word-wrap: break-word;
-    }
-
-    .input-bar #username {
-      width: 7%;
-    }
-
-    .input-bar #message {
-      width: 83%;
-    }
-
-    .input-bar button {
-      background-color: #444;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      padding: 10px 20px;
-      cursor: pointer;
-      font-size: 14px;
-    }
-
-    .back-button {
-      position: fixed;
-      top: 10px;
-      right: 10px;
-      padding: 10px 20px;
-      background-color: #444;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      font-size: 16px;
-      z-index: 1001;
-    }
-
-    .back-button:hover {
-      background-color: #666;
-    }
-
-    .notice {
-      position: fixed;
-      bottom: 50px;
-      width: 100%;
-      text-align: center;
-      color: #ccc;
-      font-size: 14px;
-      padding: 10px;
-      box-sizing: border-box;
-      pointer-events: none;
-      z-index: 999;
-    }
-
-    #message-container {
-      flex-grow: 1;
-      margin-top: 60px;
-      margin-bottom: 80px;
-      overflow-y: auto;
-      padding: 10px;
-      box-sizing: border-box;
-    }
-
-    .message {
-      background-color: #333;
-      border-radius: 5px;
-      margin-bottom: 10px;
-      padding: 10px;
-      color: white;
-      box-sizing: border-box;
-      word-wrap: break-word;
-    }
-
-    .message .username {
-      font-weight: bold;
-      margin-right: 5px;
-    }
-
-    .message .message-text {
-      color: #ccc;
-    }
-
-    .rainbow {
-      animation: rainbow 4s linear infinite;
-    }
-
-    @keyframes rainbow {
-      0% { color: red; }
-      14% { color: orange; }
-      28% { color: yellow; }
-      42% { color: green; }
-      57% { color: blue; }
-      71% { color: indigo; }
-      85% { color: violet; }
-      100% { color: red; }
-    }
-
-    @media (max-width: 600px) {
-      .announcement-text {
-        font-size: 16px;
-      }
-
-      .input-bar input {
-        font-size: 12px;
-      }
-
-      .input-bar button {
-        font-size: 12px;
-        padding: 8px 16px;
-      }
-
-      .notice {
-        font-size: 12px;
-        padding: 8px;
-      }
-    }
-  </style>
-</head>
-<body>
-  <div class="top-strip">
-    <div class="announcement-text" id="announcement-text">Loading announcement...</div>
-  </div>
-
-  <div class="notice">
-    NOTICE: This feature is experimental and may not work at times. Do not expect this to always be here.
-  </div>
-
-  <div id="message-container"></div>
-
-  <div class="input-bar">
-    <input type="text" id="username" placeholder="Enter Username" />
-    <input type="text" id="message" placeholder="Enter your message here" />
-    <button onclick="sendMessage()">Send</button>
-  </div>
-
-  <button class="back-button" onclick="window.location.href='index.html';">Back</button>
-
-  <!-- Firebase compat libraries -->
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+</head>
+<body>
 
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyDtux10LqHTpjpAyn-W9u7fTod8iRERn-c",
-      authDomain: "eclchangelog.firebaseapp.com",
-      databaseURL: "https://eclchangelog-default-rtdb.firebaseio.com",
-      projectId: "eclchangelog",
-      storageBucket: "eclchangelog.appspot.com",
-      messagingSenderId: "1046210037396",
-      appId: "1:1046210037396:web:299af227e910b308c35681",
-      measurementId: "G-YZLMXR7F9E"
-    };
+<!-- Sign Up Form -->
+<div id="sign-up-form">
+  <h2>Sign Up</h2>
+  <input type="email" id="sign-up-email" placeholder="Email" />
+  <input type="password" id="sign-up-password" placeholder="Password" />
+  <button onclick="signUp()">Sign Up</button>
+</div>
 
-    firebase.initializeApp(firebaseConfig);
-    const database = firebase.database();
+<!-- Login Form -->
+<div id="login-form" style="display: none;">
+  <h2>Log In</h2>
+  <input type="email" id="login-email" placeholder="Email" />
+  <input type="password" id="login-password" placeholder="Password" />
+  <button onclick="logIn()">Log In</button>
+</div>
 
-    const messageContainer = document.getElementById('message-container');
-    const usernameInput = document.getElementById('username');
+<!-- Your existing chat HTML content goes below -->
+<div id="message-container" style="display:none;">
+  <!-- Messages will show here -->
+</div>
+<div id="input-bar" style="display:none;">
+  <!-- Your chat input UI -->
+</div>
 
-    // Load saved username
-    if (localStorage.getItem('chatUsername')) {
-      usernameInput.value = localStorage.getItem('chatUsername');
-    }
+<script>
+  const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_AUTH_DOMAIN",
+    databaseURL: "YOUR_DATABASE_URL",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_STORAGE_BUCKET",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
+  };
 
-    function sendMessage() {
-      const username = usernameInput.value.trim();
-      const message = document.getElementById('message').value.trim();
+  firebase.initializeApp(firebaseConfig);
 
-      if (username && message) {
-        localStorage.setItem('chatUsername', username);
-        firebase.database().ref('messages/' + Date.now()).set({
-          username: username,
-          message: message,
-          timestamp: Date.now()
-        });
-        document.getElementById('message').value = '';
-      }
-    }
+  function signUp() {
+    const email = document.getElementById('sign-up-email').value;
+    const password = document.getElementById('sign-up-password').value;
 
-    function addMessageToDOM(data) {
-      const messageData = data.val();
-      const messageElement = document.createElement('div');
-      messageElement.classList.add('message');
-
-      let usernameClass = "username";
-      if (messageData.username === "EpicSparkZ") {
-        usernameClass += " rainbow";
-      }
-
-      messageElement.innerHTML = `
-        <span class="${usernameClass}">${messageData.username}:</span>
-        <span class="message-text">${messageData.message}</span>
-      `;
-
-      messageContainer.appendChild(messageElement);
-      messageContainer.scrollTop = messageContainer.scrollHeight;
-    }
-
-    // Live updates
-    firebase.database().ref('messages').on('child_added', addMessageToDOM);
-
-    // Enter to send
-    document.getElementById('message').addEventListener('keydown', function(event) {
-      if (event.key === 'Enter') {
-        sendMessage();
-      }
-    });
-
-    // Load announcement from announcementtxt.html
-    fetch('announcementtxt.html')
-      .then(response => response.text())
-      .then(text => {
-        // Extract the content of the div or the body of the HTML file
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(text, 'text/html');
-        const announcementContent = doc.body.innerHTML.trim(); // Extract body content
-
-        // Update the announcement text in the top strip
-        document.getElementById('announcement-text').innerHTML = announcementContent;
+    firebase.auth().createUserWithEmailAndPassword(email, password)
+      .then((userCredential) => {
+        alert('Sign-up successful!');
+        document.getElementById('sign-up-form').style.display = 'none';
+        document.getElementById('login-form').style.display = 'block';
       })
-      .catch(error => {
-        console.error("Failed to load announcement:", error);
-        document.getElementById('announcement-text').textContent = "Failed to load announcement.";
+      .catch((error) => {
+        alert('Error: ' + error.message);
       });
-  </script>
+  }
+
+  function logIn() {
+    const email = document.getElementById('login-email').value;
+    const password = document.getElementById('login-password').value;
+
+    firebase.auth().signInWithEmailAndPassword(email, password)
+      .then((userCredential) => {
+        alert('Login successful!');
+        document.getElementById('login-form').style.display = 'none';
+        showChat();
+      })
+      .catch((error) => {
+        alert('Error: ' + error.message);
+      });
+  }
+
+  firebase.auth().onAuthStateChanged((user) => {
+    if (user) {
+      showChat();
+    } else {
+      document.getElementById('sign-up-form').style.display = 'block';
+      document.getElementById('login-form').style.display = 'block';
+    }
+  });
+
+  function showChat() {
+    document.getElementById('message-container').style.display = 'block';
+    document.getElementById('input-bar').style.display = 'block';
+    document.getElementById('sign-up-form').style.display = 'none';
+    document.getElementById('login-form').style.display = 'none';
+  }
+</script>
+
 </body>
 </html>
