@@ -220,6 +220,26 @@
     const app = initializeApp(firebaseConfig);
     const analytics = getAnalytics(app);
     const database = getDatabase(app);
+
+    // Function to send a message to Firebase
+    function sendMessage() {
+      const username = document.getElementById('username').value;
+      const message = document.getElementById('message').value;
+
+      if (username && message) {
+        const messageRef = ref(database, 'messages/' + Date.now());
+        set(messageRef, {
+          username: username,
+          message: message,
+          timestamp: Date.now()
+        }).then(() => {
+          // Clear the message input after sending
+          document.getElementById('message').value = '';
+        }).catch((error) => {
+          console.error("Error sending message:", error);
+        });
+      }
+    }
   </script>
 </body>
 </html>
