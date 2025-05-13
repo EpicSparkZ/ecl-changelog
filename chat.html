@@ -198,12 +198,11 @@
 
   <button class="back-button" onclick="window.location.href='index.html';">Back</button>
 
-  <!-- Firebase SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/9.17.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.17.0/firebase-database.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-database.js"></script>
 
   <script>
-    // Your Firebase config
+    // Firebase configuration
     const firebaseConfig = {
       apiKey: "AIzaSyDtux10LqHTpjpAyn-W9u7fTod8iRERn-c",
       authDomain: "eclchangelog.firebaseapp.com",
@@ -215,9 +214,8 @@
       measurementId: "G-YZLMXR7F9E"
     };
 
-    // Initialize Firebase
     const app = firebase.initializeApp(firebaseConfig);
-    const database = firebase.database(app);
+    const database = firebase.database();
 
     let username = localStorage.getItem('username') || '';
     if (username) {
@@ -252,6 +250,10 @@
       .then(res => res.text())
       .then(announcement => {
         document.getElementById('announcement-text').innerHTML = applyRainbowEffectToAnnouncement(announcement);
+      })
+      .catch(err => {
+        console.error("Error loading announcement:", err);
+        document.getElementById('announcement-text').innerHTML = "Announcement failed to load.";
       });
 
     fetch('modusernames.html')
@@ -309,35 +311,24 @@
       const messageContainer = document.getElementById('message-container');
       messageContainer.innerHTML = '';
       const messagesRef = database.ref('messages');
-      messagesRef.orderByChild('timestamp').on('child_added', snapshot => {
-        const msg = snapshot.val();
-        const el = createMessageElement(msg.username, msg.message);
-        messageContainer.appendChild(el);
+      messagesRef.orderByChild('timestamp').limitToLast(10).on('child_added', function(snapshot) {
+        const msgData = snapshot.val();
+        const msgEl = createMessageElement(msgData.username, msgData.message);
+        messageContainer.appendChild(msgEl);
+        messageContainer.scrollTop = messageContainer.scrollHeight;
       });
-      messageContainer.scrollTop = messageContainer.scrollHeight;
     }
 
     function sendMessage() {
-      const msgInput = document.getElementById('message');
-      const message = msgInput.value.trim();
-      if (!message || !username) return;
-
-      if (containsBannedWords(message)) {
-        alert("Your message contains a banned word and was not sent.");
-        return;
+      const messageInput = document.getElementById('message');
+      const message = messageInput.value.trim();
+      if (message && !containsBannedWords(message)) {
+        saveMessage(message, username);
+        messageInput.value = '';
+      } else {
+        alert('Your message contains banned words or is empty.');
       }
-
-      saveMessage(message, username);
-      const el = createMessageElement(username, message);
-      document.getElementById('message-container').appendChild(el);
-      document.getElementById('message-container').scrollTop = document.getElementById('message-container').scrollHeight;
-
-      msgInput.value = '';
     }
-
-    document.getElementById('message').addEventListener('keydown', e => {
-      if (e.key === 'Enter') sendMessage();
-    });
 
     loadMessages();
   </script>
