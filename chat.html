@@ -198,50 +198,45 @@
 
   <button class="back-button" onclick="window.location.href='index.html';">Back</button>
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-    import { getDatabase, ref, set, onChildAdded } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
-    import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-analytics.js";
+  <!-- Firebase compat libraries -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
 
+  <script>
     const firebaseConfig = {
       apiKey: "AIzaSyDtux10LqHTpjpAyn-W9u7fTod8iRERn-c",
       authDomain: "eclchangelog.firebaseapp.com",
       databaseURL: "https://eclchangelog-default-rtdb.firebaseio.com",
       projectId: "eclchangelog",
-      storageBucket: "eclchangelog.firebasestorage.app",
+      storageBucket: "eclchangelog.appspot.com",
       messagingSenderId: "1046210037396",
       appId: "1:1046210037396:web:299af227e910b308c35681",
       measurementId: "G-YZLMXR7F9E"
     };
 
-    const app = initializeApp(firebaseConfig);
-    const analytics = getAnalytics(app);
-    const database = getDatabase(app);
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
 
     const messageContainer = document.getElementById('message-container');
     const usernameInput = document.getElementById('username');
 
+    // Load saved username
     if (localStorage.getItem('chatUsername')) {
       usernameInput.value = localStorage.getItem('chatUsername');
     }
 
     function sendMessage() {
-      const username = usernameInput.value;
-      const message = document.getElementById('message').value;
+      const username = usernameInput.value.trim();
+      const message = document.getElementById('message').value.trim();
 
       if (username && message) {
         localStorage.setItem('chatUsername', username);
-
-        const messageRef = ref(database, 'messages/' + Date.now());
-        set(messageRef, {
+        firebase.database().ref('messages/' + Date.now()).set({
           username: username,
           message: message,
           timestamp: Date.now()
-        }).then(() => {
-          document.getElementById('message').value = '';
-        }).catch((error) => {
-          console.error("Error sending message:", error);
         });
+        document.getElementById('message').value = '';
       }
     }
 
@@ -264,9 +259,10 @@
       messageContainer.scrollTop = messageContainer.scrollHeight;
     }
 
-    const messagesRef = ref(database, 'messages/');
-    onChildAdded(messagesRef, addMessageToDOM);
+    // Live updates
+    firebase.database().ref('messages').on('child_added', addMessageToDOM);
 
+    // Enter to send
     document.getElementById('message').addEventListener('keydown', function(event) {
       if (event.key === 'Enter') {
         sendMessage();
@@ -276,11 +272,11 @@
     // Load announcement
     fetch('announcement.txt')
       .then(response => response.text())
-      .then(data => {
-        document.getElementById('announcement-text').textContent = data;
+      .then(text => {
+        document.getElementById('announcement-text').textContent = text;
       })
       .catch(error => {
-        console.error("Error loading announcement:", error);
+        console.error("Failed to load announcement:", error);
         document.getElementById('announcement-text').textContent = "Failed to load announcement.";
       });
   </script>
