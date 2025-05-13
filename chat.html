@@ -231,7 +231,7 @@
       })
       .then(res => res.text())
       .then(announcement => {
-        document.getElementById('announcement-text').innerHTML = applyRainbowEffect(announcement);
+        document.getElementById('announcement-text').innerHTML = applyRainbowEffectToAnnouncement(announcement);
       });
 
     fetch('modusernames.html')
@@ -244,7 +244,7 @@
       return message.toLowerCase().split(/\s+/).some(w => bannedWords.includes(w));
     }
 
-    function applyRainbowEffect(text) {
+    function applyRainbowEffectToAnnouncement(text) {
       let result = text;
       specialWords.forEach(word => {
         const regex = new RegExp(`(${word})`, 'gi');
@@ -271,15 +271,11 @@
         userEl.classList.add('rainbow');
       }
 
-      if (modUsernames.includes(lowerUsername)) {
-        userEl.textContent = '🛡️ ' + username;
-      } else {
-        userEl.textContent = username;
-      }
+      userEl.textContent = username;
 
       const msgText = document.createElement('span');
       msgText.className = 'message-text';
-      msgText.innerHTML = ': ' + applyRainbowEffect(message);
+      msgText.innerHTML = ': ' + message;
 
       msgEl.appendChild(userEl);
       msgEl.appendChild(msgText);
