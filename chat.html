@@ -130,6 +130,7 @@
 
   <button class="back-button" onclick="window.location.href='index.html';">Back</button>
 
+  <!-- Firebase scripts -->
   <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database.js"></script>
 
@@ -144,6 +145,7 @@
       appId: "your-app-id"
     };
 
+    // Initialize Firebase
     const app = firebase.initializeApp(firebaseConfig);
     const database = firebase.database(app);
 
