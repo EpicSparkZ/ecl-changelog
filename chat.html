@@ -41,19 +41,141 @@
       white-space: pre-wrap;
     }
 
-    .centered-message {
-      flex-grow: 1;
+    .input-bar {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      background-color: #222;
       display: flex;
-      justify-content: center;
+      justify-content: space-between;
       align-items: center;
-      text-align: center;
-      padding: 20px;
-      margin-top: 60px;
+      padding: 10px;
+      gap: 10px;
+      box-sizing: border-box;
+      z-index: 1000;
     }
 
-    .centered-message p {
-      font-size: 18px;
+    .input-bar input {
+      background-color: #444;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      padding: 10px;
+      font-size: 14px;
+      min-width: 120px;
+      word-wrap: break-word;
+    }
+
+    .input-bar #username {
+      width: 7%;
+    }
+
+    .input-bar #message {
+      width: 83%;
+    }
+
+    .input-bar button {
+      background-color: #444;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      padding: 10px 20px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .back-button {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      padding: 10px 20px;
+      background-color: #444;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      z-index: 1001;
+    }
+
+    .back-button:hover {
+      background-color: #666;
+    }
+
+    .notice {
+      position: fixed;
+      bottom: 50px;
+      width: 100%;
+      text-align: center;
       color: #ccc;
+      font-size: 14px;
+      padding: 10px;
+      box-sizing: border-box;
+      pointer-events: none;
+      z-index: 999;
+    }
+
+    #message-container {
+      flex-grow: 1;
+      margin-top: 60px;
+      margin-bottom: 80px;
+      overflow-y: auto;
+      padding: 10px;
+      box-sizing: border-box;
+    }
+
+    .message {
+      background-color: #333;
+      border-radius: 5px;
+      margin-bottom: 10px;
+      padding: 10px;
+      color: white;
+      box-sizing: border-box;
+      word-wrap: break-word;
+    }
+
+    .message .username {
+      font-weight: bold;
+      margin-right: 5px;
+    }
+
+    .message .message-text {
+      color: #ccc;
+    }
+
+    .rainbow {
+      animation: rainbow 4s linear infinite;
+    }
+
+    @keyframes rainbow {
+      0% { color: red; }
+      14% { color: orange; }
+      28% { color: yellow; }
+      42% { color: green; }
+      57% { color: blue; }
+      71% { color: indigo; }
+      85% { color: violet; }
+      100% { color: red; }
+    }
+
+    @media (max-width: 600px) {
+      .announcement-text {
+        font-size: 16px;
+      }
+
+      .input-bar input {
+        font-size: 12px;
+      }
+
+      .input-bar button {
+        font-size: 12px;
+        padding: 8px 16px;
+      }
+
+      .notice {
+        font-size: 12px;
+        padding: 8px;
+      }
     }
   </style>
 </head>
@@ -62,13 +184,24 @@
     <div class="announcement-text" id="announcement-text">Loading announcement...</div>
   </div>
 
-  <div class="centered-message">
-    <p>Login or Sign Up to begin chatting.<br>Email <strong>EpicSparkZ@hotmail.com</strong> or DM <strong>EpicSparkZ</strong> on Discord if you are having issues with your account.</p>
+  <div class="notice">
+    NOTICE: This feature is experimental and may not work at times. Do not expect this to always be here.
   </div>
 
+  <div id="message-container"></div>
+
+  <div class="input-bar">
+    <input type="text" id="username" placeholder="Enter Username" />
+    <input type="text" id="message" placeholder="Enter your message here" />
+    <button onclick="sendMessage()">Send</button>
+  </div>
+
+  <button class="back-button" onclick="window.location.href='index.html';">Back</button>
+
+  <!-- Firebase compat libraries -->
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
 
   <script>
     const firebaseConfig = {
@@ -83,50 +216,100 @@
     };
 
     firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+    const auth = firebase.auth();
 
-    firebase.auth().onAuthStateChanged(function(user) {
+    const messageContainer = document.getElementById('message-container');
+    const usernameInput = document.getElementById('username');
+    const email = "EpicSparkZ@hotmail.com"; // Temporary email for demo purposes
+
+    // Check if the user is logged in
+    auth.onAuthStateChanged((user) => {
       if (user) {
-        const userRef = firebase.database().ref('users/' + user.uid);
-        userRef.once('value').then(snapshot => {
-          if (!snapshot.exists() || !snapshot.val().username) {
-            let username = null;
-            while (!username || username.trim() === '') {
-              username = prompt("Choose a username to display in chat:");
-            }
-
-            firebase.database().ref('users').once('value').then(usersSnap => {
-              let taken = false;
-              usersSnap.forEach(child => {
-                if (child.val().username && child.val().username.toLowerCase() === username.toLowerCase()) {
-                  taken = true;
-                }
+        if (!user.displayName) {
+          // If the user does not have a display name (username), prompt them to set it
+          document.getElementById('announcement-text').textContent = "Please set your username to start chatting.";
+          usernameInput.style.display = "block";
+          usernameInput.placeholder = "Enter a username to set";
+          usernameInput.focus();
+          usernameInput.addEventListener('input', () => {
+            const username = usernameInput.value.trim();
+            if (username) {
+              // Set the username to the Firebase user
+              user.updateProfile({
+                displayName: username
+              }).then(() => {
+                alert('Username set successfully! You can now chat.');
+                usernameInput.style.display = "none";  // Hide the input after setting the username
+              }).catch((error) => {
+                alert(error.message);
               });
-
-              if (taken) {
-                alert("That username is already taken. Please refresh and try another.");
-                firebase.auth().signOut();
-              } else {
-                userRef.set({ username: username }).then(() => {
-                  window.location.href = "chat.html";
-                });
-              }
-            });
-          } else {
-            window.location.href = "chat.html";
-          }
-        });
+            }
+          });
+        } else {
+          // If the user already has a display name, proceed with chatting
+          document.getElementById('announcement-text').textContent = "Welcome, " + user.displayName;
+          loadMessages();
+        }
+      } else {
+        // If not logged in, show login/signup
+        document.getElementById('announcement-text').textContent = "Login or Sign Up to begin chatting.";
+        loginUser();
       }
     });
 
-    fetch('announcementtxt.html')
-      .then(response => response.text())
-      .then(text => {
-        document.getElementById('announcement-text').textContent = text;
-      })
-      .catch(error => {
-        console.error("Failed to load announcement:", error);
-        document.getElementById('announcement-text').textContent = "Failed to load announcement.";
-      });
+    // Function to login/signup with email and password
+    function loginUser() {
+      const email = prompt('Please enter your email to log in:');
+      const password = prompt('Please enter your password:');
+      
+      // If user doesn't exist, create a new account
+      auth.signInWithEmailAndPassword(email, password)
+        .catch((error) => {
+          if (error.code === 'auth/user-not-found') {
+            alert('Account not found. Please create a new one.');
+            auth.createUserWithEmailAndPassword(email, password).then(() => {
+              alert('Account created successfully! Please set your username now.');
+            });
+          } else {
+            alert(error.message);
+          }
+        });
+    }
+
+    function sendMessage() {
+      const username = usernameInput.value.trim();
+      const message = document.getElementById('message').value.trim();
+
+      if (username && message) {
+        firebase.database().ref('messages/' + Date.now()).set({
+          username: username,
+          message: message,
+          timestamp: Date.now()
+        });
+        document.getElementById('message').value = '';
+      }
+    }
+
+    // Live updates for messages
+    firebase.database().ref('messages').on('child_added', (data) => {
+      const messageData = data.val();
+      const messageElement = document.createElement('div');
+      messageElement.classList.add('message');
+      
+      let usernameClass = "username";
+      if (messageData.username === "EpicSparkZ") {
+        usernameClass += " rainbow";
+      }
+
+      messageElement.innerHTML = `
+        <span class="${usernameClass}">${messageData.username}:</span>
+        <span class="message-text">${messageData.message}</span>
+      `;
+
+      messageContainer.appendChild(messageElement);
+      messageContainer.scrollTop = messageContainer.scrollHeight;
+    });
   </script>
 </body>
 </html>
