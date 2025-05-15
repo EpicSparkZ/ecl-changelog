@@ -51,15 +51,27 @@
         .then(userCredential => {
           const user = userCredential.user;
           const uid = user.uid;
-          const username = prompt("Set your username (will be visible in chat):");
-          if (username) {
+          firebase.database().ref("usernames").once("value").then(snapshot => {
+            const existingUsernames = snapshot.val() || {};
+            const username = prompt("Set your username (will be visible in chat):");
+            if (!username) {
+              alert("Username is required. Please sign up again.");
+              firebase.auth().signOut();
+              return;
+            }
+
+            const taken = Object.values(existingUsernames).includes(username);
+            if (taken) {
+              alert("That username is already taken. Please sign up again with a different one.");
+              firebase.auth().signOut();
+              return;
+            }
+
             firebase.database().ref("usernames/" + uid).set(username).then(() => {
+              localStorage.setItem("username", username);
               document.getElementById('auth-screen').style.display = 'none';
             });
-          } else {
-            alert("Username is required. Please sign up again.");
-            firebase.auth().signOut();
-          }
+          });
         })
         .catch(error => {
           alert("Sign up failed: " + error.message);
