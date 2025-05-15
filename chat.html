@@ -68,7 +68,17 @@
 
     firebase.auth().onAuthStateChanged(user => {
       if (user) {
-        document.getElementById('auth-screen').style.display = 'none';
+        const uid = user.uid;
+        firebase.database().ref("usernames/" + uid).once("value").then(snapshot => {
+          const savedUsername = snapshot.val();
+          if (savedUsername) {
+            localStorage.setItem("username", savedUsername);
+            document.getElementById('auth-screen').style.display = 'none';
+          } else {
+            alert("Username not found. Please contact support.");
+            firebase.auth().signOut();
+          }
+        });
       }
     });
   </script>
