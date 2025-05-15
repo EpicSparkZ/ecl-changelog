@@ -66,12 +66,8 @@
       word-wrap: break-word;
     }
 
-    .input-bar #username {
-      width: 7%;
-    }
-
     .input-bar #message {
-      width: 83%;
+      width: 90%;
     }
 
     .input-bar button {
@@ -177,6 +173,28 @@
         padding: 8px;
       }
     }
+
+    #login-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: #121212;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 10000;
+    }
+
+    #login-screen input, #login-screen button {
+      margin: 10px;
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 5px;
+      border: none;
+    }
   </style>
 </head>
 <body>
@@ -191,17 +209,23 @@
   <div id="message-container"></div>
 
   <div class="input-bar">
-    <input type="text" id="username" placeholder="Enter Username" />
     <input type="text" id="message" placeholder="Enter your message here" />
     <button onclick="sendMessage()">Send</button>
   </div>
 
   <button class="back-button" onclick="window.location.href='index.html';">Back</button>
 
-  <!-- Firebase compat libraries -->
+  <div id="login-screen">
+    <h2>Login or Sign Up to begin chatting.</h2>
+    <p>Email EpicSparkZ@hotmail.com or dm EpicSparkZ on Discord if you are having issues with your account.</p>
+    <input type="email" id="login-email" placeholder="Email">
+    <input type="password" id="login-password" placeholder="Password">
+    <button onclick="handleAuth()">Login / Signup</button>
+  </div>
+
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
 
   <script>
     const firebaseConfig = {
@@ -211,104 +235,59 @@
       projectId: "eclchangelog",
       storageBucket: "eclchangelog.appspot.com",
       messagingSenderId: "1046210037396",
-      appId: "1:1046210037396:web:299af227e910b308c35681",
-      measurementId: "G-YZLMXR7F9E"
+      appId: "1:1046210037396:web:299af227e910b308c35681"
     };
 
     firebase.initializeApp(firebaseConfig);
-    const database = firebase.database();
     const auth = firebase.auth();
+    const db = firebase.database();
 
-    const messageContainer = document.getElementById('message-container');
-    const usernameInput = document.getElementById('username');
-    const email = "EpicSparkZ@hotmail.com"; // Temporary email for demo purposes
-
-    // Check if the user is logged in
-    auth.onAuthStateChanged((user) => {
+    auth.onAuthStateChanged(user => {
       if (user) {
-        if (!user.displayName) {
-          // If the user does not have a display name (username), prompt them to set it
-          document.getElementById('announcement-text').textContent = "Please set your username to start chatting.";
-          usernameInput.style.display = "block";
-          usernameInput.placeholder = "Enter a username to set";
-          usernameInput.focus();
-          usernameInput.addEventListener('input', () => {
-            const username = usernameInput.value.trim();
-            if (username) {
-              // Set the username to the Firebase user
-              user.updateProfile({
-                displayName: username
-              }).then(() => {
-                alert('Username set successfully! You can now chat.');
-                usernameInput.style.display = "none";  // Hide the input after setting the username
-              }).catch((error) => {
-                alert(error.message);
-              });
-            }
-          });
-        } else {
-          // If the user already has a display name, proceed with chatting
-          document.getElementById('announcement-text').textContent = "Welcome, " + user.displayName;
-          loadMessages();
-        }
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('announcement-text').textContent = `Welcome, ${user.displayName || 'User'}`;
       } else {
-        // If not logged in, show login/signup
-        document.getElementById('announcement-text').textContent = "Login or Sign Up to begin chatting.";
-        loginUser();
+        document.getElementById('login-screen').style.display = 'flex';
       }
     });
 
-    // Function to login/signup with email and password
-    function loginUser() {
-      const email = prompt('Please enter your email to log in:');
-      const password = prompt('Please enter your password:');
-      
-      // If user doesn't exist, create a new account
-      auth.signInWithEmailAndPassword(email, password)
-        .catch((error) => {
-          if (error.code === 'auth/user-not-found') {
-            alert('Account not found. Please create a new one.');
-            auth.createUserWithEmailAndPassword(email, password).then(() => {
-              alert('Account created successfully! Please set your username now.');
-            });
-          } else {
-            alert(error.message);
-          }
-        });
+    function handleAuth() {
+      const email = document.getElementById('login-email').value;
+      const password = document.getElementById('login-password').value;
+
+      auth.signInWithEmailAndPassword(email, password).catch(error => {
+        if (error.code === 'auth/user-not-found') {
+          auth.createUserWithEmailAndPassword(email, password).then(userCredential => {
+            let username = prompt("Set a username:");
+            return userCredential.user.updateProfile({ displayName: username });
+          });
+        } else {
+          alert(error.message);
+        }
+      });
     }
 
     function sendMessage() {
-      const username = usernameInput.value.trim();
       const message = document.getElementById('message').value.trim();
+      const user = auth.currentUser;
+      if (!user || !message) return;
 
-      if (username && message) {
-        firebase.database().ref('messages/' + Date.now()).set({
-          username: username,
-          message: message,
-          timestamp: Date.now()
-        });
-        document.getElementById('message').value = '';
-      }
+      db.ref('messages/' + Date.now()).set({
+        username: user.displayName || "Unknown",
+        message: message,
+        timestamp: Date.now()
+      });
+
+      document.getElementById('message').value = '';
     }
 
-    // Live updates for messages
-    firebase.database().ref('messages').on('child_added', (data) => {
-      const messageData = data.val();
-      const messageElement = document.createElement('div');
-      messageElement.classList.add('message');
-      
-      let usernameClass = "username";
-      if (messageData.username === "EpicSparkZ") {
-        usernameClass += " rainbow";
-      }
-
-      messageElement.innerHTML = `
-        <span class="${usernameClass}">${messageData.username}:</span>
-        <span class="message-text">${messageData.message}</span>
-      `;
-
-      messageContainer.appendChild(messageElement);
-      messageContainer.scrollTop = messageContainer.scrollHeight;
+    db.ref('messages').on('child_added', data => {
+      const { username, message } = data.val();
+      const el = document.createElement('div');
+      el.className = 'message';
+      el.innerHTML = `<span class="username ${username === 'EpicSparkZ' ? 'rainbow' : ''}">${username}:</span> <span class="message-text">${message}</span>`;
+      document.getElementById('message-container').appendChild(el);
+      document.getElementById('message-container').scrollTop = document.getElementById('message-container').scrollHeight;
     });
   </script>
 </body>
